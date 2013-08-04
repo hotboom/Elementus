@@ -7,8 +7,14 @@ Getting started
 ---------------
 
 Requirements:
+apache 2.2 or higher
 php 5.3 or higher
+
 mysql 5.5.* or higher
+phpMyAdmin 3.5 or higher
+
+
+
 
 Installation:
 1. unzip arhive to httpdocs folder of web-server
