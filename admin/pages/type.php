@@ -2,25 +2,22 @@
 <?
 $type_id=(int)$_GET['id'];
 $type=Elements::getTypeById($type_id);
+//Elements::debug();
 $types=Elements::getFullType($type_id);
 $type['fields']=array();
-foreach($types as $i=>$val){
-    $types[$i]['fields']=Elements::getTypeFields($types[$i]);
-    $type['fields']=array_merge($type['fields'],$types[$i]['fields']);
-}
+$type['fields']=Elements::getTypeFields($type);
+
 $type['class']=Elements::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 if($type['class']['name']=='Elements') $params=array('type'=>$type['name']);
 else $params=array();
+//Elements::debug();
 $elements=$type['class']['name']::get($params);
 
 ?>
-<!--<pre>-->
-<?// //print_r($type['fields']); ?>
-<?// //print_r($elements); ?>
-<!--</pre>-->
 <p>
     <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><?=t('Add')?></a>
+    <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary" data-target="#window"><?=t('Edit')?></a>
     <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary" data-target="#window"><?=t('Copy')?></a>
     <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
 </p>
@@ -72,6 +69,12 @@ $elements=$type['class']['name']::get($params);
                 $(this).addClass('success');
             }
             event.preventDefault();
+        });
+
+        $('#elements tr input[type=checkbox]').click(function(event){
+            if($(this).attr('checked')) $(this).parents('tr').removeClass('success');
+            else $(this).parents('tr').addClass('success');
+            event.stopPropagation();
         });
     });
 </script>

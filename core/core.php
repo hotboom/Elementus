@@ -22,17 +22,17 @@ class Elements{
 
     public static function getById($element_id){
         if(!$type=self::getElementType($element_id)) return false;
-        $params['filter']=array('element_id'=>$element_id);
-        $elements=self::get($type['name'],$params);
+        $params['type']=$type['name'];
+        $params['filter']=array('id'=>$element_id);
+        $elements=self::get($params);
         return $elements[0];
     }
 
     public static function get($params=array()){
-        $type_name=$params['type'];
         if(empty($params['limit'])) $params['limit']=30;
         if(empty($params['page'])) $params['page']=0;
 
-        if(!$type=self::getTypeByName($type_name)) return false;
+        if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
 
         $sql="SELECT e.*";
@@ -43,7 +43,7 @@ class Elements{
             $table.='_'.$type['name'];
             $sql.="LEFT JOIN `".$table."` AS t$i ON e.id=t$i.element_id ";
         }
-        $sql.="WHERE e.app_id='".self::$app_id."' ";
+        $sql.="WHERE e.app_id='".self::$app_id."' AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
             $sql.=self::arrayToSql($params['filter']);
@@ -61,9 +61,15 @@ class Elements{
             if(!empty($prev)&$val!='|'&$prev!='|') $sql.=' AND ';
             if(!is_array($val)){
                 if($val!='|'){
-                    if($sp=strpos($i,' ')) $sql.=$i;
-                    else $sql.=$i.'=';
-                    $sql.="'".$val."'";
+                    $cond='=';
+                    if($sp=strpos($i,' ')) {
+                        $cond=substr($i,$sp);
+                        $i=substr($i,0,$sp);
+                    }
+                    if(!$sp&$val=='NULL') $cond=' is ';
+                    if($val!='NULL') $val="'".$val."'";
+
+                    $sql.=$i.$cond.$val;
                 }
                 else $sql.=' OR ';
             }
@@ -82,7 +88,10 @@ class Elements{
         }
         else{
             $prx="INSERT ";
-            if(!empty($params['type'])) $types=self::getFullType($params['type']);
+            if(!empty($params['type'])){
+                $type=self::getType($params['type']);
+                $types=self::getFullType($type['id']);
+            }
             else{
                 self::$error['code']=2;
                 self::$error['desc']='Missing element type id';
@@ -150,6 +159,12 @@ class Elements{
         }
     }
 
+    public static function getType($type_name_or_id){
+        if(is_numeric($type_name_or_id)) $type=self::getTypeById($type_name_or_id);
+        else $type=self::getTypeByName($type_name_or_id);
+        return $type;
+    }
+
     public static function getTypes($filter=array()){
         $sql="SELECT * FROM `element_types` ";
 
@@ -208,9 +223,9 @@ class Elements{
 
     public static function getFullType($type_id){
         $types=array();
-        $type=self::getTypeById($type_id);
+        $type=self::getType($type_id);
         $types[]=$type;
-        while($type['parent']!=0){
+        while(!empty($type['parent'])){
             $type=self::getTypeById($type['parent']);
             $types[]=$type;
         }
@@ -218,26 +233,34 @@ class Elements{
     }
 
     public static function getTypeFields($type){
-        $fields=self::$db->q('SHOW FULL COLUMNS FROM `elements_type_'.$type['name'].'`',self::$debug);
-        foreach($fields as $i=>$field){
-            if($field['Key']=='MUL') {
-                $sql="
-                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
-                FROM information_schema.TABLE_CONSTRAINTS i
-                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
-                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
-                AND k.COLUMN_NAME = '".$field['Field']."'
-                AND i.TABLE_SCHEMA = DATABASE()
-                AND i.TABLE_NAME = 'elements_type_".$type['name']."'";
-                $inf=self::$db->q($sql,self::$debug);
-                if(!empty($inf)) $fields[$i]['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
+        $types=self::getFullType($type['id']);
+        $allFields=array();
+        $table='elements_type';
+        foreach($types as $j=>$type){
+            $table=$table.'_'.$type['name'];
+            $fields=self::$db->q('SHOW FULL COLUMNS FROM `'.$table.'`',self::$debug);
+            foreach($fields as $i=>$field){
+                if($field['Key']=='MUL') {
+                    $sql="
+                    SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
+                    FROM information_schema.TABLE_CONSTRAINTS i
+                    LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                    WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                    AND k.COLUMN_NAME = '".$field['Field']."'
+                    AND i.TABLE_SCHEMA = DATABASE()
+                    AND i.TABLE_NAME = 'elements_type_".$type['name']."'";
+                    $inf=self::$db->q($sql,self::$debug);
+                    if(!empty($inf)) $fields[$i]['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
 
-                /*echo "<pre>";
-                print_r($inf);
-                echo "</pre>"; */
+                    /*echo "<pre>";
+                    print_r($inf);
+                    echo "</pre>"; */
+                }
+                if($j!=0&$field['Field']=='element_id') unset($fields[$i]);
             }
+            $allFields=array_merge($allFields,$fields);
         }
-        return $fields;
+        return $allFields;
     }
 
     public static function translate($text,$ucfirst=false,$lang='en'){

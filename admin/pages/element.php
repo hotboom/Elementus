@@ -6,23 +6,32 @@ header("Pragma: no-cache"); //HTTP 1.0
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
 $type_id=(int)$_GET['type'];
-$type=Elements::getTypeById($type_id);
+//Elements::debug();
+$type=Elements::getType($type_id);
 $types=Elements::getFullType($type_id);
 $type['fields']=array();
-//Elements::debug();
+
 foreach($types as $i=>$val){
     $types[$i]['fields']=Elements::getTypeFields($types[$i]);
     $type['fields']=array_merge($type['fields'],$types[$i]['fields']);
 }
 $type['class']=Elements::getTypeClass($type['name']);
-
 if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes/".$type['name'].".php");
 
 $act=htmlspecialchars($_GET['act']);
+$element=array();
+if($act=='edit'|$act=='copy') {
+    $element_id=(int)$_GET['elements'][0];
+    //Elements::debug();
+    $element=Elements::getById($element_id);
+    //print_r($element);
+}
 ?>
 
 <? if(!empty($_POST['submit'])):
+    //echo '<pre>'.print_r($_POST['fields']).'</pre>';
     //Elements::debug();
+
     if($act=='delete') $type['class']['name']::delete($_POST['elements']);
     else $type['class']['name']::set($_POST['fields']);
     if($act=='add') $done='added';
@@ -30,7 +39,6 @@ $act=htmlspecialchars($_GET['act']);
     if($act=='edit') $done='edited';
 ?>
 <span class="glyphicon glyphicon-ok"></span> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
-<pre><? print_r($_POST); ?></pre>
 <script>
     $(function() {
         $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
@@ -48,7 +56,6 @@ $act=htmlspecialchars($_GET['act']);
     <? if($act=='delete'):?>
         <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
             <p><?=t('delete selected elements')?>?</p>
-            <? print_r($_GET); ?>
             <? if(is_array($_GET['elements'])):?>
             <? foreach($_GET['elements'] as $i=>$val):?>
             <input type="text" name="elements[]" value="<?=$val?>">
@@ -63,21 +70,21 @@ $act=htmlspecialchars($_GET['act']);
         <fieldset>
                 <? foreach($type['fields'] as $i=>$field):?>
                 <? if($field['Field']=='element_id'):?>
-                    <input name="fields[<?=$field['Field']?>]" type="hidden" value="">
+                    <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element[$field['Field']]:'')?>">
                 <? elseif(!empty($field['FK'])): ?>
                     <?
                     $fk_type=Elements::getTypeByName($field['FK']);
                     $fk_type['class']=Elements::getTypeClass($fk_type['name']);
 
                     if($fk_type['class']['name']::$foreign_select=='select'):
-                    $fk_elements=$fk_type['class']['name']::get();
+                    $fk_elements=Elements::get(array('type'=>$fk_type['id']));
                     ?>
                     <div class="form-group">
                         <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
                         <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
                             <option value="NULL"><?=t('Root')?></option>
                             <? foreach($fk_elements as $fk_element):?>
-                            <option value="<?=$fk_element['id']?>"><?=$fk_element['name']?></option>
+                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
                             <? endforeach;?>
                         </select>
                     </div>
@@ -85,17 +92,18 @@ $act=htmlspecialchars($_GET['act']);
                 <? elseif($field['Type']=='text'): ?>
                     <div class="form-group">
                         <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                        <textarea name="fields[<?=$field['Field']?>]" class="form-control" rows="3"></textarea>
+                        <textarea name="fields[<?=$field['Field']?>]" class="form-control" rows="3"><?=$element[$field['Field']]?></textarea>
                     </div>
                 <? else:?>
                     <div class="form-group">
                         <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                        <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" placeholder="<?=t($field['Field'])?>">
+                        <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
                     </div>
                 <? endif;?>
                 <? endforeach;?>
                 <button type="submit" class="btn btn-success"><?=t($act)?></button>
                 <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
                 <input type="hidden" name="submit" value="submit">
         </fieldset>
     </form>

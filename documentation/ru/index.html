@@ -58,15 +58,10 @@
                     <div class="descr">Базовый класс. Все остальные классы являются расширениями данного класса.</div>
                     <strong>Методы:</strong>
                     <ul class="methods">
-                        <li><h2><a name="/elements/get">get(type_name[,params])</a></h2>
+                        <li><h2><a name="/elements/get">get(params)</a></h2>
                             <div class="return"><span>Возвращает:</span> массив элементов</div>
                             <div class="desc">Выбор элементов указанного типа на основе параметров</div>
                             <ul class="params">
-                                <li>
-                                    <h3>type_name</h3>
-                                    <div class="type"><span>Тип:</span> строка</div>
-                                    <div class="desc">Имя типа элементов</div>
-                                </li>
                                 <li>
                                     <h3>params</h3>
                                     <div class="type"><span>Тип:</span> массив</div>
@@ -74,21 +69,23 @@
                                         Параметры выборки элементов:
                                         <ul>
                                             <li>
+                                                <h5>type</h5>
+                                                <div class="type"><span>Тип:</span> массив</div>
+                                                <div class="default">Обязательный</div>
+                                                <div class="desc">Имя типа элементов</div>
+                                            </li>
+                                            <li>
                                                 <h5>filter</h5>
                                                 <div class="type"><span>Тип:</span> массив</div>
                                                 <div class="default"><span>По-умолчанию:</span> пустой массив</div>
                                                 <div class="desc"><a href="#/elements/filter">Массив параметров фильтрации элементов</a></div>
                                             </li>
-                                        </ul>
-                                        <ul>
                                             <li>
                                                 <h5>limit</h5>
                                                 <div class="type"><span>Тип:</span> число</div>
                                                 <div class="default"><span>По-умолчанию:</span> 100</div>
                                                 <div class="desc">Лимит кол-ва возвращаемых элементов</div>
                                             </li>
-                                        </ul>
-                                        <ul>
                                             <li>
                                                 <h5>page</h5>
                                                 <div class="type"><span>Тип:</span> число</div>
