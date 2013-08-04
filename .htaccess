@@ -1,0 +1,9 @@
+AddDefaultCharset UTF-8
+
+RewriteEngine On
+RewriteCond %{HTTP_HOST}  ^www\.(.+)$  [NC]
+RewriteRule ^(.*)         http://%1$1 [L,R=301]
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule robots.txt robots.php [L]
