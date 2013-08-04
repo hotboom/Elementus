@@ -22,7 +22,7 @@ $elements=$type['class']['name']::get($params);
 <p>
     <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><?=t('Add')?></a>
     <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary" data-target="#window"><?=t('Copy')?></a>
-    <a href="page/element/act/delete/type/<?=$type['id']?>" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
+    <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
 </p>
 <table id="elements" class="table table-hover table-condensed">
     <tr>
@@ -50,11 +50,11 @@ $elements=$type['class']['name']::get($params);
     $(function() {
         $('a[data-target]').click(function(event) {
             target=$(this).attr('data-target');
-            url=$(this).attr('href')+'?';
+            url=$(this).attr('href');
             $('#elements input:checked').each(function(){
-                url=url+$(this).attr('name')+'='+$(this).val()+'&';
+                url=url+'&'+$(this).attr('name')+'='+$(this).val();
             });
-
+            //alert(url);
             $.get(url, function(data) {
                 $(target+' .modal-body').html(data);
             });
@@ -62,12 +62,6 @@ $elements=$type['class']['name']::get($params);
             event.preventDefault();
         });
 
-//        $('#elements input[type=checkbox]').click(function(event){
-//            if($(this).attr('checked')) $(this).parents('tr').removeClass('success');
-//            else $(this).parents('tr').addClass('success');
-//            event.stopPropagation();
-//            //event.preventDefault();
-//        });
         $('#elements tr').click(function(event){
             if($(this).find('input[type=checkbox]').attr('checked')) {
                 $(this).find('input[type=checkbox]').attr('checked',false);

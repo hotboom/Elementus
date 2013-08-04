@@ -121,6 +121,23 @@ class Elements{
         else return true;
     }
 
+    public static function delete($element_id){
+        $log=false;
+        if(is_array($element_id)){
+            $log=array();
+            foreach ($element_id as $id){
+                $log=self::delete($id);
+            }
+        }
+        else{
+            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app_id."'",self::$debug)) {
+            $log=$element_id;
+            }
+            else $log=false;
+        }
+        return $log;
+    }
+
     public static function getTypeById($type_id){
         $filter=array('id'=>$type_id);
         $types=self::getTypes($filter);
