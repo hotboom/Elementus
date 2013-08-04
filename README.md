@@ -1,7 +1,7 @@
 All is Element
 ==============
 
-*Elemental - is powerful, flexible and simple PHP/mySQL framework for any web applications*
+* Elemental - is powerful, flexible and simple PHP/mySQL framework for any web applications *
 
 Getting started
 ---------------
