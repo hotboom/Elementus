@@ -1,7 +1,7 @@
 All is Element
 ==============
 
-*Elemental - is powerful, flexible and simple web application framework based on php  mysql core with easy and well documentated API*
+*Elemental - is powerful, flexible and simple PHP/mySQL framework for any web applications*
 
 Getting started
 ---------------
