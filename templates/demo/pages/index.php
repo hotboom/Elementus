@@ -1,57 +1,38 @@
-<div class="container">
-    <div class="row">
-        <div class="col-lg-4">
-            <?
-            /* function tree($parent_id=0,$class='sections'){
-                $sections=Sections::getList($parent_id);
-                if(empty($sections)) return false;
 
-                if($parent_id==0) echo '<ul class="'.$class.'">';
-                else echo '<ul>';
-                foreach($sections as $section){
-                    echo '<li><a href="#/section/'.$section['id'].'">'.$section['name'].'</a>';
-                    tree($section['id']);
-                    echo '</li>';
-                }
-                echo '</ul>';
-                return true;
-            }
-            tree(0);
-            */
-            ?>
-        </div>
-        <div class="col-lg-8">
-            <h1>Dashboard</h1>
-            <?
-            /* function treeTypes($parent_id=0,$class='types'){
-                $types=Elements::getTypes(array('parent'=>$parent_id));
-                if(empty($types)) return false;
 
-                if($parent_id==0) echo '<ul class="'.$class.'">';
-                else echo '<ul>';
-                foreach($types as $type){
-                    echo '<li><a href="#/type/'.$type['id'].'">'.$type['name'].'</a>';
-                    treeTypes($type['id']);
-                    echo '</li>';
-                }
-                echo '</ul>';
-                return true;
-            }
-            treeTypes(0); */
-
-            //ok let's get some fun
-            Elements::debug();
-
-            $elements=Elements::get('bikes',array(
-                'limit'=>30,
-                'filter'=>array(
-                    'frame_size'=>'18',
-                    array('store_moskow >'=>1,'|','store_perm >'=>1),
-                    'brand !='=>'GT'
-                )
-            ));
-            print_r($elements);
-            ?>
-        </div>
+    <!-- Main jumbotron for a primary marketing message or call to action -->
+    <div class="jumbotron">
+        <? $lead=Elements::getById(17); ?>
+        <h1><?=$lead['header']?></h1>
+        <p><?=$lead['content']?></p>
+        <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>
     </div>
-</div><!-- /.container -->
+
+    <div class="body-content">
+
+        <!-- Example row of columns -->
+        <div class="row">
+            <div class="col-lg-4">
+                <h2>Heading</h2>
+                <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
+            </div>
+            <div class="col-lg-4">
+                <h2>Heading</h2>
+                <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
+            </div>
+            <div class="col-lg-4">
+                <h2>Heading</h2>
+                <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+                <p><a class="btn btn-default" href="#">View details &raquo;</a></p>
+            </div>
+        </div>
+
+        <hr>
+
+        <footer>
+            <p>&copy; Company 2013</p>
+        </footer>
+    </div>
+

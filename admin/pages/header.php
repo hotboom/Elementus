@@ -23,6 +23,9 @@
         $.address.init(function(event) {
 
         }).change(function(event) {
+            $('a').each(function() {
+                $(this).toggleClass('selected', $(this).attr('href') == '#'+event.value);
+            });
             if(event.value=='/') var url='page/dashboard';
             else var url='/admin'+event.value;
             $.deepLink(url);

@@ -16,6 +16,7 @@ class Sections extends Elements{
     }
 
     public static function getList($parent_id='NULL'){
+        if(empty($parent_id)) $parent_id='NULL';
         $params['filter']=array('parent_id'=>$parent_id);
         return self::get($params);
     }

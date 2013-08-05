@@ -1,3 +1,7 @@
 table.table-hover{
     cursor: pointer;
 }
+a.selected{
+    text-decoration: none;
+    color: #5e5e5e;
+}
