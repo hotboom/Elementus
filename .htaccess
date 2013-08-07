@@ -7,3 +7,6 @@ RewriteRule ^(.*)         http://%1$1 [L,R=301]
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule robots.txt robots.php [L]
+
+Options -Indexes
+ErrorDocument 404 /router.php

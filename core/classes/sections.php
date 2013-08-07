@@ -12,7 +12,13 @@ class Sections extends Elements{
 
     public static function getById($section_id){
         $params['filter']=array('element_id'=>$section_id);
-        return self::get($params);
+        $sections=self::get($params);
+        return $sections[0];
+    }
+    public static function getByPath($section_path){
+        $params['filter']=array('path'=>$section_path);
+        $sections=self::get($params);
+        return $sections[0];
     }
 
     public static function getList($parent_id='NULL'){

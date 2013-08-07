@@ -9,7 +9,6 @@
     </div>
 
     <div class="body-content">
-
         <!-- Example row of columns -->
         <div class="row">
             <div class="col-lg-4">

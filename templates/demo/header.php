@@ -6,13 +6,13 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Jumbotron Template for Bootstrap</title>
+    <title>Elementus framework</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="static/css/bootstrap.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="static/css/jumbotron.css" rel="stylesheet">
+    <link href="/static/css/jumbotron.css" rel="stylesheet">
 </head>
 
 <body>
@@ -24,7 +24,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">Elemental</a>
+        <a class="navbar-brand" href="/">Elemental</a>
         <div class="nav-collapse collapse">
             <?
             function tree($parent_id=0){
@@ -34,7 +34,8 @@
                 if($parent_id==0) echo '<ul class="nav navbar-nav">';
                 else echo '<ul>';
                 foreach($sections as $section){
-                    echo '<li><a href="#/section/'.$section['id'].'">'.$section['name'].'</a>';
+                    if(empty($section['link'])) $section['link']='/'.$section['path'].'/';
+                    echo '<li><a href="'.$section['link'].'">'.$section['name'].'</a>';
                     tree($section['id']);
                     echo '</li>';
                 }
@@ -47,7 +48,7 @@
             <form class="navbar-form form-inline pull-right">
                 <input type="text" placeholder="Email">
                 <input type="password" placeholder="Password">
-                <button type="submit" class="btn">Sign in</button>
+                <button type="submit" class="btn btn-primary">Войти</button>
             </form>
         </div><!--/.nav-collapse -->
     </div>
