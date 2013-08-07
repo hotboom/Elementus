@@ -23,7 +23,7 @@ class Elements{
     public static function getById($element_id){
         if(!$type=self::getElementType($element_id)) return false;
         $params['type']=$type['name'];
-        $params['filter']=array('id'=>$element_id);
+        $params['filter']='id='.$element_id;
         $elements=self::get($params);
         return $elements[0];
     }
@@ -46,7 +46,7 @@ class Elements{
         $sql.="WHERE e.app_id='".self::$app_id."' AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
-            $sql.=self::arrayToSql($params['filter']);
+            $sql.=self::filterToSql($params['filter']);
             $sql.=") ";
         }
         $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
@@ -54,29 +54,8 @@ class Elements{
         return $elements;
     }
 
-    private static function arrayToSql($array){
-        $sql="";
-        $prev=false;
-        foreach($array as $i=>$val){
-            if(!empty($prev)&$val!='|'&$prev!='|') $sql.=' AND ';
-            if(!is_array($val)){
-                if($val!='|'){
-                    $cond='=';
-                    if($sp=strpos($i,' ')) {
-                        $cond=substr($i,$sp);
-                        $i=substr($i,0,$sp);
-                    }
-                    if(!$sp&$val=='NULL') $cond=' is ';
-                    if($val!='NULL') $val="'".$val."'";
-
-                    $sql.=$i.$cond.$val;
-                }
-                else $sql.=' OR ';
-            }
-            else $sql.='('.self::arrayToSql($val).')';
-            $prev=$val;
-        }
-        return $sql;
+    private static function filterToSql($filter){
+        return $filter;
     }
 
     public static function set($params=array()){

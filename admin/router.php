@@ -8,6 +8,6 @@ foreach($url as $i=>$val){
     else $_GET['id']=$val;
     $prev=$url[$i+1];
 }
-header("HTTP/1.0 200 OK");
-require_once('pages/'.$_GET['page'].'.php');
+
+require_once("index.php");
 ?>

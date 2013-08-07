@@ -60,20 +60,15 @@ $elements=$type['class']['name']::get($params);
         });
 
         $('#elements tr').click(function(event){
-            if($(this).find('input[type=checkbox]').attr('checked')) {
-                $(this).find('input[type=checkbox]').attr('checked',false);
-                $(this).removeClass('success');
-            }
-            else{
-                $(this).find('input[type=checkbox]').attr('checked',true);
-                $(this).addClass('success');
-            }
+            var checkbox=$(this).find('input[type=checkbox]');
+            checkbox.click();
             event.preventDefault();
         });
 
         $('#elements tr input[type=checkbox]').click(function(event){
-            if($(this).attr('checked')) $(this).parents('tr').removeClass('success');
-            else $(this).parents('tr').addClass('success');
+            var tr=$(this).parents('tr');
+            if(tr.hasClass('success')) tr.removeClass('success');
+            else tr.addClass('success');
             event.stopPropagation();
         });
     });

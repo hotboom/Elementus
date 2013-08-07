@@ -8,7 +8,10 @@
     </div>
     <div class="col-lg-10">
         <h1><?=$data['section']['name']?></h1>
-        <? if($content=Elements::get(array('filter'=>array('type'=>'content','section_id'=>$data['section']['id'])))): ?>
+        <? if($content=Elements::get(array(
+            'type'=>'content',
+            'filter'=>'section_id='.$data['section']['id']
+        ))): ?>
         <? foreach($content as $text):?>
             <h2><?=$text['header']?></h2>
             <?=$text['content']?>

@@ -1,5 +1,6 @@
 <? require_once("core/init.php"); ?>
 <?
+
 if(empty($_GET['section'])) $_GET['section']='main';
 if($data['section']=Sections::getByPath($_GET['section'])) header("HTTP/1.0 200 OK");
 ?>
