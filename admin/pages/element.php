@@ -1,4 +1,3 @@
-<? require_once("../core/init.php"); ?>
 <?
 //set headers to NOT cache a page
 header("Cache-Control: no-cache, must-revalidate"); //HTTP 1.1
@@ -34,18 +33,20 @@ if($act=='edit'|$act=='copy') {
 
     if($act=='delete') $type['class']['name']::delete($_POST['elements']);
     else $type['class']['name']::set($_POST['fields']);
+
     if($act=='add') $done='added';
     if($act=='delete') $done='deleted';
     if($act=='edit') $done='edited';
-?>
-<span class="glyphicon glyphicon-ok"></span> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
-<script>
-    $(function() {
-        $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
-        $('.modal-footer').show();
-        $.deepLink('/admin/page/type/<?=$type['id']?>');
-    });
-</script>
+    ?>
+    <span class="glyphicon glyphicon-ok"></span> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
+    <script>
+        $(function() {
+            $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
+            $('.modal-footer').show();
+            console.log($.deepLink);
+            $.deepLink('/admin/page/type/<?=$type['id']?>');
+        });
+    </script>
 <? else:?>
     <script>
         $(function() {
@@ -58,7 +59,7 @@ if($act=='edit'|$act=='copy') {
             <p><?=t('delete selected elements')?>?</p>
             <? if(is_array($_GET['elements'])):?>
             <? foreach($_GET['elements'] as $i=>$val):?>
-            <input type="text" name="elements[]" value="<?=$val?>">
+            <input type="hidden" name="elements[]" value="<?=$val?>">
             <? endforeach;?>
             <?endif?>
             <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
@@ -77,18 +78,26 @@ if($act=='edit'|$act=='copy') {
                     $fk_type['class']=Elements::getTypeClass($fk_type['name']);
 
                     if($fk_type['class']['name']::$foreign_select=='select'):
-                    $fk_elements=Elements::get(array('type'=>$fk_type['id']));
-                    ?>
+                        $fk_elements=Elements::get(array('type'=>$fk_type['id']));
+                        ?>
+                        <div class="form-group">
+                            <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
+                            <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
+                                <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                                <? foreach($fk_elements as $fk_element):?>
+                                <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
+                                <? endforeach;?>
+                            </select>
+                        </div>
+                    <? endif; ?>
+                <? elseif($field['Field']=='password'): ?>
                     <div class="form-group">
-                        <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                        <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
-                            <option value="NULL"><?=t('Root')?></option>
-                            <? foreach($fk_elements as $fk_element):?>
-                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
-                            <? endforeach;?>
-                        </select>
+                        <label for="input<?=$field['Field']?>"><?=t($field['Field'])?> <?=t('hash')?></label>
+                        <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
+                        <label for="inputnew<?=$field['Field']?>"><?=t('New')?> <?=t($field['Field'])?></label>
+                        <input name="fields[new_<?=$field['Field']?>]" type="text" class="form-control" id="inputnew<?=$field['Field']?>" value="">
+                        <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
                     </div>
-                    <? endif;?>
                 <? elseif($field['Type']=='text'): ?>
                     <div class="form-group">
                         <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>

@@ -1,4 +1,3 @@
-<? require_once("../core/init.php"); ?>
 <?
 $type_id=(int)$_GET['id'];
 $type=Elements::getTypeById($type_id);
@@ -9,8 +8,8 @@ $type['fields']=Elements::getTypeFields($type);
 
 $type['class']=Elements::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
-if($type['class']['name']=='Elements') $params=array('type'=>$type['name']);
-else $params=array();
+$params=array('type'=>$type['name']);
+
 //Elements::debug();
 $elements=$type['class']['name']::get($params);
 

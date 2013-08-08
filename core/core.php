@@ -38,7 +38,7 @@ class Elements{
         $sql="SELECT e.*";
         foreach($types as $i=>$type) $sql.=", t$i.* ";
         $sql.="FROM `elements` AS e ";
-        $table="elements_type";
+        $table="et";
         foreach($types as $i=>$type) {
             $table.='_'.$type['name'];
             $sql.="LEFT JOIN `".$table."` AS t$i ON e.id=t$i.element_id ";
@@ -93,7 +93,7 @@ class Elements{
         }
 
         foreach($types as $type){
-            $sql=$prx."`elements_type_".$type['name']."` SET ";
+            $sql=$prx."`et_".$type['name']."` SET ";
             $i=0;
             foreach($type['fields'] as $field){
                 if($i!=0) $sql.=", ";
@@ -145,7 +145,7 @@ class Elements{
     }
 
     public static function getTypes($filter=array()){
-        $sql="SELECT * FROM `element_types` ";
+        $sql="SELECT * FROM `types` ";
 
         if(!empty($filter)){
             $sql.="WHERE ";
@@ -214,7 +214,7 @@ class Elements{
     public static function getTypeFields($type){
         $types=self::getFullType($type['id']);
         $allFields=array();
-        $table='elements_type';
+        $table='et';
         foreach($types as $j=>$type){
             $table=$table.'_'.$type['name'];
             $fields=self::$db->q('SHOW FULL COLUMNS FROM `'.$table.'`',self::$debug);
@@ -227,7 +227,7 @@ class Elements{
                     WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
                     AND k.COLUMN_NAME = '".$field['Field']."'
                     AND i.TABLE_SCHEMA = DATABASE()
-                    AND i.TABLE_NAME = 'elements_type_".$type['name']."'";
+                    AND i.TABLE_NAME = '".$table."'";
                     $inf=self::$db->q($sql,self::$debug);
                     if(!empty($inf)) $fields[$i]['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
 

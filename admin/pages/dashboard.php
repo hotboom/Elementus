@@ -1,4 +1,3 @@
-<? require_once("../core/init.php"); ?>
 <h3><?=t('Types')?></h3>
 <?
 function treeTypes($parent_id=0,$class='types'){
