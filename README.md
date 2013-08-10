@@ -25,3 +25,7 @@ Installation:
 
 3. set your database name, user and password in config.php
 
+To open admin panel use yourdomain.com/admin
+email: demo@demo.dem
+password: demo
+
