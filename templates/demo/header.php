@@ -13,6 +13,14 @@
 
     <!-- Custom styles for this template -->
     <link href="/static/css/jumbotron.css" rel="stylesheet">
+
+    <!-- JavaScript plugins (requires jQuery) -->
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/static/js/bootstrap.min.js"></script>
+
+    <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+    <!-- <script src="js/respond.js"></script> -->
 </head>
 
 <body>
@@ -44,12 +52,23 @@
             }
             tree(0);
             ?>
-
-            <form class="navbar-form form-inline pull-right">
-                <input type="text" placeholder="Email">
-                <input type="password" placeholder="Password">
+            <? if(Users::$user):?>
+            <ul class="nav navbar-nav pull-right">
+                <li class="dropdown">
+                    <a data-toggle="dropdown" href="#"><?=Users::$user['email']?> <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li><a href="#">Profile</a></li>
+                        <li><a href="/main/act/logout"><?=t('Exit')?></a></li>
+                    </ul>
+                </li>
+            </ul>
+            <? else:?>
+            <form class="navbar-form form-inline pull-right" method="POST" data-async data-target="#window .modal-body" action="index.php?act=login">
+                <input type="text" name="email" placeholder="Email">
+                <input type="password" name="password" placeholder="Password">
                 <button type="submit" class="btn btn-primary">Войти</button>
             </form>
+            <? endif;?>
         </div><!--/.nav-collapse -->
     </div>
 </div>

@@ -19,6 +19,10 @@ Template::init(1);
 //Sections
 require_once($root_path."/core/classes/sections.php");
 
+//Users
+require_once($root_path."/core/classes/users.php");
+Users::init();
+
 /* Shortcut functions */
 //Translate
 function t($text,$lang='en'){

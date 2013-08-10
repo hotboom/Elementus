@@ -1,4 +1,3 @@
-<? require_once("../core/init.php"); ?>
 <? require_once("pages/header.php"); ?>
     <div class="container">
         <div class="row">

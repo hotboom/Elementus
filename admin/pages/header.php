@@ -40,7 +40,6 @@
 
 
     </script>
-
 </head>
 <body>
 <div class="navbar">
@@ -58,5 +57,8 @@
                 <li><a href="#/files">Files</a></li>
             </ul>
         </div><!--/.nav-collapse -->
+        <form class="navbar-form form-inline pull-right">
+            <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><?=t('Exit')?></a>
+        </form>
     </div>
 </div>
