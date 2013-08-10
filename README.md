@@ -21,7 +21,7 @@ Installation:
 
 1. unzip arhive to httpdocs folder of web-server
 
-2. import  mysql dump elemental.sql to your mySQL database and delete elemental.sql
+2. import  mysql dump dbdump.sql to your mySQL database and delete elemental.sql
 
 3. set your database name, user and password in config.php
 
