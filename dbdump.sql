@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 08, 2013 at 11:51 PM
+-- Generation Time: Aug 11, 2013 at 12:06 AM
 -- Server version: 5.5.25
 -- PHP Version: 5.3.13
 
@@ -51,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `elements` (
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=29 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
 
 --
 -- Dumping data for table `elements`
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS `et_users` (
 --
 
 INSERT INTO `et_users` (`element_id`, `name`, `surname`, `email`, `password`, `group_id`, `regdate`) VALUES
-(22, 'admin', '', 'huntedbox@gmail.com', '18a417d7dfc98288', 18, '2013-08-08 13:31:22'),
+(22, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22'),
 (23, 'user', '', '', '', 18, '0000-00-00 00:00:00'),
 (24, 'test1', '', '', '', 18, '0000-00-00 00:00:00'),
 (25, 'test2', '', '', '', 18, '0000-00-00 00:00:00'),
