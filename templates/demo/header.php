@@ -59,6 +59,7 @@
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                         <li><a href="#">Profile</a></li>
                         <li><a href="/main/act/logout"><?=t('Exit')?></a></li>
+                        <? if(Users::$user['group_id']=='19'):?><li><a href="/admin"><?=t('Admin panel')?></a></li><? endif;?>
                     </ul>
                 </li>
             </ul>

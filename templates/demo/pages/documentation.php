@@ -34,9 +34,9 @@
                                     <ul>
                                         <li>
                                             <h5>type</h5>
-                                            <div class="type"><span>Тип:</span> массив</div>
+                                            <div class="type"><span>Тип:</span> строка или целое число</div>
                                             <div class="default">Обязательный</div>
-                                            <div class="desc">Имя типа элементов</div>
+                                            <div class="desc">ID или имя типа элементов</div>
                                         </li>
                                         <li>
                                             <h5>filter</h5>
@@ -47,7 +47,7 @@
                                         <li>
                                             <h5>limit</h5>
                                             <div class="type"><span>Тип:</span> число</div>
-                                            <div class="default"><span>По-умолчанию:</span> 100</div>
+                                            <div class="default"><span>По-умолчанию:</span> 0</div>
                                             <div class="desc">Лимит кол-ва возвращаемых элементов</div>
                                         </li>
                                         <li>
@@ -85,6 +85,23 @@ $elements=Elements::get('posts',array(
                                 </pre>
                         </div>
                     </li>
+                    <li><h2><a name="/elements/set">getById(element_id)</a></h2>
+                        <div class="return"><span>Возвращает:</span> элемент</div>
+                        <div class="desc">Возвращает элемент по его идентификатору</div>
+                        <ul class="params">
+                            <li>
+                                <h3>element_id</h3>
+                                <div class="type"><span>Тип:</span> целое</div>
+                                <div class="desc">ID элемента</div>
+                            </li>
+                        </ul>
+                        <div class="examples">
+                            <h3>Примеры</h3>
+                                <pre>
+$lilu=Elements::getById(5);
+                                </pre>
+                        </div>
+                    </li>
                     <li><h2><a name="/elements/set">set(params)</a></h2>
                         <div class="return"><span>Возвращает:</span> истина или id добавленного элемента</div>
                         <div class="desc">Редактирование/добавление элемента</div>
@@ -118,6 +135,91 @@ $elements=Elements::get('posts',array(
                             </li>
                         </ul>
                     </li>
+                    <li><h2><a name="/elements/set">delete(element_id)</a></h2>
+                        <div class="return"><span>Возвращает:</span> истина</div>
+                        <div class="desc">Удаляет элемент</div>
+                        <ul class="params">
+                            <li>
+                                <h3>element_id</h3>
+                                <div class="type"><span>Тип:</span> целое</div>
+                                <div class="desc">ID элемента</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><h2><a name="/elements/set">getType(type)</a></h2>
+                        <div class="return"><span>Возвращает:</span> массив</div>
+                        <div class="desc">Возвращает тип эелементов по его имени или идентификатору</div>
+                        <ul class="params">
+                            <li>
+                                <h3>element_id</h3>
+                                <div class="type"><span>Тип:</span> целое или строка</div>
+                                <div class="desc">Имя или ID типа элементов</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><h2><a name="/elements/set">getFullType(type)</a></h2>
+                        <div class="return"><span>Возвращает:</span> массив</div>
+                        <div class="desc">Возвращает массив типов в порядке от корневого до заданного</div>
+                        <ul class="params">
+                            <li>
+                                <h3>type</h3>
+                                <div class="type"><span>Тип:</span> целое или строка</div>
+                                <div class="desc">Имя или ID типа</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><h2><a name="/elements/set">getTypeFields(type)</a></h2>
+                        <div class="return"><span>Возвращает:</span> массив</div>
+                        <div class="desc">Возвращает массив полей типа где у каждого поля указано:
+                            <ul>
+                            <li>Field - имя поля</li>
+                                <li>Type - тип поля в базе данных</li>
+                                <li>Collation - сравнение</li>
+                                <li>Null - может ли принимать значение NULL</li>
+                                <li>Key - имя ключа (если задан)</li>
+                                <li>Default - значение по-умолчанию</li>
+                                <li>Extra - дополнительные данные</li>
+                                <li>Privileges - привилегии</li>
+                                <li>Comment - комментарий</li>
+                                <li>FK - имя таблицы на первичный ключ которой ссылается поле (если ему задан вторичный ключ)</li>
+                            </ul>
+                        </div>
+                        <ul class="params">
+                            <li>
+                                <h3>type</h3>
+                                <div class="type"><span>Тип:</span> целое или строка</div>
+                                <div class="desc">Имя или ID типа</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><h2><a name="/elements/set">getElementType(element_id)</a></h2>
+                        <div class="return"><span>Возвращает:</span> массив</div>
+                        <div class="desc">Возвращает тип элемента по его идентификатору</div>
+                        <ul class="params">
+                            <li>
+                                <h3>element_id</h3>
+                                <div class="type"><span>Тип:</span> целое</div>
+                                <div class="desc">ID элемента</div>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><h2><a name="/elements/set">translate(text,[lang])</a></h2>
+                        <div class="return"><span>Возвращает:</span> строка</div>
+                        <div class="desc">Возвращает заранее заданный перевод текста на любом из доступных в интерфейсе языков на текущий язык интерфейса</div>
+                        <ul class="params">
+                            <li>
+                                <h3>text</h3>
+                                <div class="type"><span>Тип:</span> строка</div>
+                                <div class="desc">Текст на любом языке из доступных в интерфейсе</div>
+                            </li>
+                            <li>
+                                <h3>lang</h3>
+                                <div class="type"><span>Тип:</span> строка</div>
+                                <div class="desc">Сокращение названия языка на который необходимо перевести текст</div>
+                            </li>
+                        </ul>
+                    </li>
+
                 </ul>
                 <strong>Свойства:</strong>
             </li>

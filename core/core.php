@@ -200,9 +200,9 @@ class Elements{
         return $class;
     }
 
-    public static function getFullType($type_id){
+    public static function getFullType($type){
         $types=array();
-        $type=self::getType($type_id);
+        $type=self::getType($type);
         $types[]=$type;
         while(!empty($type['parent'])){
             $type=self::getTypeById($type['parent']);
@@ -230,7 +230,7 @@ class Elements{
                     AND i.TABLE_NAME = '".$table."'";
                     $inf=self::$db->q($sql,self::$debug);
                     if(!empty($inf)) $fields[$i]['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
-
+                    else $fields[$i]['FK']=false;
                     /*echo "<pre>";
                     print_r($inf);
                     echo "</pre>"; */
@@ -239,6 +239,7 @@ class Elements{
             }
             $allFields=array_merge($allFields,$fields);
         }
+        print_r($allFields);
         return $allFields;
     }
 
