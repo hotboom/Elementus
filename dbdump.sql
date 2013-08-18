@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 11, 2013 at 12:06 AM
+-- Generation Time: Aug 18, 2013 at 07:11 PM
 -- Server version: 5.5.25
 -- PHP Version: 5.3.13
 
@@ -30,15 +30,19 @@ CREATE TABLE IF NOT EXISTS `apps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `key` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=2 ;
+  `domain` varchar(255) NOT NULL,
+  `template_id` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `template_id` (`template_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Dumping data for table `apps`
 --
 
-INSERT INTO `apps` (`id`, `name`, `key`) VALUES
-(1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw');
+INSERT INTO `apps` (`id`, `name`, `key`, `domain`, `template_id`) VALUES
+(1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw', 'elementus.loc', 23),
+(2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.loc', NULL);
 
 -- --------------------------------------------------------
 
@@ -51,7 +55,7 @@ CREATE TABLE IF NOT EXISTS `elements` (
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=23 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=31 ;
 
 --
 -- Dumping data for table `elements`
@@ -64,7 +68,14 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (17, 2, 1),
 (18, 5, 1),
 (19, 5, 1),
-(22, 4, 1);
+(22, 4, 1),
+(23, 6, 1),
+(24, 1, 2),
+(25, 4, 2),
+(26, 1, 1),
+(28, 1, 2),
+(29, 1, 2),
+(30, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -130,7 +141,33 @@ CREATE TABLE IF NOT EXISTS `et_sections` (
 INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`, `link`) VALUES
 (1, NULL, 'Главная', 'main', 'main', ''),
 (9, NULL, 'Первые шаги', 'gettingstarted', 'text', ''),
-(10, NULL, 'Документация', 'documentation', 'documentation', '');
+(10, NULL, 'Документация', 'documentation', 'documentation', ''),
+(24, NULL, 'Главная', 'main', 'main', ''),
+(26, NULL, 'Демо', '', '', 'http://demo.elementus.loc'),
+(27, NULL, 'О компании', 'about', 'text', ''),
+(28, NULL, 'Каталог', 'catalog', 'catalog', ''),
+(29, NULL, 'Оплата', 'howtopay', 'text', ''),
+(30, NULL, 'Доставка', 'delivery', 'text', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `et_templates`
+--
+
+CREATE TABLE IF NOT EXISTS `et_templates` (
+  `element_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `path` varchar(255) NOT NULL,
+  PRIMARY KEY (`element_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `et_templates`
+--
+
+INSERT INTO `et_templates` (`element_id`, `name`, `path`) VALUES
+(23, 'Elementus', 'home');
 
 -- --------------------------------------------------------
 
@@ -157,12 +194,7 @@ CREATE TABLE IF NOT EXISTS `et_users` (
 
 INSERT INTO `et_users` (`element_id`, `name`, `surname`, `email`, `password`, `group_id`, `regdate`) VALUES
 (22, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22'),
-(23, 'user', '', '', '', 18, '0000-00-00 00:00:00'),
-(24, 'test1', '', '', '', 18, '0000-00-00 00:00:00'),
-(25, 'test2', '', '', '', 18, '0000-00-00 00:00:00'),
-(26, 'test3', '', '', '', 18, '0000-00-00 00:00:00'),
-(27, 'test5', '', '', '', 18, '0000-00-00 00:00:00'),
-(28, 'test', '', '', '', 18, '0000-00-00 00:00:00');
+(25, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22');
 
 -- --------------------------------------------------------
 
@@ -195,7 +227,7 @@ CREATE TABLE IF NOT EXISTS `lang` (
   `en` text NOT NULL,
   `ru` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=25 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ;
 
 --
 -- Dumping data for table `lang`
@@ -209,22 +241,25 @@ INSERT INTO `lang` (`id`, `en`, `ru`) VALUES
 (5, 'delete', 'удалить'),
 (6, 'text', 'текст'),
 (7, 'products', 'товары'),
-(8, 'name', 'Название'),
-(24, 'Usersgroups', 'Группы пользователей'),
+(8, 'name', 'название'),
+(24, 'Usersgroups', 'группы пользователей'),
 (10, 'header', 'заголовок'),
-(11, 'content', 'Содержание'),
+(11, 'content', 'cодержание'),
 (12, 'cancel', 'отмена'),
 (13, 'added', 'добавлено'),
 (14, 'close', 'закрыть'),
 (15, 'descr', 'описание'),
 (16, 'users', 'пользователи'),
 (17, 'delete selected elements', 'удалить выбранные элементы'),
-(18, 'types', 'Типы'),
+(18, 'types', 'типы'),
 (19, 'section_id', 'раздел'),
 (20, 'tree', 'дерево'),
 (21, 'edit', 'изменить'),
 (22, 'as', 'как'),
-(23, 'not set', 'не задано');
+(23, 'not set', 'не задано'),
+(25, 'subtype', 'субтип'),
+(26, 'settings', 'настройки'),
+(27, 'exit', 'выход');
 
 -- --------------------------------------------------------
 
@@ -234,21 +269,25 @@ INSERT INTO `lang` (`id`, `en`, `ru`) VALUES
 
 CREATE TABLE IF NOT EXISTS `types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `parent` int(11) NOT NULL DEFAULT '0',
+  `parent` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=6 ;
+  PRIMARY KEY (`id`),
+  KEY `parent` (`parent`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
 
 --
 -- Dumping data for table `types`
 --
 
 INSERT INTO `types` (`id`, `parent`, `name`) VALUES
-(1, 0, 'sections'),
-(2, 0, 'content'),
+(1, NULL, 'sections'),
+(2, NULL, 'content'),
 (3, 2, 'products'),
-(4, 0, 'users'),
-(5, 0, 'usersGroups');
+(4, NULL, 'users'),
+(5, NULL, 'usersGroups'),
+(6, NULL, 'templates'),
+(7, 3, 'phones'),
+(8, 3, 'cameras');
 
 -- --------------------------------------------------------
 
@@ -268,6 +307,12 @@ CREATE TABLE IF NOT EXISTS `type_groups` (
 --
 
 --
+-- Constraints for table `apps`
+--
+ALTER TABLE `apps`
+  ADD CONSTRAINT `apps_ibfk_1` FOREIGN KEY (`template_id`) REFERENCES `et_templates` (`element_id`);
+
+--
 -- Constraints for table `et_content`
 --
 ALTER TABLE `et_content`
@@ -284,6 +329,12 @@ ALTER TABLE `et_sections`
 --
 ALTER TABLE `et_users`
   ADD CONSTRAINT `et_users_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `et_usersgroups` (`element_id`);
+
+--
+-- Constraints for table `types`
+--
+ALTER TABLE `types`
+  ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
