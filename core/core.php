@@ -4,20 +4,24 @@ class Elements{
     public static $db;
     public static $error=array();
     public static $debug;
-    public static $app_id;
+    public static $app;
     public static $foreign_select='select';
     public static $root_path;
     public static $lang='ru';
+    public static $template;
 
-    public static function init($app_id, $db, $root_path, $debug=false){
-        self::$app_id    = $app_id;
+    public static function init($db, $root_path, $debug=false){
         self::$db        = $db;
         self::$debug     = $debug;
         self::$root_path = $root_path;
+
+        if(!self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps WHERE domain='".$_SERVER['HTTP_HOST']."'",self::$debug)) self::$app=self::$db->q("SELECT id,name,domain,template FROM apps ORDER BY id LIMIT 0,1",self::$debug);
+        if(!empty(self::$app['template_id'])) self::$template=self::getById(self::$app['template_id']);
+        else self::$template=self::$db->q("SELECT element_id AS id,name,path FROM et_templates ORDER BY id LIMIT 0,1",self::$debug);
     }
 
-    public static function debug(){
-        self::$debug=true;
+    public static function debug($debug=true){
+        self::$debug=$debug;
     }
 
     public static function getById($element_id){
@@ -43,7 +47,7 @@ class Elements{
             $table.='_'.$type['name'];
             $sql.="LEFT JOIN `".$table."` AS t$i ON e.id=t$i.element_id ";
         }
-        $sql.="WHERE e.app_id='".self::$app_id."' AND e.type_id='".$type['id']."' ";
+        $sql.="WHERE e.app_id='".self::$app['id']."' AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
             $sql.=self::filterToSql($params['filter']);
@@ -77,7 +81,7 @@ class Elements{
                 if(self::$debug) print_r(self::$error);
                 return false;
             }
-            self::$db->q("INSERT INTO `elements` SET `type_id`='".$params['type']."', `app_id`='".self::$app_id."'",self::$debug);
+            self::$db->q("INSERT INTO `elements` SET `type_id`='".$params['type']."', `app_id`='".self::$app['id']."'",self::$debug);
             $params['element_id']=self::$db->q("SELECT LAST_INSERT_ID()",self::$debug);
         }
 
@@ -118,7 +122,7 @@ class Elements{
             }
         }
         else{
-            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app_id."'",self::$debug)) {
+            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) {
             $log=$element_id;
             }
             else $log=false;
@@ -127,8 +131,7 @@ class Elements{
     }
 
     public static function getTypeById($type_id){
-        $filter=array('id'=>$type_id);
-        $types=self::getTypes($filter);
+        $types=self::getTypes("id='".$type_id."'");
         if(!empty($types)) return $types[0];
         else {
             self::$error['code']=3;
@@ -144,13 +147,11 @@ class Elements{
         return $type;
     }
 
-    public static function getTypes($filter=array()){
+    public static function getTypes($filter=false){
         $sql="SELECT * FROM `types` ";
 
         if(!empty($filter)){
-            $sql.="WHERE ";
-            foreach($filter as $i=>$val) $sql.="`$i`='$val', ";
-            $sql=substr($sql,0,strlen($sql)-2); //Mad skill to trim last ', ';
+            $sql.="WHERE ".$filter;
         }
         return self::$db->q($sql,self::$debug,false);
     }
@@ -168,7 +169,7 @@ class Elements{
     }
 
     private static function getElementById($element_id){
-        if($element=self::$db->q("SELECT * FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app_id."'",self::$debug)) return $element;
+        if($element=self::$db->q("SELECT * FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) return $element;
         else{
             self::$error['code']='1';
             self::$error['desc']='Element id:'.$element_id.' not found';
@@ -178,8 +179,7 @@ class Elements{
     }
 
     public static function getTypeByName($type_name){
-        $filter=array('name'=>$type_name);
-        $types=self::getTypes($filter);
+        $types=self::getTypes("name='".$type_name."'");
         if(!empty($types)) return $types[0];
         else {
             self::$error['code']=4;
@@ -239,20 +239,28 @@ class Elements{
             }
             $allFields=array_merge($allFields,$fields);
         }
-        print_r($allFields);
         return $allFields;
     }
 
-    public static function translate($text,$ucfirst=false,$lang='en'){
-        if(empty($ucfirst)) $ucfirst=ctype_upper(substr($text,0,1));
-        if($lang==self::$lang) {
+    public static function translate($text,$lang='en'){
+        $text=trim($text);
+        $ucfirst=ctype_upper(substr($text,0,1));
+
+        if($lang==self::$lang) { //Do not translate
             if($ucfirst) return mb_convert_case($text, MB_CASE_TITLE, "UTF-8");
             else return $text;
         }
+
         $sql="SELECT `".self::$lang."` FROM `lang` WHERE `".$lang."`='".$text."'";
-        if($translate=self::$db->q($sql,self::$debug)) $text=$translate;
-        if($ucfirst) $text=mb_convert_case($text, MB_CASE_TITLE, "UTF-8");
-        return $text;
+        if($translate=self::$db->q($sql,self::$debug)) $text=($ucfirst ? mb_convert_case($translate, MB_CASE_TITLE, "UTF-8") : $translate);
+        else{ //Try translate by word
+            if(strpos($text,' ')) {
+                $words=explode(' ',$text);
+                $text='';
+                foreach($words as $word) $text.=self::translate($word).' ';
+            }
+        }
+        return trim($text);
     }
 }
 ?>

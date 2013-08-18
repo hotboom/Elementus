@@ -1,5 +1,4 @@
 <? require_once("pages/header.php"); ?>
-    <div class="container">
         <div class="row">
             <div class="col-lg-2">
                 <h3><?=t('Types');?></h3>
@@ -15,11 +14,14 @@
                     </div>
                 </form>-->
                 <?
-                function treeTypes($parent_id=0,$class='types'){
-                    $types=Elements::getTypes(array('parent'=>$parent_id));
+                //Elements::debug();
+                function treeTypes($parent_id='NULL',$class='types'){
+                    if($parent_id!='NULL') $filter="parent='".$parent_id."'";
+                    else $filter="parent is NULL";
+                    $types=Elements::getTypes($filter);
                     if(empty($types)) return false;
 
-                    if($parent_id==0) echo '<ul class="'.$class.'">';
+                    if($parent_id==0) echo '<ul class="list-unstyled '.$class.'">';
                     else echo '<ul>';
                     foreach($types as $type){
                         echo '<li><a href="#/page/type/'.$type['id'].'">'.t($type['name']).'</a>';
@@ -29,12 +31,11 @@
                     echo '</ul>';
                     return true;
                 }
-                treeTypes(0);
+                treeTypes();
                 ?>
             </div>
             <div id="page" class="col-lg-10">
                 loading...
             </div>
         </div>
-    </div><!-- /.container -->
 <? require_once("pages/footer.php"); ?>

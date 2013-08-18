@@ -1,15 +1,18 @@
 <?
 class Template extends Elements{
-    public static $template;
+    public static $id;
+    public static $path;
+    public static $name;
     public static $templates_dir='templates';
 
-    public static function init($template_name){
-        $filter="name='".$template_name."'";
-        self::$template=parent::get('templates',array('filter'=>$filter));
+    public static function init(){
+        self::$id=parent::$template['id'];
+        self::$name=parent::$template['name'];
+        self::$path=parent::$template['path'];
     }
 
     public static function header($params){
-       include(self::$templates_dir.'/'.self::$template['name'].'/header.php');
+       include(self::$templates_dir.'/'.self::$path.'/header.php');
     }
 
     public static function page($params){

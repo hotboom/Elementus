@@ -14,12 +14,17 @@ $params=array('type'=>$type['name']);
 $elements=$type['class']['name']::get($params);
 
 ?>
-<p>
-    <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><?=t('Add')?></a>
-    <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary" data-target="#window"><?=t('Edit')?></a>
-    <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary" data-target="#window"><?=t('Copy')?></a>
-    <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
-</p>
+    <p class="col-md-8 pull-left">
+        <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><?=t('Add')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary" data-target="#window"><?=t('Edit')?></a>
+        <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary" data-target="#window"><?=t('Copy')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
+    </p>
+    <p class="col-md-4 pull-right">
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><?=t('Settings')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><?=t('Add subtype')?></a>
+    </p>
+
 <table id="elements" class="table table-hover table-condensed">
     <tr>
         <? foreach($type['fields'] as $i=>$field):?>

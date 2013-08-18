@@ -9,15 +9,15 @@
     <title>Elementus framework</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="/static/css/bootstrap.css" rel="stylesheet">
+    <link href="/templates/demo/static/css/bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="/static/css/jumbotron.css" rel="stylesheet">
+    <link href="/templates/demo/static/css/jumbotron.css" rel="stylesheet">
 
     <!-- JavaScript plugins (requires jQuery) -->
     <script src="http://code.jquery.com/jquery.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="/static/js/bootstrap.min.js"></script>
+    <script src="/templates/demo/static/js/bootstrap.min.js"></script>
 
     <!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
     <!-- <script src="js/respond.js"></script> -->

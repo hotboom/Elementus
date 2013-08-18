@@ -43,22 +43,21 @@
 </head>
 <body>
 <div class="navbar">
-    <div class="container">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="#">Elemental</a>
-        <div class="nav-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#/page/dashboard">Dashboard</a></li>
-                <li><a href="#/users">Users</a></li>
-                <li><a href="#/files">Files</a></li>
-            </ul>
-        </div><!--/.nav-collapse -->
-        <form class="navbar-form form-inline pull-right">
-            <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><?=t('Exit')?></a>
-        </form>
-    </div>
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">Elemental</a>
+    <div class="nav-collapse collapse">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#/page/dashboard">Dashboard</a></li>
+            <li><a href="#/page/settings"><?=t('Settings')?></a></li>
+            <li><a href="#/page/types"><?=t('Types')?></a></li>
+            <li><a href="#/page/files">Files</a></li>
+        </ul>
+    </div><!--/.nav-collapse -->
+    <form class="navbar-form form-inline pull-right">
+        <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><?=t('Exit')?></a>
+    </form>
 </div>
