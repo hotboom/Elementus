@@ -6,10 +6,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Elemental</title>
+    <title>Admin - Elementus</title>
     <!-- Bootstrap -->
     <link href="/admin/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="/admin/static/css/bootstrap-glyphicons.css" rel="stylesheet" media="screen">
+    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
     <link href="/admin/static/css/custom.css" rel="stylesheet" media="screen">
 
     <!-- JavaScript plugins (requires jQuery) -->
@@ -48,16 +48,16 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
     </button>
-    <a class="navbar-brand" href="#">Elemental</a>
+    <a class="navbar-brand" href="#">Elementus</a>
     <div class="nav-collapse collapse">
         <ul class="nav navbar-nav">
-            <li class="active"><a href="#/page/dashboard">Dashboard</a></li>
-            <li><a href="#/page/settings"><?=t('Settings')?></a></li>
-            <li><a href="#/page/types"><?=t('Types')?></a></li>
+            <li class="active"><a href="#/page/dashboard"><i class="icon-th"></i> Dashboard</a></li>
+            <li><a href="#/page/settings"><i class="icon-cog"></i> <?=t('Settings')?></a></li>
+            <li><a href="#/page/types"><i class="icon-code-fork"></i> <?=t('Types')?></a></li>
             <li><a href="#/page/files">Files</a></li>
         </ul>
     </div><!--/.nav-collapse -->
     <form class="navbar-form form-inline pull-right">
-        <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><?=t('Exit')?></a>
+        <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><i class="icon-code-right"></i>  <?=t('Exit')?></a>
     </form>
 </div>

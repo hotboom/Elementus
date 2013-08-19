@@ -15,21 +15,21 @@ $elements=$type['class']['name']::get($params);
 
 ?>
     <p class="col-md-8 pull-left">
-        <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><?=t('Add')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary" data-target="#window"><?=t('Edit')?></a>
-        <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary" data-target="#window"><?=t('Copy')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><?=t('Delete')?></a>
+        <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><i class="icon-plus"></i> <?=t('Add')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit"><i class="icon-edit"></i> <?=t('Edit')?></a>
+        <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary disabled" data-target="#window" id="btn-copy"><i class="icon-copy"></i> <?=t('Copy')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><i class="icon-remove"></i> <?=t('Delete')?></a>
     </p>
     <p class="col-md-4 pull-right">
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><?=t('Settings')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><?=t('Add subtype')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
     </p>
 
 <table id="elements" class="table table-hover table-condensed">
     <tr>
         <? foreach($type['fields'] as $i=>$field):?>
             <? if($field['Field']=='element_id'):?>
-                <th class="span1"><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
+                <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
             <? else:?>
                 <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
             <?endif;?>
@@ -49,6 +49,7 @@ $elements=$type['class']['name']::get($params);
 </table>
 <script>
     $(function() {
+        // Nav links
         $('a[data-target]').click(function(event) {
             target=$(this).attr('data-target');
             url=$(this).attr('href');
@@ -63,6 +64,7 @@ $elements=$type['class']['name']::get($params);
             event.preventDefault();
         });
 
+        //Selecting elements
         $('#elements tr').click(function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
@@ -71,8 +73,15 @@ $elements=$type['class']['name']::get($params);
 
         $('#elements tr input[type=checkbox]').click(function(event){
             var tr=$(this).parents('tr');
-            if(tr.hasClass('success')) tr.removeClass('success');
-            else tr.addClass('success');
+            tr.toggleClass('active');
+            if($('#elements tr.active').size()){
+                $('#btn-edit').removeClass('disabled');
+                $('#btn-copy').removeClass('disabled');
+            }
+            else{
+                $('#btn-edit').addClass('disabled');
+                $('#btn-copy').addClass('disabled');
+            }
             event.stopPropagation();
         });
     });
