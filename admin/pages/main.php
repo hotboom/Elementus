@@ -24,7 +24,7 @@
                     if($parent_id==0) echo '<ul class="list-unstyled '.$class.'">';
                     else echo '<ul>';
                     foreach($types as $type){
-                        echo '<li><a href="#/page/type/'.$type['id'].'">'.t($type['name']).'</a>';
+                        echo '<li><a href="#/page/type/'.$type['id'].'">'.t($type['name'],true).'</a>';
                         treeTypes($type['id']);
                         echo '</li>';
                     }

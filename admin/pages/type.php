@@ -1,16 +1,16 @@
 <?
+//Elements::debug();
 $type_id=(int)$_GET['id'];
 $type=Elements::getTypeById($type_id);
-//Elements::debug();
+
 $types=Elements::getFullType($type_id);
 $type['fields']=array();
-$type['fields']=Elements::getTypeFields($type);
+$type['fields']=Elements::getFullTypeFields($type);
 
 $type['class']=Elements::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array('type'=>$type['name']);
 
-//Elements::debug();
 $elements=$type['class']['name']::get($params);
 
 ?>
@@ -21,8 +21,9 @@ $elements=$type['class']['name']::get($params);
         <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><i class="icon-remove"></i> <?=t('Delete')?></a>
     </p>
     <p class="col-md-4 pull-right">
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
+        <a href="/admin/router.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
+        <a href="#/page/type_fields/<?=$type['id']?>" class="btn btn-primary"><i class="icon-cog"></i> <?=t('Fields')?></a>
+        <a href="/admin/router.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
     </p>
 
 <table id="elements" class="table table-hover table-condensed">

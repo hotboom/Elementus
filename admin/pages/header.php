@@ -54,7 +54,7 @@
             <li class="active"><a href="#/page/dashboard"><i class="icon-th"></i> Dashboard</a></li>
             <li><a href="#/page/settings"><i class="icon-cog"></i> <?=t('Settings')?></a></li>
             <li><a href="#/page/types"><i class="icon-code-fork"></i> <?=t('Types')?></a></li>
-            <li><a href="#/page/files">Files</a></li>
+            <li><a href="#/page/files"><i class="icon-columns"></i> Files</a></li>
         </ul>
     </div><!--/.nav-collapse -->
     <form class="navbar-form form-inline pull-right">

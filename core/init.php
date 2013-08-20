@@ -25,7 +25,7 @@ Users::init();
 
 /* Shortcut functions */
 //Translate
-function t($text,$lang='en'){
-    return Elements::translate($text,$lang);
+function t($text,$ucfirst='auto',$lang='en'){
+    return Elements::translate($text,$ucfirst,$lang);
 }
 ?>

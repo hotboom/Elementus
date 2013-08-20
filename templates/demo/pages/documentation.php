@@ -170,7 +170,7 @@ $lilu=Elements::getById(5);
                     </li>
                     <li><h2><a name="/elements/set">getTypeFields(type)</a></h2>
                         <div class="return"><span>Возвращает:</span> массив</div>
-                        <div class="desc">Возвращает массив полей типа где у каждого поля указано:
+                        <div class="desc">Возвращает поля типа где у каждого поля указано:
                             <ul>
                             <li>Field - имя поля</li>
                                 <li>Type - тип поля в базе данных</li>
