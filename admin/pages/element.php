@@ -49,69 +49,67 @@ if($act=='edit'|$act=='copy') {
             $('.modal-footer').hide();
         });
     </script>
-    <? if($act=='delete'):?>
-        <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
-            <p><?=t('delete selected elements')?>?</p>
-            <? if(is_array($_GET['elements'])):?>
-            <? foreach($_GET['elements'] as $i=>$val):?>
-            <input type="hidden" name="elements[]" value="<?=$val?>">
-            <? endforeach;?>
-            <?endif?>
-            <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
-            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
-            <input type="hidden" name="submit" value="submit">
-        </form>
-    <?else:?>
     <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
+    <? if($act=='delete'):?>
+        <p><?=t('delete selected elements')?>?</p>
+        <? if(is_array($_GET['elements'])):?>
+        <? foreach($_GET['elements'] as $i=>$val):?>
+        <input type="hidden" name="elements[]" value="<?=$val?>">
+        <? endforeach;?>
+        <?endif?>
+        <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
+        <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+        <input type="hidden" name="submit" value="submit">
+    <?else:?>
         <fieldset>
-                <? foreach($type['fields'] as $i=>$field):?>
-                <? if($field['Field']=='element_id'):?>
-                    <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element[$field['Field']]:'')?>">
-                <? elseif(!empty($field['FK'])): ?>
-                    <?
-                    $fk_type=Elements::getTypeByName($field['FK']);
-                    $fk_type['class']=Elements::getTypeClass($fk_type['name']);
+            <? foreach($type['fields'] as $i=>$field):?>
+            <? if($field['Field']=='element_id'):?>
+                <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element[$field['Field']]:'')?>">
+            <? elseif(!empty($field['FK'])): ?>
+                <?
+                $fk_type=Elements::getTypeByName($field['FK']);
+                $fk_type['class']=Elements::getTypeClass($fk_type['name']);
 
-                    if($fk_type['class']['name']::$foreign_select=='select'):
-                        $fk_elements=Elements::get(array('type'=>$fk_type['id']));
-                        ?>
-                        <div class="form-group">
-                            <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                            <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
-                                <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
-                                <? foreach($fk_elements as $fk_element):?>
-                                <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
-                                <? endforeach;?>
-                            </select>
-                        </div>
-                    <? endif; ?>
-                <? elseif($field['Field']=='password'): ?>
-                    <div class="form-group">
-                        <label for="input<?=$field['Field']?>"><?=t($field['Field'])?> <?=t('hash')?></label>
-                        <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
-                        <label for="inputnew<?=$field['Field']?>"><?=t('New')?> <?=t($field['Field'])?></label>
-                        <input name="fields[new_<?=$field['Field']?>]" type="text" class="form-control" id="inputnew<?=$field['Field']?>" value="">
-                        <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
-                    </div>
-                <? elseif($field['Type']=='text'): ?>
+                if($fk_type['class']['name']::$foreign_select=='select'):
+                    $fk_elements=Elements::get(array('type'=>$fk_type['id']));
+                    ?>
                     <div class="form-group">
                         <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                        <textarea name="fields[<?=$field['Field']?>]" class="form-control" rows="3"><?=$element[$field['Field']]?></textarea>
+                        <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
+                            <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                            <? foreach($fk_elements as $fk_element):?>
+                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
+                            <? endforeach;?>
+                        </select>
                     </div>
-                <? else:?>
-                    <div class="form-group">
-                        <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                        <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
-                    </div>
-                <? endif;?>
-                <? endforeach;?>
-                <button type="submit" class="btn btn-success"><?=t($act)?></button>
-                <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
-                <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
-                <input type="hidden" name="submit" value="submit">
+                <? endif; ?>
+            <? elseif($field['Field']=='password'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?> <?=t('hash')?></label>
+                    <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
+                    <label for="inputnew<?=$field['Field']?>"><?=t('New')?> <?=t($field['Field'])?></label>
+                    <input name="fields[new_<?=$field['Field']?>]" type="text" class="form-control" id="inputnew<?=$field['Field']?>" value="">
+                    <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
+                </div>
+            <? elseif($field['Type']=='text'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
+                    <textarea name="fields[<?=$field['Field']?>]" class="form-control" rows="3"><?=$element[$field['Field']]?></textarea>
+                </div>
+            <? else:?>
+                <div class="form-group">
+                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
+                    <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
+                </div>
+            <? endif;?>
+            <? endforeach;?>
+            <button type="submit" class="btn btn-success"><?=t($act)?></button>
+            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+            <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
+            <input type="hidden" name="submit" value="submit">
         </fieldset>
-    </form>
     <?endif;?>
+    </form>
     <script>
         $(function() {
             $('form[data-async]').submit(function(event) {

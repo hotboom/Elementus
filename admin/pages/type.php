@@ -18,7 +18,7 @@ $elements=$type['class']['name']::get($params);
         <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><i class="icon-plus"></i> <?=t('Add')?></a>
         <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit"><i class="icon-edit"></i> <?=t('Edit')?></a>
         <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary disabled" data-target="#window" id="btn-copy"><i class="icon-copy"></i> <?=t('Copy')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><i class="icon-remove"></i> <?=t('Delete')?></a>
+        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete"><i class="icon-remove"></i> <?=t('Delete')?></a>
     </p>
     <p class="col-md-4 pull-right">
         <a href="/admin/router.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
@@ -78,10 +78,12 @@ $elements=$type['class']['name']::get($params);
             if($('#elements tr.active').size()){
                 $('#btn-edit').removeClass('disabled');
                 $('#btn-copy').removeClass('disabled');
+                $('#btn-delete').removeClass('disabled');
             }
             else{
                 $('#btn-edit').addClass('disabled');
                 $('#btn-copy').addClass('disabled');
+                $('#btn-delete').addClass('disabled');
             }
             event.stopPropagation();
         });

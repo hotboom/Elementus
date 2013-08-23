@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 18, 2013 at 07:11 PM
+-- Generation Time: Aug 24, 2013 at 12:59 AM
 -- Server version: 5.5.25
 -- PHP Version: 5.3.13
 
@@ -102,7 +102,24 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (17, 1, 'Все есть Элемент', 'Elementus - это функциональный, гибкий и простой PHP mySQL фреймворк для разработки веб приложений на любом языке программирования.'),
 (18, NULL, 'Все есть Элемент', 'Elemental - test'),
 (19, NULL, 'Все есть Элемент', 'Elemental -'),
-(20, NULL, 'Все есть Элемент', 'Elemental -');
+(20, NULL, 'Все есть Элемент', 'Elemental -'),
+(31, NULL, '', ''),
+(32, NULL, '', ''),
+(33, NULL, '', '');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `et_content_phones`
+--
+
+CREATE TABLE IF NOT EXISTS `et_content_phones` (
+  `element_id` int(11) NOT NULL,
+  `fulldescr` text NOT NULL,
+  `screen` varchar(255) NOT NULL,
+  `store` int(11) NOT NULL,
+  PRIMARY KEY (`element_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -113,6 +130,7 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
   `fulldescr` text NOT NULL,
+  `store` int(11) NOT NULL,
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -147,7 +165,8 @@ INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`
 (27, NULL, 'О компании', 'about', 'text', ''),
 (28, NULL, 'Каталог', 'catalog', 'catalog', ''),
 (29, NULL, 'Оплата', 'howtopay', 'text', ''),
-(30, NULL, 'Доставка', 'delivery', 'text', '');
+(30, NULL, 'Доставка', 'delivery', 'text', ''),
+(34, NULL, 'test', '', '', '');
 
 -- --------------------------------------------------------
 
@@ -227,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `lang` (
   `en` text NOT NULL,
   `ru` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=28 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=32 ;
 
 --
 -- Dumping data for table `lang`
@@ -259,7 +278,11 @@ INSERT INTO `lang` (`id`, `en`, `ru`) VALUES
 (23, 'not set', 'не задано'),
 (25, 'subtype', 'субтип'),
 (26, 'settings', 'настройки'),
-(27, 'exit', 'выход');
+(27, 'exit', 'выход'),
+(28, 'type', 'тип'),
+(29, 'fields', 'поля'),
+(30, 'back', 'назад'),
+(31, 'elements', 'элементы');
 
 -- --------------------------------------------------------
 

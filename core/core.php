@@ -38,9 +38,13 @@ class Elements{
 
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
-
+        foreach($types as $i=>$type){
+            if(!self::$db->q("SHOW TABLES LIKE 'et_".$type['name']."'",self::$debug)) unset($types[$i]);
+        }
         $sql="SELECT e.*";
-        foreach($types as $i=>$type) $sql.=", t$i.* ";
+        foreach($types as $i=>$type) {
+            $sql.=", t$i.* ";
+        }
         $sql.="FROM `elements` AS e ";
         $table="et";
         foreach($types as $i=>$type) {
@@ -114,7 +118,6 @@ class Elements{
     }
 
     public static function delete($element_id){
-        $log=false;
         if(is_array($element_id)){
             $log=array();
             foreach ($element_id as $id){
@@ -122,12 +125,37 @@ class Elements{
             }
         }
         else{
-            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) {
-            $log=$element_id;
-            }
+            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) $log=$element_id;
             else $log=false;
         }
         return $log;
+    }
+
+    public static function setType($params){
+        if(empty($params['id'])) $insert=true;
+        else $insert=false;
+        $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
+        $sql.=" WHERE id='".$params['id']."'";
+
+        return self::$db->q($sql,self::$debug);
+    }
+
+    public static function setTypeField($type,$params){
+        $type=self::getType($type);
+        $table=self::getTypeTableName($type);
+        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")){
+            $sql="CREATE TABLE  ".$table." (
+            element_id INT( 11 ) NOT NULL ,
+            PRIMARY KEY (  element_id )
+            ) ENGINE = INNODB DEFAULT CHARSET = utf8";
+            self::$db->q($sql,self::$debug);
+        }
+        $exists=self::$db->q("SHOW COLUMNS FROM ".$table." LIKE ".$params['name'],self::$debug);
+        ALTER TABLE  `et_content_phones` ADD  `screen` VARCHAR( 255 ) NOT NULL AFTER  `fulldescr`
+        $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
+        $sql.=" WHERE id='".$params['id']."'";
+
+        //return self::$db->q($sql,self::$debug);
     }
 
     public static function getTypeById($type_id){
@@ -142,6 +170,7 @@ class Elements{
     }
 
     public static function getType($type_name_or_id){
+        if(is_array($type_name_or_id)) return $type_name_or_id;
         if(is_numeric($type_name_or_id)) $type=self::getTypeById($type_name_or_id);
         else $type=self::getTypeByName($type_name_or_id);
         return $type;
@@ -202,7 +231,7 @@ class Elements{
 
     public static function getFullType($type){
         $types=array();
-        if(!is_array($type)) $type=self::getType($type);
+        $type=self::getType($type);
         $types[]=$type;
         while(!empty($type['parent'])){
             $type=self::getTypeById($type['parent']);
@@ -211,10 +240,21 @@ class Elements{
         return array_reverse($types);
     }
 
+    public static function getTypeTableName($type){
+        $table='_';
+        $type=self::getType($type);
+
+        while(!empty($type['parent'])){
+            $parent=self::getTypeById($type['parent']);
+            $table=$parent['name'].'_'.$table;
+        }
+        return 'et'.$table.$type['name'];
+    }
+
     public static function getTypeFields($type){
-        $table='et';
         if(!is_array($type)) $type=self::getType($type);
-        $table=$table.'_'.$type['name'];
+        $table='et_'.$type['name'];
+        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
         $fields=self::$db->q('SHOW FULL COLUMNS FROM `'.$table.'`',self::$debug);
         foreach($fields as $i=>$field){
             if($field['Key']=='MUL') {
