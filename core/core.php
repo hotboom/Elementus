@@ -15,7 +15,8 @@ class Elements{
         self::$debug     = $debug;
         self::$root_path = $root_path;
 
-        if(!self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps WHERE domain='".$_SERVER['HTTP_HOST']."'",self::$debug)) self::$app=self::$db->q("SELECT id,name,domain,template FROM apps ORDER BY id LIMIT 0,1",self::$debug);
+        if(!self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps WHERE domain='".$_SERVER['HTTP_HOST']."'",self::$debug))
+            self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps ORDER BY id LIMIT 0,1",self::$debug);
         if(!empty(self::$app['template_id'])) self::$template=self::getById(self::$app['template_id']);
         else self::$template=self::$db->q("SELECT element_id AS id,name,path FROM et_templates ORDER BY id LIMIT 0,1",self::$debug);
     }
@@ -151,8 +152,8 @@ class Elements{
             self::$db->q($sql,self::$debug);
         }
         $exists=self::$db->q("SHOW COLUMNS FROM ".$table." LIKE ".$params['name'],self::$debug);
-        ALTER TABLE  `et_content_phones` ADD  `screen` VARCHAR( 255 ) NOT NULL AFTER  `fulldescr`
-        $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
+        //ALTER TABLE  `et_content_phones` ADD  `screen` VARCHAR( 255 ) NOT NULL AFTER  `fulldescr`
+        $sql=($exists ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
         $sql.=" WHERE id='".$params['id']."'";
 
         //return self::$db->q($sql,self::$debug);

@@ -1,6 +1,6 @@
 <?
 //Config
-$root_path=str_replace('core','',__DIR__);
+$root_path=str_replace('core','',dirname(__FILE__));
 require_once($root_path."/config.php");
 
 //Mysql class
