@@ -3,13 +3,14 @@
 $type_id=(int)$_GET['id'];
 $type=Elements::getTypeById($type_id);
 
-$types=Elements::getFullType($type_id);
 $type['fields']=array();
 $type['fields']=Elements::getFullTypeFields($type);
+//print_r($type['fields']);
 
 $type['class']=Elements::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
-$params=array('type'=>$type['name']);
+$params=array('type'=>$type);
+//print_r($type['class']);
 
 $elements=$type['class']['name']::get($params);
 
@@ -28,21 +29,15 @@ $elements=$type['class']['name']::get($params);
 
 <table id="elements" class="table table-hover table-condensed">
     <tr>
+        <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
         <? foreach($type['fields'] as $i=>$field):?>
-            <? if($field['Field']=='element_id'):?>
-                <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
-            <? else:?>
-                <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
-            <?endif;?>
+           <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
         <? endforeach; ?>
         <? foreach($elements as $element): ?>
             <tr>
+                <td><input type="checkbox" name="elements[]" value="<?=$element['element_id']?>"> <?=$element['element_id']?></td>
             <? foreach($type['fields'] as $i=>$field):?>
-                <? if($field['Field']=='element_id'):?>
-                <td><input type="checkbox" name="elements[]" value="<?=$element[$field['Field']]?>"> <?=$element[$field['Field']]?></td>
-                <? else:?>
                 <td><?=$element[$field['Field']]?></td>
-                <? endif;?>
             <? endforeach; ?>
             </tr>
         <? endforeach; ?>

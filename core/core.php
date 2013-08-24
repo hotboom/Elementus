@@ -40,17 +40,16 @@ class Elements{
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
         foreach($types as $i=>$type){
-            if(!self::$db->q("SHOW TABLES LIKE 'et_".$type['name']."'",self::$debug)) unset($types[$i]);
+            $types[$i]['table']=self::getTypeTableName($type);
+            if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) unset($types[$i]);
         }
         $sql="SELECT e.*";
         foreach($types as $i=>$type) {
             $sql.=", t$i.* ";
         }
         $sql.="FROM `elements` AS e ";
-        $table="et";
         foreach($types as $i=>$type) {
-            $table.='_'.$type['name'];
-            $sql.="LEFT JOIN `".$table."` AS t$i ON e.id=t$i.element_id ";
+            $sql.="LEFT JOIN `".$types[$i]['table']."` AS t$i ON e.id=t$i.element_id ";
         }
         $sql.="WHERE e.app_id='".self::$app['id']."' AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
@@ -92,7 +91,7 @@ class Elements{
 
         foreach($types as $i=>$type){
             $types[$i]['fields']=self::getTypeFields($type);
-            //print_r($types[$i]['fields']);
+            $types[$i]['table']=self::getTypeTableName($type);
             foreach($types[$i]['fields'] as $j=>$field){
                 foreach($params as $k=>$val){
                     if($k==$field['Field']) $types[$i]['fields'][$j]['val']=$val;
@@ -102,14 +101,12 @@ class Elements{
         }
 
         foreach($types as $type){
-            $sql=$prx."`et_".$type['name']."` SET ";
-            $i=0;
+            $sql=$prx.$type['table']." SET ";
+            $sql.="element_id='".$params['element_id']."'";
             foreach($type['fields'] as $field){
-                if($i!=0) $sql.=", ";
-                $sql.="`".$field['Field']."`=";
+                $sql.=", ".$field['Field']."=";
                 if($field['val']=='NULL') $sql.="NULL";
                 else $sql.="'".$field['val']."'";
-                $i++;
             }
             if($prx=="UPDATE ") $sql.=" WHERE `element_id`='".$params['element_id']."'";
             return self::$db->q($sql,self::$debug);
@@ -151,12 +148,21 @@ class Elements{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        $exists=self::$db->q("SHOW COLUMNS FROM ".$table." LIKE ".$params['name'],self::$debug);
-        //ALTER TABLE  `et_content_phones` ADD  `screen` VARCHAR( 255 ) NOT NULL AFTER  `fulldescr`
-        $sql=($exists ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
-        $sql.=" WHERE id='".$params['id']."'";
+        //Example: ALTER TABLE et_content_products CHANGE store store INT( 11 ) NOT NULL
+        return self::$db->q("ALTER TABLE  ".$table." ".(empty($params['field']) ? 'ADD' :'CHANGE '.$params['field'])." ".$params['name']." ".$params['type']." NOT NULL",self::$debug); // AFTER  `field`
+    }
 
-        //return self::$db->q($sql,self::$debug);
+    public static function deleteTypeField($type,$field_name){
+        $type=self::getType($type);
+        if(is_array($field_name)){
+            $return=array();
+            foreach($field_name as $name){
+                $return[]=self::deleteTypeField($type,$name);
+            }
+            return $return;
+        }
+        $table=self::getTypeTableName($type);
+        return self::$db->q("ALTER TABLE ".$table." DROP ".$field_name,self::$debug);
     }
 
     public static function getTypeById($type_id){
@@ -242,19 +248,19 @@ class Elements{
     }
 
     public static function getTypeTableName($type){
-        $table='_';
         $type=self::getType($type);
+        $table=$type['name'];
 
         while(!empty($type['parent'])){
-            $parent=self::getTypeById($type['parent']);
-            $table=$parent['name'].'_'.$table;
+            $type=self::getType($type['parent']);
+            $table=$type['name'].'_'.$table;
         }
-        return 'et'.$table.$type['name'];
+        return 'et_'.$table;
     }
 
     public static function getTypeFields($type){
-        if(!is_array($type)) $type=self::getType($type);
-        $table='et_'.$type['name'];
+        $type=self::getType($type);
+        $table=self::getTypeTableName($type);
         if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
         $fields=self::$db->q('SHOW FULL COLUMNS FROM `'.$table.'`',self::$debug);
         foreach($fields as $i=>$field){
@@ -274,7 +280,7 @@ class Elements{
                 print_r($inf);
                 echo "</pre>"; */
             }
-            if($j!=0&$field['Field']=='element_id') unset($fields[$i]);
+            if($field['Field']=='element_id') unset($fields[$i]);
         }
         return $fields;
     }
@@ -282,7 +288,7 @@ class Elements{
     public static function getFullTypeFields($type){
         $types=self::getFullType($type);
         $allFields=array();
-        foreach($types as $j=>$type){
+        foreach($types as $type){
             $fields=self::getTypeFields($type);
             $allFields=array_merge($allFields,$fields);
         }
@@ -297,7 +303,7 @@ class Elements{
             else return mb_convert_case(substr($text,0,1), MB_CASE_LOWER, "UTF-8").substr($text,1);
         }
         $sql="SELECT `".self::$lang."` FROM `lang` WHERE `".$lang."`='".$text."'";
-        if($translate=self::$db->q($sql,self::$debug)) {
+        if($translate=self::$db->q($sql)) {
             $text=($ucfirst ? mb_convert_case($translate, MB_CASE_TITLE, "UTF-8") : mb_convert_case(substr($translate,0,1), MB_CASE_LOWER, "UTF-8").substr($translate,1));
         }
         else{ //Try translate by word

@@ -28,17 +28,15 @@
             });
             if(event.value=='/') var url='page/dashboard';
             else var url='/admin'+event.value;
-            $.deepLink(url);
+            $.fn.deepLink(url);
         });
-        $.deepLink=function(url){
+        $.fn.deepLink=function(url){
             $.ajax({
                 url: url
             }).done(function( html ) {
                     $("#page").html(html);
             });
         }
-
-
     </script>
 </head>
 <body>

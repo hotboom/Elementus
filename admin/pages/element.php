@@ -3,12 +3,8 @@ $type_id=(int)$_GET['type'];
 //Elements::debug();
 $type=Elements::getType($type_id);
 $types=Elements::getFullType($type_id);
-$type['fields']=array();
+$type['fields']=Elements::getFullTypeFields($type);
 
-foreach($types as $i=>$val){
-    $types[$i]['fields']=Elements::getFullTypeFields($types[$i]);
-    $type['fields']=array_merge($type['fields'],$types[$i]['fields']);
-}
 $type['class']=Elements::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes/".$type['name'].".php");
 
@@ -38,8 +34,7 @@ if($act=='edit'|$act=='copy') {
         $(function() {
             $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
             $('.modal-footer').show();
-            console.log($.deepLink);
-            $.deepLink('/admin/page/type/<?=$type['id']?>');
+            $.fn.deepLink('/admin/page/type/<?=$type['id']?>');
         });
     </script>
 <? else:?>
@@ -54,7 +49,7 @@ if($act=='edit'|$act=='copy') {
         <p><?=t('delete selected elements')?>?</p>
         <? if(is_array($_GET['elements'])):?>
         <? foreach($_GET['elements'] as $i=>$val):?>
-        <input type="hidden" name="elements[]" value="<?=$val?>">
+        <input type="test" name="elements[]" value="<?=$val?>">
         <? endforeach;?>
         <?endif?>
         <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
@@ -62,10 +57,9 @@ if($act=='edit'|$act=='copy') {
         <input type="hidden" name="submit" value="submit">
     <?else:?>
         <fieldset>
+            <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['element_id']:'')?>">
             <? foreach($type['fields'] as $i=>$field):?>
-            <? if($field['Field']=='element_id'):?>
-                <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element[$field['Field']]:'')?>">
-            <? elseif(!empty($field['FK'])): ?>
+            <? if(!empty($field['FK'])): ?>
                 <?
                 $fk_type=Elements::getTypeByName($field['FK']);
                 $fk_type['class']=Elements::getTypeClass($fk_type['name']);

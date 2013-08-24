@@ -16,7 +16,7 @@ $params=array('type'=>$type['name']);
     <a href="page/field_form/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><i class="icon-plus"></i> <?=t('Add')?></a>
     <a href="/admin/router.php?page=field_form&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit"><i class="icon-edit"></i> <?=t('Edit')?></a>
     <a href="page/field_form/act/copy/type/<?=$type['id']?>" class="btn btn-primary disabled" data-target="#window" id="btn-copy"><i class="icon-copy"></i> <?=t('Copy')?></a>
-    <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><i class="icon-remove"></i> <?=t('Delete')?></a>
+    <a href="/admin/router.php?page=field_form&type=<?=$type['id']?>&act=delete" class="btn btn-danger" data-target="#window"><i class="icon-remove"></i> <?=t('Delete')?></a>
 </p>
 
 <p class="col-md-4 pull-right">

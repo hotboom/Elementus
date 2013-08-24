@@ -11,23 +11,28 @@ else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    //echo '<pre>'.print_r($_POST['fields']).'</pre>';
-    //Elements::debug();
+    echo '<pre>'.print_r($_POST['fields']).'</pre>';
+    //echo '<pre>'.print_r($_GET['fields']).'</pre>';
+    Elements::debug();
 
-    if($act=='delete') Elements::deleteTypeField((int)$_POST['type'],$_POST['field']);
-    else Elements::setTypeField((int)$_POST['type'],$_POST['field']);
+    if($act=='delete') $result=Elements::deleteTypeField((int)$_GET['type'],$_POST['fields']);
+    else $result=Elements::setTypeField((int)$_GET['type'],$_POST['field']);
 
     if($act=='add') $done='added';
     if($act=='delete') $done='deleted';
     if($act=='edit') $done='edited';
     ?>
-    <i class="icon-ok"></i> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
+    <? if($result):?>
+    <i class="icon-ok"></i> <?=t('Field succesfuly '.$done)?>
+    <? else:?>
+    <i class="icon-warning-sign"></i> <?=t('Error occurred:'.Elements::$error['desc'])?>
+    <? endif;?>
     <script>
         $(function() {
-            $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
+            $('.modal-title').html('<?=t($type['name'].' added')?>');
             $('.modal-footer').show();
-            $.deepLink('/admin/page/type/<?=$type['id']?>');
         });
+        $.fn.deepLink('/admin/page/type_fields/<?=$type['id']?>');
     </script>
 <? else:?>
     <script>
@@ -49,18 +54,18 @@ else $field=array();
         <input type="hidden" name="submit" value="submit">
     <?else:?>
         <fieldset>
-            <input name="type[id]" type="hidden" value="<?=($act!='copy' ? $type['id']:'')?>">
+            <input name="field[field]" type="hidden" value="<?=($act!='copy' ? $field['Field']:'')?>">
             <div class="form-group">
                 <label for="input_name"><?=t('Name')?></label>
-                <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['name']?>">
+                <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['Field']?>">
             </div>
             <div class="form-group">
-                <label for="input_type"><?=t('Parent')?></label>
+                <label for="input_type"><?=t('Type')?></label>
                 <select name="field[type]" id="input_type" class="form-control">
-                    <option value="INT(11)">Int</option>
-                    <option value="VARCHAR(255)">Varchar</option>
-                    <option value="TEXT">Text</option>
-                    <option value="FOREIGN KEY">Foreign key</option>
+                    <option value="INT(11)"><?=t('Int')?></option>
+                    <option value="VARCHAR(255)"><?=t('Varchar')?></option>
+                    <option value="TEXT"><?=t('Text')?></option>
+                    <option value="FOREIGN KEY"><?=t('Foreign key')?></option>
                 </select>
             </div>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
