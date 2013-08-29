@@ -1,41 +1,37 @@
 <?
-//Elements::debug();
-$type_id=(int)$_GET['id'];
-$type=Elements::getTypeById($type_id);
+//E::debug();
+$type=E::getTypeById((int)$_GET['id']);
 
 $type['fields']=array();
-$type['fields']=Elements::getFullTypeFields($type);
-//print_r($type['fields']);
+$type['fields']=E::getFullTypeFields($type);
 
-$type['class']=Elements::getTypeClass($type['name']);
+$type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array('type'=>$type);
-//print_r($type['class']);
-
 $elements=$type['class']['name']::get($params);
 
 ?>
-    <p class="col-md-8 pull-left">
-        <a href="page/element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window"><i class="icon-plus"></i> <?=t('Add')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit"><i class="icon-edit"></i> <?=t('Edit')?></a>
-        <a href="page/element/act/copy/type/<?=$type['id']?>" class="btn btn-primary disabled" data-target="#window" id="btn-copy"><i class="icon-copy"></i> <?=t('Copy')?></a>
-        <a href="/admin/router.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete"><i class="icon-remove"></i> <?=t('Delete')?></a>
-    </p>
-    <p class="col-md-4 pull-right">
-        <a href="/admin/router.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
-        <a href="#/page/type_fields/<?=$type['id']?>" class="btn btn-primary"><i class="icon-cog"></i> <?=t('Fields')?></a>
-        <a href="/admin/router.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
-    </p>
+<p class="pull-left">
+    <a href="element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window" tabindex="1"><i class="icon-plus"></i> <?=t('Add')?></a>
+    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit" tabindex="2"><i class="icon-edit"></i> <?=t('Edit')?></a>
+    <a href="element/act/copy/type/<?=$type['id']?>" class="btn btn-primary disabled" data-target="#window" id="btn-copy" tabindex="3"><i class="icon-copy"></i> <?=t('Copy')?></a>
+    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
+</p>
+<p class="pull-right">
+    <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
+    <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="icon-cog"></i> <?=t('Fields')?></a>
+    <a href="/admin/index.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
+</p>
 
 <table id="elements" class="table table-hover table-condensed">
     <tr>
-        <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
+        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
         <? foreach($type['fields'] as $i=>$field):?>
-           <th><a href="#/page/type/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
+           <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
         <? endforeach; ?>
         <? foreach($elements as $element): ?>
             <tr>
-                <td><input type="checkbox" name="elements[]" value="<?=$element['element_id']?>"> <?=$element['element_id']?></td>
+                <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
             <? foreach($type['fields'] as $i=>$field):?>
                 <td><?=$element[$field['Field']]?></td>
             <? endforeach; ?>
@@ -43,44 +39,3 @@ $elements=$type['class']['name']::get($params);
         <? endforeach; ?>
     </tr>
 </table>
-<script>
-    $(function() {
-        // Nav links
-        $('a[data-target]').click(function(event) {
-            target=$(this).attr('data-target');
-            url=$(this).attr('href');
-            $('#elements input:checked').each(function(){
-                url=url+'&'+$(this).attr('name')+'='+$(this).val();
-            });
-            //alert(url);
-            $.get(url, function(data) {
-                $(target+' .modal-body').html(data);
-            });
-            $(target).modal('show');
-            event.preventDefault();
-        });
-
-        //Selecting elements
-        $('#elements tr').click(function(event){
-            var checkbox=$(this).find('input[type=checkbox]');
-            checkbox.click();
-            event.preventDefault();
-        });
-
-        $('#elements tr input[type=checkbox]').click(function(event){
-            var tr=$(this).parents('tr');
-            tr.toggleClass('active');
-            if($('#elements tr.active').size()){
-                $('#btn-edit').removeClass('disabled');
-                $('#btn-copy').removeClass('disabled');
-                $('#btn-delete').removeClass('disabled');
-            }
-            else{
-                $('#btn-edit').addClass('disabled');
-                $('#btn-copy').addClass('disabled');
-                $('#btn-delete').addClass('disabled');
-            }
-            event.stopPropagation();
-        });
-    });
-</script>

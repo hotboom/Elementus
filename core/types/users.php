@@ -1,5 +1,5 @@
 <?
-class Users extends Elements{
+class Users extends E{
     public static $user;
 
     public static function init(){

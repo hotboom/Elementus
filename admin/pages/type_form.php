@@ -4,39 +4,40 @@ else $act='add';
 
 if($act=='edit'|$act=='copy') {
     $type_id=(int)$_GET['type'];
-    $type=Elements::getType($type_id);
+    $type=E::getType($type_id);
 }
 else $type=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
     echo '<pre>'.print_r($_POST['fields']).'</pre>';
-    Elements::debug();
+    //E::debug();
 
-    if($act=='delete') Elements::deleteType($_POST['types']);
-    else Elements::setType($_POST['type']);
+    if($act=='delete') $result=E::deleteType($_POST['types']);
+    else $result=E::setType($_POST['type']);
 
-    if($act=='add') $done='added';
-    if($act=='delete') $done='deleted';
-    if($act=='edit') $done='edited';
-    ?>
-    <span class="glyphicon glyphicon-ok"></span> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
+    if($result):?>
+        <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
+    <? else:?>
+        <div class="alert alert-warning"><?=t('Error occurred:'.E::$error['desc'])?></div>
+    <? endif;?>
     <script>
+        $(window).hashchange();
         $(function() {
             $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
             $('.modal-footer').show();
-            $.deepLink('/admin/page/type/<?=$type['id']?>');
         });
     </script>
 <? else:?>
     <script>
+        $(window).hashchange();
         $(function() {
             $('.modal-title').html('<?=t($act)?> <?=t('type')?>');
             $('.modal-footer').hide();
         });
     </script>
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=type_form&type=<?=$type['id']?>&act=<?=$act?>">
     <? if($act=='delete'):?>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=type_form&type=<?=$type['id']?>&act=<?=$act?>">
         <p><?=t('delete selected elements')?>?</p>
         <? if(is_array($_GET['elements'])):?>
             <? foreach($_GET['elements'] as $i=>$val):?>
@@ -46,14 +47,12 @@ else $type=array();
         <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
         <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
         <input type="hidden" name="submit" value="submit">
-    </form>
-<?else:?>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=type_form&type=<?=$type['id']?>&act=<?=$act?>">
+    <?else:?>
         <fieldset>
             <input name="type[id]" type="hidden" value="<?=($act!='copy' ? $type['id']:'')?>">
             <div class="form-group">
                 <label for="input_parent"><?=t('Parent')?></label>
-                <? $allTypes=Elements::getTypes(); ?>
+                <? $allTypes=E::getTypes(); ?>
                 <select name="type[parent]" id="input_parent" class="form-control">
                     <option value="NULL"><?=t('Root')?></option>
                     <? foreach($allTypes as $t):?>
@@ -70,24 +69,6 @@ else $type=array();
             <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
             <input type="hidden" name="submit" value="submit">
         </fieldset>
+    <?endif;?>
     </form>
-<?endif;?>
-    <script>
-        $(function() {
-            $('form[data-async]').submit(function(event) {
-                var form = $(this);
-                var target = $(form.attr('data-target'));
-                $.ajax({
-                    type: form.attr('method'),
-                    url: form.attr('action'),
-                    data: form.serialize(),
-
-                    success: function(data, status) {
-                        target.html(data);
-                    }
-                });
-                event.preventDefault();
-            });
-        });
-    </script>
 <? endif;?>

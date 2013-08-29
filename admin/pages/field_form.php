@@ -2,7 +2,7 @@
 if(!empty($_GET['act'])) $act=htmlspecialchars($_GET['act']);
 else $act='add';
 
-$type=Elements::getType((int)$_GET['type']);
+$type=E::getType((int)$_GET['type']);
 
 if($act=='edit'|$act=='copy') {
     $field=array();
@@ -13,26 +13,23 @@ else $field=array();
 <? if(!empty($_POST['submit'])):
     echo '<pre>'.print_r($_POST['fields']).'</pre>';
     //echo '<pre>'.print_r($_GET['fields']).'</pre>';
-    Elements::debug();
+    E::debug();
 
-    if($act=='delete') $result=Elements::deleteTypeField((int)$_GET['type'],$_POST['fields']);
-    else $result=Elements::setTypeField((int)$_GET['type'],$_POST['field']);
+    if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
+    else $result=E::setTypeField((int)$_GET['type'],$_POST['field']);
 
-    if($act=='add') $done='added';
-    if($act=='delete') $done='deleted';
-    if($act=='edit') $done='edited';
     ?>
     <? if($result):?>
-    <i class="icon-ok"></i> <?=t('Field succesfuly '.$done)?>
+    <i class="icon-ok"></i> <?=t('Field succesfuly '.$act)?>
     <? else:?>
-    <i class="icon-warning-sign"></i> <?=t('Error occurred:'.Elements::$error['desc'])?>
+    <i class="icon-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?>
     <? endif;?>
     <script>
+        $(window).hashchange();
         $(function() {
             $('.modal-title').html('<?=t($type['name'].' added')?>');
             $('.modal-footer').show();
         });
-        $.fn.deepLink('/admin/page/type_fields/<?=$type['id']?>');
     </script>
 <? else:?>
     <script>
@@ -41,7 +38,7 @@ else $field=array();
             $('.modal-footer').hide();
         });
     </script>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=field_form&type=<?=$type['id']?>&act=<?=$act?>">
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=field_form&type=<?=$type['id']?>&act=<?=$act?>">
     <? if($act=='delete'):?>
         <p><?=t('delete selected fields')?>?</p>
         <? if(is_array($_GET['fields'])):?>
@@ -75,22 +72,4 @@ else $field=array();
         </fieldset>
     <?endif;?>
     </form>
-    <script>
-        $(function() {
-            $('form[data-async]').submit(function(event) {
-                var form = $(this);
-                var target = $(form.attr('data-target'));
-                $.ajax({
-                    type: form.attr('method'),
-                    url: form.attr('action'),
-                    data: form.serialize(),
-
-                    success: function(data, status) {
-                        target.html(data);
-                    }
-                });
-                event.preventDefault();
-            });
-        });
-    </script>
 <? endif;?>

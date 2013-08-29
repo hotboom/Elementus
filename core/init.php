@@ -10,7 +10,7 @@ if(!$db->getConnect(false, $avx['sql_host'], $avx['sql_user'], $avx['sql_pass'],
 
 //Core
 require_once($root_path."/core/core.php");
-Elements::init($db,$root_path);
+E::init($db,$root_path);
 
 //Template
 require_once($root_path."/core/types/template.php");
@@ -26,6 +26,6 @@ Users::init();
 /* Shortcut functions */
 //Translate
 function t($text,$ucfirst='auto',$lang='en'){
-    return Elements::translate($text,$ucfirst,$lang);
+    return E::translate($text,$ucfirst,$lang);
 }
 ?>

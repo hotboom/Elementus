@@ -1,0 +1,70 @@
+    <ul class="wysihtml5-toolbar">
+        <li>
+            <a class="btn btn-default btn-sm" data-wysihtml5-action="change_view" href="javascript:;" unselectable="on" class=""><i class="icon-code"></i> HTML</a>
+        </li>
+        <li class="dropdown">
+            <a class="btn btn-default btn-sm btn-smdropdown-toggle" data-toggle="dropdown" href="#"><i class="icon-font"></i>&nbsp;<span class="current-font">Normal text</span>&nbsp;<b class="caret"></b></a>
+            <ul class="dropdown-menu">
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="div" tabindex="-1" href="javascript:;" unselectable="on">Normal text</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h1" tabindex="-1" href="javascript:;" unselectable="on">Heading1</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h2" tabindex="-1" href="javascript:;" unselectable="on">Heading2</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h3" tabindex="-1" href="javascript:;" unselectable="on">Heading3</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h4" href="javascript:;" unselectable="on">Heading4</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h5" href="javascript:;" unselectable="on">Heading5</a></li>
+                <li><a data-wysihtml5-command="formatBlock" data-wysihtml5-command-value="h6" href="javascript:;" unselectable="on">Heading6</a></li>
+            </ul>
+        </li>
+        <li>
+            <div class="btn-group btn-group-sm">
+                <a class="btn btn-default" data-wysihtml5-command="bold" title="CTRL+B" tabindex="-1" href="javascript:;" unselectable="on">Bold</a>
+                <a class="btn btn-default" data-wysihtml5-command="italic" title="CTRL+I" tabindex="-1" href="javascript:;" unselectable="on">Italic</a>
+                <a class="btn btn-default" data-wysihtml5-command="underline" title="CTRL+U" tabindex="-1" href="javascript:;" unselectable="on">Underline</a>
+            </div>
+        </li>
+        <li>
+            <div class="btn-group btn-group-sm">
+                <a class="btn btn-default" data-wysihtml5-command="insertUnorderedList" title="Unordered list" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-list"></i></a>
+                <a class="btn btn-default" data-wysihtml5-command="insertOrderedList" title="Ordered list" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-th-list"></i></a>
+                <a class="btn btn-default" data-wysihtml5-command="Outdent" title="Outdent" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-indent-right"></i></a>
+                <a class="btn btn-default" data-wysihtml5-command="Indent" title="Indent" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-indent-left"></i></a>
+            </div>
+        </li>
+        <li style="position:relative;">
+            <div data-wysihtml5-dialog="createLink" class="popover top" style="display: none;">
+                <div class="arrow"></div>
+                <h3 class="popover-title">Insert Link</h3>
+                <div class="popover-content">
+                    <p>
+                        <label>Link:<input data-wysihtml5-dialog-field="href" class="form-control" value="http://"></label>
+                        <a data-wysihtml5-dialog-action="save" class="btn btn-default btn-sm">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel" class="btn btn-default btn-sm">Cancel</a>
+                    </p>
+
+                </div>
+            </div>
+            <a class="btn btn-default btn-sm" data-wysihtml5-command="createLink" title="Insert link" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-link"></i></a>
+        </li>
+        <li style="position:relative;">
+            <div data-wysihtml5-dialog="insertImage" class="popover top" style="display: none;">
+                <div class="arrow"></div>
+                <h3 class="popover-title">Insert Image</h3>
+                <div class="popover-content">
+                    <p>
+                        <label>Image:<input data-wysihtml5-dialog-field="src" value="http://" class="form-control"></label>
+                        <label>
+                            Align:
+                            <select data-wysihtml5-dialog-field="className" class="form-control">
+                                <option value="">default</option>
+                                <option value="wysiwyg-float-left">left</option>
+                                <option value="wysiwyg-float-right">right</option>
+                            </select>
+                        </label>
+                        <a data-wysihtml5-dialog-action="save" class="btn btn-default btn-sm">OK</a>&nbsp;<a data-wysihtml5-dialog-action="cancel" class="btn btn-default btn-sm">Cancel</a>
+                    </p>
+
+                </div>
+            </div>
+            <a class="btn btn-default btn-sm" data-wysihtml5-command="insertImage" title="Insert image" tabindex="-1" href="javascript:;" unselectable="on"><i class="icon-picture"></i></a>
+        </li>
+    </ul>
+
+

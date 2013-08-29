@@ -1,6 +1,6 @@
 <?
  //Ядро системы
-class Elements{
+class E{
     public static $db;
     public static $error=array();
     public static $debug;
@@ -14,23 +14,43 @@ class Elements{
         self::$db        = $db;
         self::$debug     = $debug;
         self::$root_path = $root_path;
+        $filter="domain='".$_SERVER['HTTP_HOST']."'";
+        $apps=self::getApps($params=array('filter'=>$filter));
+        if(empty($apps[0])) $apps=self::getApp($params=array('order'=>'id','limit'=>'1'));
+        self::$app=$apps[0];
 
-        if(!self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps WHERE domain='".$_SERVER['HTTP_HOST']."'",self::$debug))
-            self::$app=self::$db->q("SELECT id,name,domain,template_id FROM apps ORDER BY id LIMIT 0,1",self::$debug);
         if(!empty(self::$app['template_id'])) self::$template=self::getById(self::$app['template_id']);
-        else self::$template=self::$db->q("SELECT element_id AS id,name,path FROM et_templates ORDER BY id LIMIT 0,1",self::$debug);
+        else {
+            $templates=self::get(array('type'=>'templates','order'=>'id','limit'=>'1'));
+            self::$template=$templates[0];
+        }
     }
 
     public static function debug($debug=true){
         self::$debug=$debug;
     }
 
-    public static function getById($element_id){
-        if(!$type=self::getElementType($element_id)) return false;
-        $params['type']=$type['name'];
-        $params['filter']='id='.$element_id;
-        $elements=self::get($params);
-        return $elements[0];
+    public static function getApps($params=array()){
+        if(empty($params)) return self::$app;
+        $sql="SELECT id,name,domain,template_id FROM apps";
+        if(!empty($params['filter'])) $sql.=' WHERE '.$params['filter'];
+        if(!empty($params['order']))  $sql.=' ORDER BY '.$params['order'];
+        if(empty($params['page'])) $params['page']=0;
+        if(!empty($params['limit']))  $sql.=' LIMIT '.$params['page']*$params['limit'].','.$params['limit'];
+        $apps=self::$db->q($sql,self::$debug,0);
+        return $apps;
+    }
+
+    public static function setApp($params){
+        if(empty($params['id'])) $insert=true;
+        else $insert=false;
+        $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." apps SET
+        name='".$params['name']."',
+        domain='".$params['domain']."',
+        template_id=".(empty($params['template_id']) ? "NULL" : "'".$params['template_id']."'")."
+        WHERE id='".$params['id']."'";
+
+        return self::$db->q($sql,self::$debug);
     }
 
     public static function get($params=array()){
@@ -39,22 +59,22 @@ class Elements{
 
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
-        foreach($types as $i=>$type){
-            $types[$i]['table']=self::getTypeTableName($type);
+        foreach($types as $i=>$t){
+            $types[$i]['table']=self::getTypeTableName($t);
             if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) unset($types[$i]);
         }
         $sql="SELECT e.*";
-        foreach($types as $i=>$type) {
+        foreach($types as $i=>$t) {
             $sql.=", t$i.* ";
         }
         $sql.="FROM `elements` AS e ";
-        foreach($types as $i=>$type) {
+        foreach($types as $i=>$t) {
             $sql.="LEFT JOIN `".$types[$i]['table']."` AS t$i ON e.id=t$i.element_id ";
         }
         $sql.="WHERE e.app_id='".self::$app['id']."' AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
-            $sql.=self::filterToSql($params['filter']);
+            $sql.=$params['filter'];
             $sql.=") ";
         }
         $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
@@ -62,8 +82,12 @@ class Elements{
         return $elements;
     }
 
-    private static function filterToSql($filter){
-        return $filter;
+    public static function getById($element_id){
+        if(!$type=self::getElementType($element_id)) return false;
+        $params['type']=$type['name'];
+        $params['filter']='id='.$element_id;
+        $elements=self::get($params);
+        return $elements[0];
     }
 
     public static function set($params=array()){
@@ -226,7 +250,7 @@ class Elements{
     }
 
     public static function getTypeClass($type_name){
-        $class['name']='Elements';
+        $class['name']='E';
         $class['path']=self::$root_path.'/core/core.php';
         $path=self::$root_path."/core/classes/".$type_name.".php";
         if(file_exists($path)) {
@@ -310,6 +334,8 @@ class Elements{
             if(strpos($text,' ')) {
                 $words=explode(' ',$text);
                 $text='';
+                $text=self::translate($words[0],$ucfirst).' '; //Use $ucfirst to first word
+                unset($words[0]);
                 foreach($words as $word) $text.=self::translate($word).' ';
             }
         }

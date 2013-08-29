@@ -2,7 +2,7 @@
 
     <!-- Main jumbotron for a primary marketing message or call to action -->
     <div class="jumbotron">
-        <? $lead=Elements::getById(17); ?>
+        <? $lead=E::getById(17); ?>
         <h1><?=$lead['header']?></h1>
         <p><?=$lead['content']?></p>
         <p><a class="btn btn-primary btn-large">Learn more &raquo;</a></p>

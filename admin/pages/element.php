@@ -1,55 +1,52 @@
 <?
 $type_id=(int)$_GET['type'];
-//Elements::debug();
-$type=Elements::getType($type_id);
-$types=Elements::getFullType($type_id);
-$type['fields']=Elements::getFullTypeFields($type);
+$type=E::getType($type_id);
+$types=E::getFullType($type_id);
+$type['fields']=E::getFullTypeFields($type);
 
-$type['class']=Elements::getTypeClass($type['name']);
+$type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes/".$type['name'].".php");
 
 $act=htmlspecialchars($_GET['act']);
 $element=array();
 if($act=='edit'|$act=='copy') {
     $element_id=(int)$_GET['elements'][0];
-    //Elements::debug();
-    $element=Elements::getById($element_id);
-    //print_r($element);
+    $element=E::getById($element_id);
 }
 ?>
 
 <? if(!empty($_POST['submit'])):
     //echo '<pre>'.print_r($_POST['fields']).'</pre>';
-    //Elements::debug();
+    //E::debug();
 
-    if($act=='delete') $type['class']['name']::delete($_POST['elements']);
-    else $type['class']['name']::set($_POST['fields']);
-
-    if($act=='add') $done='added';
-    if($act=='delete') $done='deleted';
-    if($act=='edit') $done='edited';
+    if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
+    else $result=$type['class']['name']::set($_POST['fields']);
     ?>
-    <span class="glyphicon glyphicon-ok"></span> <?=t($type['name']).' '.t('succesfuly').' '.t($done)?>
+    <? if($result):?>
+        <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
+    <? else:?>
+        <div class="alert alert-warning"><?=t('Error occurred:'.E::$error['desc'])?></div>
+    <? endif;?>
     <script>
+        $(window).hashchange();
         $(function() {
             $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
             $('.modal-footer').show();
-            $.fn.deepLink('/admin/page/type/<?=$type['id']?>');
         });
     </script>
 <? else:?>
     <script>
         $(function() {
-            $('.modal-title').html('<?=t($act)?> <?=t($type['name'])?>');
+            $('.modal-title').html('<?=t($act.' '.$type['name'],true)?>');
             $('.modal-footer').hide();
         });
     </script>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/router.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
     <? if($act=='delete'):?>
         <p><?=t('delete selected elements')?>?</p>
         <? if(is_array($_GET['elements'])):?>
         <? foreach($_GET['elements'] as $i=>$val):?>
-        <input type="test" name="elements[]" value="<?=$val?>">
+        <input type="hidden" name="elements[]" value="<?=$val?>">
         <? endforeach;?>
         <?endif?>
         <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
@@ -61,14 +58,14 @@ if($act=='edit'|$act=='copy') {
             <? foreach($type['fields'] as $i=>$field):?>
             <? if(!empty($field['FK'])): ?>
                 <?
-                $fk_type=Elements::getTypeByName($field['FK']);
-                $fk_type['class']=Elements::getTypeClass($fk_type['name']);
+                $fk_type=E::getTypeByName($field['FK']);
+                $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                 if($fk_type['class']['name']::$foreign_select=='select'):
-                    $fk_elements=Elements::get(array('type'=>$fk_type['id']));
+                    $fk_elements=E::get(array('type'=>$fk_type['id']));
                     ?>
                     <div class="form-group">
-                        <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
+                        <label for="input<?=$field['Field']?>"><?=t($field['Field'],true)?></label>
                         <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
                             <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
                             <? foreach($fk_elements as $fk_element):?>
@@ -87,8 +84,18 @@ if($act=='edit'|$act=='copy') {
                 </div>
             <? elseif($field['Type']=='text'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                    <textarea name="fields[<?=$field['Field']?>]" class="form-control" rows="3"><?=$element[$field['Field']]?></textarea>
+                    <label for="input<?=$field['Field']?>"><?=t($field['Field'],true)?></label>
+                    <div id="toolbar<?=$field['Field']?>" style="display: none;">
+                    <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
+                    </div>
+                    <textarea name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['Field']]?></textarea>
+                    <script>
+                        var editor = new wysihtml5.Editor("input<?=$field['Field']?>", {
+                            toolbar:      "toolbar<?=$field['Field']?>",
+                            //stylesheets:  "css/stylesheet.css",
+                            parserRules:  wysihtml5ParserRules
+                        });
+                    </script>
                 </div>
             <? else:?>
                 <div class="form-group">
@@ -104,22 +111,5 @@ if($act=='edit'|$act=='copy') {
         </fieldset>
     <?endif;?>
     </form>
-    <script>
-        $(function() {
-            $('form[data-async]').submit(function(event) {
-                var form = $(this);
-                var target = $(form.attr('data-target'));
-                $.ajax({
-                    type: form.attr('method'),
-                    url: form.attr('action'),
-                    data: form.serialize(),
-
-                    success: function(data, status) {
-                        target.html(data);
-                    }
-                });
-                event.preventDefault();
-            });
-        });
-    </script>
+    <div class="clearfix"></div>
 <? endif;?>

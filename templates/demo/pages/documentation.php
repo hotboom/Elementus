@@ -69,13 +69,13 @@
 в наличии на складе в Москве или Перми
 любой макри кроме GT
 */
-$elements=Elements::get('bikes',array(
+$elements=E::get('bikes',array(
     'limit'=>30,
     'filter'=>'frame_size>18 & (store_moskow >1|store_perm>1)&brand!=GT'
 ));
 
 /* Сортировать посты авторов с рейтингом больше 100 по кол-ву комментариев */
-$elements=Elements::get('posts',array(
+$elements=E::get('posts',array(
     'limit'=>30,
     'select'=>'posts_comments.count(*) as comments_cnt',
     'sort'=>'comments_cnt',
@@ -98,7 +98,7 @@ $elements=Elements::get('posts',array(
                         <div class="examples">
                             <h3>Примеры</h3>
                                 <pre>
-$lilu=Elements::getById(5);
+$lilu=E::getById(5);
                                 </pre>
                         </div>
                     </li>

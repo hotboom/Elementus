@@ -1,13 +1,12 @@
 <?
 //Simple router
-$url=explode('/',$_SERVER['REQUEST_URI']);
-$prev='';
-foreach($url as $i=>$val){
-    if(empty($val)|$val=='admin'|$val==$prev) continue;
-    if(!empty($url[$i+1])) $_GET[$val]=$url[$i+1];
-    else $_GET['id']=$val;
-    $prev=$url[$i+1];
+$url=parse_url($_SERVER['REQUEST_URI']);
+$url['path']=explode('/',$url['path']);
+$url['path'] = array_slice($url['path'], 2);
+$_GET['page']=$url['path'][0];
+$url['path'] = array_slice($url['path'], 1);
+for($i=0; $i<count($url['path']); $i=$i+2){
+    $_GET[$url['path'][$i]]=$url['path'][$i+1];
 }
-
-require_once("index.php");
+if(!empty($_GET['page'])) require_once("index.php");
 ?>

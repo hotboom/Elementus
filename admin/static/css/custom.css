@@ -5,3 +5,38 @@ a.selected{
     text-decoration: none;
     color: #5e5e5e;
 }
+
+.modal-dialog{
+    width:100% !important;
+}
+.modal-content{
+    width:650px; margin:0 auto;
+}
+.modal-content .modal-header { cursor: move; }
+
+.form-control{width:100%;}
+
+.modal.minimizated{position: absolute; bottom:0 !important; height:58px; left:0; top:auto!important; overflow:hidden;}
+.modal.minimizated .modal-dialog{padding:0;}
+.modal.minimizated .modal-body{display:none;}
+.modal.minimizated .modal-footer{display:none;}
+.modal.fullscreen .modal-content{width:100%!important;}
+
+/*
+.modal-header .icon-remove{background:#ac2925;}
+.modal-header .icon-minus{background:#efefef;}*/
+.leftBar{
+    width: 217px;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: #fafafa;
+    padding: 40px 0;
+    min-height: 100%;
+}
+.mainBar{
+    position: relative;
+    margin:0 0 0 219px;
+}
+.navbar-brand{width:217px;}
+.container{max-width:1920px;}

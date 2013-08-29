@@ -1,5 +1,5 @@
 <?
-class Template extends Elements{
+class Template extends E{
     public static $id;
     public static $path;
     public static $name;

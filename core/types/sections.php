@@ -1,5 +1,5 @@
 <?
-class Sections extends Elements{
+class Sections extends E{
     public static function get($params=array()){
         $params['type']='sections';
         return parent::get($params);

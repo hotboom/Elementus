@@ -7,7 +7,7 @@ if(!empty($_GET['act'])){
         break;
 
         case 'login':
-            //Elements::debug();
+            //E::debug();
             if(!Users::login($_POST['email'],$_POST['password'],$_POST['remember'])) {
                 header('HTTP/1.0 403 Forbidden');
                 exit();

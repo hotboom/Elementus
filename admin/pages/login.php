@@ -1,5 +1,10 @@
+<? if(Users::$user['group_id']=='19'){
+    header('Location: /admin');
+    exit();
+}
+?>
 <? if(!empty($_POST['submit'])):
-    //Elements::debug();
+    //E::debug();
     if(!Users::login($_POST['email'],$_POST['password'],$_POST['password'])) {
        header('HTTP/1.0 403 Forbidden');
     }
@@ -21,33 +26,10 @@
     <link href="/admin/static/css/custom.css" rel="stylesheet" media="screen">
 
     <!-- JavaScript plugins (requires jQuery) -->
-    <script type="text/javascript" src="/admin//static/js/jquery-1.9.0.min.js"></script>
+    <script type="text/javascript" src="/admin/static/js/jquery-1.9.0.min.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/admin/static/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="/admin/static/js/jquery.address-1.6.min.js"></script>
-    <script type="text/javascript">
-        // Event handlers
-        $.address.init(function(event) {
-
-        }).change(function(event) {
-                $('a').each(function() {
-                    $(this).toggleClass('selected', $(this).attr('href') == '#'+event.value);
-                });
-                if(event.value=='/') var url='page/dashboard';
-                else var url='/admin'+event.value;
-                $.deepLink(url);
-            });
-        $.deepLink=function(url){
-            $.ajax({
-                url: url
-            }).done(function( html ) {
-                    $("#page").html(html);
-                });
-        }
-
-
-    </script>
     <style type="text/css">
         body {
             padding-top: 40px;
