@@ -40,11 +40,15 @@ Installation:
 
 1. unzip arhive to httpdocs folder of web-server
 
-2. import  mysql dump dbdump.sql to your mySQL database and delete this file
+2. import  mysql dump dbdump.sql to your mySQL database
 
 3. set your database name, user and password in config.php
 
-To open admin panel use yourdomain.com/admin
+To open admin panel:
+
+yourdomain.com/admin
+
 email: demo@demo.dem
+
 password: demo
 
