@@ -16,7 +16,7 @@ class E{
         self::$root_path = $root_path;
         $filter="domain='".$_SERVER['HTTP_HOST']."'";
         $apps=self::getApps($params=array('filter'=>$filter));
-        if(empty($apps[0])) $apps=self::getApp($params=array('order'=>'id','limit'=>'1'));
+        if(empty($apps[0])) $apps=self::getApps($params=array('order'=>'id','limit'=>'1'));
         self::$app=$apps[0];
 
         if(!empty(self::$app['template_id'])) self::$template=self::getById(self::$app['template_id']);
