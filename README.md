@@ -3,6 +3,25 @@ All is Element
 
 *Elementus - is powerful, flexible and simple PHP/mySQL framework for any web applications*
 
+Basics
+------
+
+All is Element
+
+Element know how to edit itself, application know how to show it
+
+Almost all action has default way
+
+Features
+--------
+
+Intelligent core and base classes methods based on few basic core methods 
+
+Flexible, clean and simple admin panel based on Bootstrap 3 and jQuery 1.9
+
+Multyapplication support
+
+
 Getting started
 ---------------
 
