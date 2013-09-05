@@ -118,7 +118,7 @@ class E{
             $types[$i]['table']=self::getTypeTableName($type);
             foreach($types[$i]['fields'] as $j=>$field){
                 foreach($params as $k=>$val){
-                    if($k==$field['Field']) $types[$i]['fields'][$j]['val']=$val;
+                    if($k==$field['name']) $types[$i]['fields'][$j]['val']=$val;
                 }
                 if(!isset($types[$i]['fields'][$j]['val'])) unset($types[$i]['fields'][$j]);
             }
@@ -128,7 +128,7 @@ class E{
             $sql=$prx.$type['table']." SET ";
             $sql.="element_id='".$params['element_id']."'";
             foreach($type['fields'] as $field){
-                $sql.=", ".$field['Field']."=";
+                $sql.=", ".$field['name']."=";
                 if($field['val']=='NULL') $sql.="NULL";
                 else $sql.="'".$field['val']."'";
             }
@@ -162,7 +162,7 @@ class E{
         return self::$db->q($sql,self::$debug);
     }
 
-    public static function setTypeField($type,$params){
+    public static function setField($type,$params){
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
         if(!self::$db->q("SHOW TABLES LIKE '".$table."'")){
@@ -172,8 +172,28 @@ class E{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        //Example: ALTER TABLE et_content_products CHANGE store store INT( 11 ) NOT NULL
-        return self::$db->q("ALTER TABLE  ".$table." ".(empty($params['field']) ? 'ADD' :'CHANGE '.$params['field'])." ".$params['name']." ".$params['type']." NOT NULL",self::$debug); // AFTER  `field`
+        //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
+        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['name'])." ".$params['name']." ";
+        if($params['type']=='string')
+            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
+        if($params['type']=='int')
+            return self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug);
+        if($params['type']=='text')
+            return self::$db->q($alter_prx."TEXT NOT NULL",self::$debug);
+        if($params['type']=='html')
+            return self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug);
+        if($params['type']=='file')
+            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug);
+        if($params['type']=='image')
+            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"image"}\'',self::$debug);
+        if($params['type']=='select'){
+            if($params['select']['type']=='list'){
+                foreach($params['select']['list'] as $i=>$item) $params['select']['list'][$i]="'$item'";
+                return self::$db->q($alter_prx."ENUM(".implode(',',$params['select']['list']).") NOT NULL",self::$debug);
+            }
+        }
+        else return false;
+
     }
 
     public static function deleteTypeField($type,$field_name){
@@ -282,29 +302,43 @@ class E{
         return 'et_'.$table;
     }
 
-    public static function getTypeFields($type){
+    public static function getField($type,$field_name){
         $type=self::getType($type);
-        $table=self::getTypeTableName($type);
-        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
-        $fields=self::$db->q('SHOW FULL COLUMNS FROM `'.$table.'`',self::$debug);
-        foreach($fields as $i=>$field){
-            if($field['Key']=='MUL') {
-                $sql="
+        $type['table']=self::getTypeTableName($type);
+        $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
+        $field['name']=$column['COLUMN_NAME'];
+        $field['type']=$column['DATA_TYPE'];
+        $field['default']=$column['COLUMN_DEFAULT'];
+        $field['position']=$column['ORDINAL_POSITION'];
+        $field['key']=$column['COLUMN_KEY'];
+        if(!empty($column['COLUMN_COMMENT'])) {
+            $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
+            if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
+        }
+        if($field['key']=='MUL') {
+            $sql="
                 SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
                 FROM information_schema.TABLE_CONSTRAINTS i
                 LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
                 WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
-                AND k.COLUMN_NAME = '".$field['Field']."'
+                AND k.COLUMN_NAME = '".$field['name']."'
                 AND i.TABLE_SCHEMA = DATABASE()
-                AND i.TABLE_NAME = '".$table."'";
-                $inf=self::$db->q($sql,self::$debug);
-                if(!empty($inf)) $fields[$i]['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
-                else $fields[$i]['FK']=false;
-                /*echo "<pre>";
-                print_r($inf);
-                echo "</pre>"; */
-            }
+                AND i.TABLE_NAME = '".$type['table']."'";
+            $inf=self::$db->q($sql,self::$debug);
+            if(!empty($inf)) $field['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
+            else $field['FK']=false;
+        }
+        return $field;
+    }
+
+    public static function getTypeFields($type){
+        $type=self::getType($type);
+        $table=self::getTypeTableName($type);
+        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
+        $fields=self::$db->q('SHOW COLUMNS FROM `'.$table.'`',self::$debug);
+        foreach($fields as $i=>$field){
             if($field['Field']=='element_id') unset($fields[$i]);
+            else $fields[$i]=self::getField($type,$field['Field']);
         }
         return $fields;
     }

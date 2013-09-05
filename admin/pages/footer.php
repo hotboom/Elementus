@@ -27,7 +27,7 @@
     $(document).bind("ajaxComplete", function(){
 
         //Ajax form submit
-        $('form[data-async]').submit(function(event) {
+        $('form[data-async]').unbind().submit(function(event) {
             var form = $(this);
             var target = $(form.attr('data-target'));
             $.ajax({
@@ -43,7 +43,7 @@
         });
 
         //Ajax links
-        $('a[data-target]').click(function(event) {
+        $('a[data-target]').unbind().click(function(event) {
             target=$(this).attr('data-target');
             url=$(this).attr('href');
             $('#elements input:checked').each(function(){
@@ -62,13 +62,14 @@
         });
 
         //Selecting elements
-        $('#elements tr').click(function(event){
+        $('#elements tr').unbind().click(function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
             event.preventDefault();
         });
 
-        $('#elements tr input[type=checkbox]').click(function(event){
+        $('#elements tr input[type=checkbox]').unbind().click(function(event){
+            //console.log($(this));
             var tr=$(this).parents('tr');
             tr.toggleClass('active');
             if($('#elements tr.active').size()){

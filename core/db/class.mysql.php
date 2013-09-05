@@ -39,11 +39,11 @@
 class MySQL {
 
     // SET THESE VALUES TO MATCH YOUR DATA CONNECTION
-    private $db_host    = "localhost";  // server name
+    public $db_host    = "localhost";  // server name
     private $db_user    = "root";       // user name
     private $db_pass    = "";           // password
-    private $db_dbname  = "";           // database name
-    private $db_charset = "";           // optional character set (i.e. utf8)
+    public $db_dbname  = "";           // database name
+    public $db_charset = "";           // optional character set (i.e. utf8)
     private $db_pcon    = false;        // use persistent connection?
 
     // class-internal variables - do not change

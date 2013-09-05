@@ -32,10 +32,10 @@ $params=array('type'=>$type['name']);
     </tr>
     <? foreach($type['fields'] as $i=>$field):?>
     <tr>
-        <td><input type="checkbox" name="fields[]" value="<?=$field['Field']?>"> <?=$i?></td>
-        <td><?=$field['Field']?></td>
-        <td><?=$field['Type']?></td>
-        <td><?=$field['Default']?></td>
+        <td><input type="checkbox" name="fields[]" value="<?=$field['name']?>"> <?=$i?></td>
+        <td><?=$field['name']?></td>
+        <td><?=$field['type']?></td>
+        <td><?=$field['default']?></td>
     </tr>
     <? endforeach; ?>
 </table>

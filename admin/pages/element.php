@@ -14,10 +14,13 @@ if($act=='edit'|$act=='copy') {
     $element=E::getById($element_id);
 }
 ?>
+<? if(!empty($_FILES)):
+    $uploaddir = $root_path.'/upload/files/';
+    $uploadfile = $uploaddir . basename($_FILES['file']['name']);
 
-<? if(!empty($_POST['submit'])):
-    //echo '<pre>'.print_r($_POST['fields']).'</pre>';
-    //E::debug();
+    if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
+    ?>
+<? elseif(!empty($_POST['submit'])):
 
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else $result=$type['class']['name']::set($_POST['fields']);
@@ -65,33 +68,35 @@ if($act=='edit'|$act=='copy') {
                     $fk_elements=E::get(array('type'=>$fk_type['id']));
                     ?>
                     <div class="form-group">
-                        <label for="input<?=$field['Field']?>"><?=t($field['Field'],true)?></label>
-                        <select name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control">
+                        <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                        <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
                             <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
                             <? foreach($fk_elements as $fk_element):?>
-                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['Field']] ? 'selected':'')?>><?=$fk_element['name']?></option>
+                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=$fk_element['name']?></option>
                             <? endforeach;?>
                         </select>
                     </div>
                 <? endif; ?>
-            <? elseif($field['Field']=='password'): ?>
+            <? elseif($field['type']=='image'|$field['type']=='file'): ?>
+                 <? include("pages/field_types/file.php");?>
+            <? elseif($field['name']=='password'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?> <?=t('hash')?></label>
-                    <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
-                    <label for="inputnew<?=$field['Field']?>"><?=t('New')?> <?=t($field['Field'])?></label>
-                    <input name="fields[new_<?=$field['Field']?>]" type="text" class="form-control" id="inputnew<?=$field['Field']?>" value="">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
+                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
+                    <label for="inputnew<?=$field['name']?>"><?=t('New')?> <?=t($field['name'])?></label>
+                    <input name="fields[new_<?=$field['name']?>]" type="text" class="form-control" id="inputnew<?=$field['name']?>" value="">
                     <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
                 </div>
-            <? elseif($field['Type']=='text'): ?>
+            <? elseif($field['type']=='text'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['Field']?>"><?=t($field['Field'],true)?></label>
-                    <div id="toolbar<?=$field['Field']?>" style="display: none;">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <div id="toolbar<?=$field['name']?>" style="display: none;">
                     <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
                     </div>
-                    <textarea name="fields[<?=$field['Field']?>]" id="input<?=$field['Field']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['Field']]?></textarea>
+                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
                     <script>
-                        var editor = new wysihtml5.Editor("input<?=$field['Field']?>", {
-                            toolbar:      "toolbar<?=$field['Field']?>",
+                        var editor = new wysihtml5.Editor("input<?=$field['name']?>", {
+                            toolbar:      "toolbar<?=$field['name']?>",
                             //stylesheets:  "css/stylesheet.css",
                             parserRules:  wysihtml5ParserRules
                         });
@@ -99,8 +104,8 @@ if($act=='edit'|$act=='copy') {
                 </div>
             <? else:?>
                 <div class="form-group">
-                    <label for="input<?=$field['Field']?>"><?=t($field['Field'])?></label>
-                    <input name="fields[<?=$field['Field']?>]" type="text" class="form-control" id="input<?=$field['Field']?>" value="<?=$element[$field['Field']]?>">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'])?></label>
+                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
                 </div>
             <? endif;?>
             <? endforeach;?>

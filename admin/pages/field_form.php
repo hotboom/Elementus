@@ -3,20 +3,18 @@ if(!empty($_GET['act'])) $act=htmlspecialchars($_GET['act']);
 else $act='add';
 
 $type=E::getType((int)$_GET['type']);
-
+$type['table']=E::getTypeTableName($type);
 if($act=='edit'|$act=='copy') {
-    $field=array();
+    $field=E::getField($type,$_GET['fields'][0]);
 }
 else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    echo '<pre>'.print_r($_POST['fields']).'</pre>';
-    //echo '<pre>'.print_r($_GET['fields']).'</pre>';
-    E::debug();
+    //E::debug();
 
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
-    else $result=E::setTypeField((int)$_GET['type'],$_POST['field']);
+    else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
     ?>
     <? if($result):?>
@@ -51,18 +49,28 @@ else $field=array();
         <input type="hidden" name="submit" value="submit">
     <?else:?>
         <fieldset>
-            <input name="field[field]" type="hidden" value="<?=($act!='copy' ? $field['Field']:'')?>">
+            <input name="field[act]" type="hidden" value="<?=$act?>">
             <div class="form-group">
                 <label for="input_name"><?=t('Name')?></label>
-                <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['Field']?>">
+                <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['name']?>">
             </div>
             <div class="form-group">
                 <label for="input_type"><?=t('Type')?></label>
+                <?
+                $ftypes=array(
+                    'int'=>'Integer',
+                    'string'=>'String',
+                    'text'=>'Text',
+                    'select'=>'select',
+                    'html'=>'HTML',
+                    'file'=>'File',
+                    'image'=>'Image'
+                );
+                ?>
                 <select name="field[type]" id="input_type" class="form-control">
-                    <option value="INT(11)"><?=t('Int')?></option>
-                    <option value="VARCHAR(255)"><?=t('Varchar')?></option>
-                    <option value="TEXT"><?=t('Text')?></option>
-                    <option value="FOREIGN KEY"><?=t('Foreign key')?></option>
+                    <? foreach($ftypes as $i=>$ftype):?>
+                    <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
+                    <? endforeach;?>
                 </select>
             </div>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>

@@ -25,15 +25,15 @@ $elements=$type['class']['name']::get($params);
 
 <table id="elements" class="table table-hover table-condensed">
     <tr>
-        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['Field']?>">id</a></th>
+        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
         <? foreach($type['fields'] as $i=>$field):?>
-           <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['Field']?>"><?=t($field['Field'])?></a></th>
+           <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
         <? endforeach; ?>
         <? foreach($elements as $element): ?>
             <tr>
                 <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
             <? foreach($type['fields'] as $i=>$field):?>
-                <td><?=$element[$field['Field']]?></td>
+                <td><?=$element[$field['name']]?></td>
             <? endforeach; ?>
             </tr>
         <? endforeach; ?>
