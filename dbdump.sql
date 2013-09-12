@@ -19,14 +19,14 @@ CREATE TABLE IF NOT EXISTS `apps` (
 
 INSERT INTO `apps` (`id`, `name`, `key`, `domain`, `template_id`) VALUES
 (1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw', 'elementus.loc', 23),
-(2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.loc', NULL);
+(2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.loc', 82);
 
 CREATE TABLE IF NOT EXISTS `elements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=32 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=89 ;
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
@@ -41,8 +41,14 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (25, 4, 2),
 (26, 1, 1),
 (28, 1, 2),
+(51, 2, 2),
+(86, 3, 2),
+(87, 3, 2),
+(30, 1, 2),
 (29, 1, 2),
-(30, 1, 2);
+(85, 3, 2),
+(82, 6, 2),
+(88, 3, 2);
 
 CREATE TABLE IF NOT EXISTS `et_content` (
   `element_id` int(11) NOT NULL,
@@ -62,7 +68,49 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (20, NULL, 'Все есть Элемент', 'Elemental -'),
 (31, NULL, '', ''),
 (32, NULL, '', ''),
-(33, NULL, '', '');
+(33, NULL, '', ''),
+(46, NULL, 'первый нах!', ''),
+(47, NULL, 'второй пошел', ''),
+(48, NULL, '', ''),
+(49, NULL, 'test', ''),
+(50, NULL, 'Всем заголовкам заголовок', 'test2'),
+(51, 24, 'О магазине', 'Это&nbsp;пример реализации интернет-магазина на основе <a rel="nofollow" target="_blank" href="http://elementus.org/">Elementus&nbsp;фреймворк</a>. Все материалы на сайте&nbsp;<span>присутствуют исключительно в демострационных целях.</span>'),
+(52, NULL, 'test3', ''),
+(53, NULL, 'test4', ''),
+(54, 28, 'test6', ''),
+(55, NULL, 'test6', ''),
+(56, NULL, 'test6', ''),
+(57, NULL, 'tset769', ''),
+(58, NULL, '4y6drhg', ''),
+(59, NULL, 'tset', 'tset'),
+(60, NULL, '', 'tests'),
+(61, NULL, 'tsetsets', ''),
+(62, NULL, 'sefgi', ''),
+(63, NULL, 'wlitfhrsdio', ''),
+(64, NULL, 'etstse', ''),
+(65, NULL, 'test35r', 'sklfjsklj'),
+(66, NULL, 'test', 'test'),
+(67, NULL, 'test', 'test'),
+(68, NULL, 'test39785', 'test'),
+(69, NULL, 'test39785', 'test'),
+(70, NULL, 'test39785', 'test'),
+(71, NULL, 'test39785', 'test'),
+(72, NULL, 'etset', 'setset'),
+(73, NULL, 'etset', 'setset'),
+(74, NULL, 'etset', 'setset'),
+(75, NULL, 'etsfsetsfs', 'setset'),
+(76, NULL, 'sklfjskl', 'sklfsl'),
+(77, NULL, 'test', ''),
+(78, NULL, '', ''),
+(79, NULL, '', ''),
+(80, NULL, '', ''),
+(81, NULL, '', ''),
+(83, 24, '', ''),
+(84, 24, '', ''),
+(85, 24, 'test', ''),
+(86, 24, '', ''),
+(87, 24, '', ''),
+(88, 24, '', '');
 
 CREATE TABLE IF NOT EXISTS `et_content_phones` (
   `element_id` int(11) NOT NULL,
@@ -74,8 +122,11 @@ CREATE TABLE IF NOT EXISTS `et_content_phones` (
 
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
-  `fulldescr` text NOT NULL,
+  `fulldescr` text NOT NULL COMMENT '{"type":"html"}',
   `store` int(11) NOT NULL,
+  `brand` enum('Apple','HTC','LG') NOT NULL,
+  `model` int(11) NOT NULL,
+  `image` varchar(255) NOT NULL COMMENT '{"type":"image"}',
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -101,7 +152,8 @@ INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`
 (28, NULL, 'Каталог', 'catalog', 'catalog', ''),
 (29, NULL, 'Оплата', 'howtopay', 'text', ''),
 (30, NULL, 'Доставка', 'delivery', 'text', ''),
-(34, NULL, 'test', '', '', '');
+(34, NULL, 'test', '', '', ''),
+(45, NULL, 'test7', '', '', '');
 
 CREATE TABLE IF NOT EXISTS `et_templates` (
   `element_id` int(11) NOT NULL,
@@ -111,7 +163,8 @@ CREATE TABLE IF NOT EXISTS `et_templates` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_templates` (`element_id`, `name`, `path`) VALUES
-(23, 'Elementus', 'home');
+(23, 'Elementus', 'elementus'),
+(82, 'E-store demo', 'demo');
 
 CREATE TABLE IF NOT EXISTS `et_users` (
   `element_id` int(11) NOT NULL,
