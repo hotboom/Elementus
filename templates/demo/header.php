@@ -67,7 +67,7 @@
             <form class="navbar-form form-inline pull-right" method="POST" data-async data-target="#window .modal-body" action="index.php?act=login">
                 <input type="text" name="email" placeholder="Email">
                 <input type="password" name="password" placeholder="Password">
-                <button type="submit" class="btn btn-primary">Войти</button>
+                <button type="submit" class="btn btn-primary btn-small">Войти</button>
             </form>
             <? endif;?>
         </div><!--/.nav-collapse -->

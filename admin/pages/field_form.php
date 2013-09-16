@@ -61,7 +61,7 @@ else $field=array();
                     'int'=>'Integer',
                     'string'=>'String',
                     'text'=>'Text',
-                    'select'=>'select',
+                    'select'=>'Select',
                     'html'=>'HTML',
                     'file'=>'File',
                     'image'=>'Image'
@@ -69,10 +69,39 @@ else $field=array();
                 ?>
                 <select name="field[type]" id="input_type" class="form-control">
                     <? foreach($ftypes as $i=>$ftype):?>
-                    <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
+                        <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
                     <? endforeach;?>
                 </select>
             </div>
+            <div class="form-group">
+                <select name="field[select]" id="input_type_select" class="form-control" style="display:none;">
+                    <option value="list"><?=t('From list')?></option>
+                    <option value="list"><?=t('Elements')?></option>
+                </select>
+            </div>
+            <div class="form-group select_list" style="display:none;">
+                <label for="input_type"><?=t('List entries')?></label>
+                <input name="field[select][list][]" type="text" class="form-control select_value" value="<?=$field['name']?>"><a href="#" class="btn btn-default" id="add_select_value"><?=t('More')?></a>
+            </div>
+            <script>
+                var field_select=$('#input_type_select');
+                var select_list=$('.select_list');
+                $('#input_type').change(function(){
+                    if ($(this).val()=='select') {
+                        field_select.show();
+                        select_list.show();
+                    }
+                    else {
+                        field_select.hide();
+                        select_list.hide();
+                    }
+                });
+
+                $('#add_select_value').click(function(e){
+                    $('.select_value').after($('.select_value:eq(0)').clone());
+                    e.preventDefault();
+                });
+            </script>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
             <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
