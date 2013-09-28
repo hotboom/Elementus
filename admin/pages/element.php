@@ -59,9 +59,9 @@ if($act=='edit'|$act=='copy') {
         <fieldset>
             <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['element_id']:'')?>">
             <? foreach($type['fields'] as $i=>$field):?>
-            <? if(!empty($field['FK'])): ?>
+            <? if($field['type']==='elements'): ?>
                 <?
-                $fk_type=E::getTypeByName($field['FK']);
+                $fk_type=E::getTypeByName($field['elements_type']);
                 $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                 if($fk_type['class']['name']::$foreign_select=='select'):
@@ -77,7 +77,7 @@ if($act=='edit'|$act=='copy') {
                         </select>
                     </div>
                 <? endif; ?>
-            <? elseif($field['type']=='image'|$field['type']=='file'): ?>
+            <? elseif($field['type']==='image'|$field['type']=='file'): ?>
                  <? include("pages/field_types/file.php");?>
             <? elseif($field['name']=='password'): ?>
                 <div class="form-group">

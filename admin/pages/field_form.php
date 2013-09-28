@@ -11,7 +11,7 @@ else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    //E::debug();
+    E::debug();
 
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
@@ -61,7 +61,8 @@ else $field=array();
                     'int'=>'Integer',
                     'string'=>'String',
                     'text'=>'Text',
-                    'select'=>'Select',
+                    'elements'=>'Elements select',
+                    'enum'=>'Values select',
                     'html'=>'HTML',
                     'file'=>'File',
                     'image'=>'Image'
@@ -73,32 +74,35 @@ else $field=array();
                     <? endforeach;?>
                 </select>
             </div>
-            <div class="form-group">
-                <select name="field[select]" id="input_type_select" class="form-control" style="display:none;">
-                    <option value="list"><?=t('From list')?></option>
-                    <option value="list"><?=t('Elements')?></option>
+            <div class="form-group extra" id="extra_enum" style="<?=($field['type']!='enum' ? 'display:none;' : '')?>">
+                <label for="input_type"><?=t('List entries')?></label>
+                <? if(!empty($field['values'])):?>
+                    <? foreach($field['values'] as $val):?>
+                        <input name="field[enum][list][]" type="text" class="form-control select_value" value="<?=$val?>">
+                    <? endforeach;?>
+                <? else:?>
+                    <input name="field[enum][list][]" type="text" class="form-control select_value" value="">
+                <? endif;?>
+                <a href="#" class="btn btn-default" id="add_select_value"><?=t('More')?></a>
+            </div>
+            <div class="form-group extra" id="extra_elements" style="<?=($field['type']!='elements' ? 'display:none;' : '')?>">
+                <label for="input_type"><?=t('Type')?></label>
+                <? $types=E::getTypes();?>
+                <select name="field[elements_type]" id="input_type" class="form-control">
+                    <? foreach($types as $i=>$t):?>
+                        <option value="<?=$t['id']?>"<?=($field['elements_type']==$t['name'] ? ' selected="selected"' : '')?>><?=t($t['name'])?></option>
+                    <? endforeach;?>
                 </select>
             </div>
-            <div class="form-group select_list" style="display:none;">
-                <label for="input_type"><?=t('List entries')?></label>
-                <input name="field[select][list][]" type="text" class="form-control select_value" value="<?=$field['name']?>"><a href="#" class="btn btn-default" id="add_select_value"><?=t('More')?></a>
-            </div>
             <script>
-                var field_select=$('#input_type_select');
-                var select_list=$('.select_list');
                 $('#input_type').change(function(){
-                    if ($(this).val()=='select') {
-                        field_select.show();
-                        select_list.show();
-                    }
-                    else {
-                        field_select.hide();
-                        select_list.hide();
-                    }
+                    $('.extra').hide();
+                    $('#extra_'+$(this).val()).show();
                 });
 
                 $('#add_select_value').click(function(e){
-                    $('.select_value').after($('.select_value:eq(0)').clone());
+                    $('.select_value:last').after($('.select_value:last').clone());
+                    $('.select_value:last').val('');
                     e.preventDefault();
                 });
             </script>
