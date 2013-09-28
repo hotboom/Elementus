@@ -11,7 +11,7 @@ else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    E::debug();
+    //E::debug();
 
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);

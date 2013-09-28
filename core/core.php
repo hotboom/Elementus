@@ -172,6 +172,23 @@ class E{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
+        $field=self::getField($type,$params['name']);
+        if($field['type']==='elements'){
+            //DROP OLD KEY
+            $sql="
+                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                FROM information_schema.TABLE_CONSTRAINTS i
+                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                AND k.COLUMN_NAME = '".$field['name']."'
+                AND i.TABLE_SCHEMA = DATABASE()
+                AND i.TABLE_NAME = '".$table."'";
+            $foreign_keys=self::$db->q($sql,self::$debug,false);
+            foreach($foreign_keys as $key){
+                self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+            }
+        }
+
         //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
         $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['name'])." ".$params['name']." ";
         if($params['type']=='string')
@@ -342,7 +359,6 @@ class E{
                 $field['type']='elements';
                 $field['elements_type']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
             }
-            else $field['FK']=false;
         }
         return $field;
     }
