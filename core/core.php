@@ -190,7 +190,7 @@ class E{
         }
 
         //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
-        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['old_name'])." ".$params['name']." ";
+        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='string')
             return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
         elseif($params['type']=='int')
@@ -207,12 +207,12 @@ class E{
         }
         elseif($params['type']=='elements'){
             if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
-            if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX ('.$params['name'].')',self::$debug)) return false;
+            if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
             $params['elements_type']=self::getTypeTableName($params['elements_type']);
             echo $params['elements_type'];
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
-            return self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY ('.$params['name'].') REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug);
+            return self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug);
         }
         else {
             self::$error['code']=5;

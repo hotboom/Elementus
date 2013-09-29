@@ -100,6 +100,11 @@ if($act=='edit'|$act=='copy') {
             <? elseif($field['type']=='text'): ?>
                 <div class="form-group">
                     <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
+                </div>
+            <? elseif($field['type']=='html'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
                     <div id="toolbar<?=$field['name']?>" style="display: none;">
                     <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
                     </div>
