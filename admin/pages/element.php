@@ -61,7 +61,7 @@ if($act=='edit'|$act=='copy') {
             <? foreach($type['fields'] as $i=>$field):?>
             <? if($field['type']==='elements'): ?>
                 <?
-                $fk_type=E::getTypeByName($field['elements_type']);
+                $fk_type=E::getType($field['elements_type']);
                 $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                 if($fk_type['class']['name']::$foreign_select=='select'):
@@ -77,6 +77,16 @@ if($act=='edit'|$act=='copy') {
                         </select>
                     </div>
                 <? endif; ?>
+            <? elseif($field['type']==='enum'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
+                        <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                        <? foreach($field['values'] as $val):?>
+                            <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
+                        <? endforeach;?>
+                    </select>
+                </div>
             <? elseif($field['type']==='image'|$field['type']=='file'): ?>
                  <? include("pages/field_types/file.php");?>
             <? elseif($field['name']=='password'): ?>
