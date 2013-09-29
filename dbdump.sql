@@ -42,19 +42,15 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (26, 1, 1),
 (28, 1, 2),
 (51, 2, 2),
-(86, 3, 2),
-(87, 3, 2),
 (30, 1, 2),
 (29, 1, 2),
-(85, 3, 2),
-(82, 6, 2),
-(88, 3, 2);
+(82, 6, 2);
 
 CREATE TABLE IF NOT EXISTS `et_content` (
   `element_id` int(11) NOT NULL,
   `section_id` int(11) DEFAULT NULL,
   `header` varchar(255) NOT NULL,
-  `content` text NOT NULL,
+  `content` text NOT NULL COMMENT '{"type":"html"}',
   PRIMARY KEY (`element_id`),
   KEY `section_id` (`section_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -112,21 +108,45 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (87, 24, '', ''),
 (88, 24, '', '');
 
-CREATE TABLE IF NOT EXISTS `et_content_phones` (
-  `element_id` int(11) NOT NULL,
-  `fulldescr` text NOT NULL,
-  `screen` varchar(255) NOT NULL,
-  `store` int(11) NOT NULL,
-  PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
-  `fulldescr` text NOT NULL COMMENT '{"type":"html"}',
+  `shortdescr` text NOT NULL,
   `store` int(11) NOT NULL,
-  `brand` enum('Apple','HTC','LG') NOT NULL,
+  `brand` enum('Samsung','LG','HTC','Sony') NOT NULL,
   `model` int(11) NOT NULL,
   `image` varchar(255) NOT NULL COMMENT '{"type":"image"}',
+  PRIMARY KEY (`element_id`),
+  KEY `brand` (`brand`),
+  KEY `brand_2` (`brand`),
+  KEY `brand_3` (`brand`),
+  KEY `brand_4` (`brand`),
+  KEY `brand_5` (`brand`),
+  KEY `brand_6` (`brand`),
+  KEY `brand_7` (`brand`),
+  KEY `brand_8` (`brand`),
+  KEY `brand_9` (`brand`),
+  KEY `brand_10` (`brand`),
+  KEY `brand_11` (`brand`),
+  KEY `brand_12` (`brand`),
+  KEY `brand_13` (`brand`),
+  KEY `brand_14` (`brand`),
+  KEY `brand_15` (`brand`),
+  KEY `brand_16` (`brand`),
+  KEY `brand_17` (`brand`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
+  `element_id` int(11) NOT NULL,
+  `type` enum('смартфон','телефон') NOT NULL,
+  `platform` enum('Android','iOS','Windows','другая') NOT NULL,
+  `sims` int(11) NOT NULL,
+  `screen_size` int(11) NOT NULL,
+  `memory_size` int(11) NOT NULL,
+  `card_slot` enum('Нет','Да') NOT NULL,
+  `wi-fi` enum('Нет','Да') NOT NULL,
+  `Bluetooth` enum('Нет','Да') NOT NULL,
+  `gps` enum('Нет','Да') NOT NULL,
+  `battery` int(11) NOT NULL,
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
