@@ -50,6 +50,7 @@ else $field=array();
     <?else:?>
         <fieldset>
             <input name="field[act]" type="hidden" value="<?=$act?>">
+            <input name="field[old_name]" type="hidden" value="<?=$field['name']?>">
             <div class="form-group">
                 <label for="input_name"><?=t('Name')?></label>
                 <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['name']?>">

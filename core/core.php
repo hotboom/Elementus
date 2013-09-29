@@ -172,7 +172,7 @@ class E{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        $field=self::getField($type,$params['name']);
+        $field=self::getField($type,$params['old_name']);
         if($field['type']==='elements'){
             //DROP OLD KEY
             $sql="
@@ -190,7 +190,7 @@ class E{
         }
 
         //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
-        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['name'])." ".$params['name']." ";
+        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['old_name'])." ".$params['name']." ";
         if($params['type']=='string')
             return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
         elseif($params['type']=='int')
