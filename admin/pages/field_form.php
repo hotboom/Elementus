@@ -36,7 +36,7 @@ else $field=array();
             $('.modal-footer').hide();
         });
     </script>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=field_form&type=<?=$type['id']?>&act=<?=$act?>">
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=field_form&type=<?=$type['id']?>&act=<?=$act?>" class="form-horizontal">
     <? if($act=='delete'):?>
         <p><?=t('delete selected fields')?>?</p>
         <? if(is_array($_GET['fields'])):?>
@@ -52,11 +52,13 @@ else $field=array();
             <input name="field[act]" type="hidden" value="<?=$act?>">
             <input name="field[old_name]" type="hidden" value="<?=$field['name']?>">
             <div class="form-group">
-                <label for="input_name"><?=t('Name')?></label>
-                <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['name']?>">
+                <label class="col-lg-2 control-label" for="input_name"><?=t('Name')?></label>
+                <div class="col-lg-10">
+                    <input name="field[name]" type="text" class="form-control" id="input_name" value="<?=$field['name']?>">
+                </div>
             </div>
             <div class="form-group">
-                <label for="input_type"><?=t('Type')?></label>
+                <label class="col-lg-2 control-label" for="input_type"><?=t('Type')?></label>
                 <?
                 $ftypes=array(
                     'int'=>'Integer',
@@ -69,31 +71,43 @@ else $field=array();
                     'image'=>'Image'
                 );
                 ?>
-                <select name="field[type]" id="input_type" class="form-control">
-                    <? foreach($ftypes as $i=>$ftype):?>
-                        <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
-                    <? endforeach;?>
-                </select>
+                <div class="col-lg-10">
+                    <select name="field[type]" id="input_type" class="form-control">
+                        <? foreach($ftypes as $i=>$ftype):?>
+                            <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
+                        <? endforeach;?>
+                    </select>
+                </div>
             </div>
             <div class="form-group extra" id="extra_enum" style="<?=($field['type']!='enum' ? 'display:none;' : '')?>">
-                <label for="input_type"><?=t('List entries')?></label>
-                <? if(!empty($field['values'])):?>
-                    <? foreach($field['values'] as $val):?>
-                        <input name="field[enum][list][]" type="text" class="form-control select_value" value="<?=$val?>">
-                    <? endforeach;?>
-                <? else:?>
-                    <input name="field[enum][list][]" type="text" class="form-control select_value" value="">
-                <? endif;?>
-                <a href="#" class="btn btn-default" id="add_select_value"><?=t('More')?></a>
+                <label class="col-lg-2 control-label" for="input_type"><?=t('List entries')?></label>
+                <div class="col-lg-10">
+                    <? if(!empty($field['values'])):?>
+                        <? foreach($field['values'] as $val):?>
+                            <input name="field[enum][list][]" type="text" class="form-control select_value" value="<?=$val?>">
+                        <? endforeach;?>
+                    <? else:?>
+                        <input name="field[enum][list][]" type="text" class="form-control select_value" value="">
+                    <? endif;?>
+                    <a href="#" class="btn btn-default" id="add_select_value"><i class="icon-plus"></i> <?=t('More')?></a>
+                </div>
             </div>
             <div class="form-group extra" id="extra_elements" style="<?=($field['type']!='elements' ? 'display:none;' : '')?>">
-                <label for="input_type"><?=t('Type')?></label>
+                <label class="col-lg-2 control-label" for="input_type"><?=t('Type')?></label>
                 <? $types=E::getTypes();?>
-                <select name="field[elements_type]" id="input_type" class="form-control">
-                    <? foreach($types as $i=>$t):?>
-                        <option value="<?=$t['id']?>"<?=($field['elements_type']==$t['name'] ? ' selected="selected"' : '')?>><?=t($t['name'])?></option>
-                    <? endforeach;?>
-                </select>
+                <div class="col-lg-10">
+                    <select name="field[elements_type]" id="input_type" class="form-control">
+                        <? foreach($types as $i=>$t):?>
+                            <option value="<?=$t['id']?>"<?=($field['elements_type']==$t['name'] ? ' selected="selected"' : '')?>><?=t($t['name'])?></option>
+                        <? endforeach;?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-lg-2 control-label" for="input_name"><a href="#"><?=t('Default')?></a></label>
+                <div class="col-lg-10">
+                    <input name="field[default]" type="text" class="form-control" id="input_name" value="<?=$field['default']?>">
+                </div>
             </div>
             <script>
                 $('#input_type').change(function(){
@@ -107,8 +121,13 @@ else $field=array();
                     e.preventDefault();
                 });
             </script>
-            <button type="submit" class="btn btn-success"><?=t($act)?></button>
-            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+            <div class="form-group">
+                <label class="col-lg-2 control-label"></label>
+                <div class="col-lg-10">
+                    <button type="submit" class="btn btn-success"><?=t($act)?></button>
+                    <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                </div>
+            </div>
             <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
             <input type="hidden" name="submit" value="submit">
         </fieldset>
