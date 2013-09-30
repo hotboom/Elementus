@@ -172,28 +172,53 @@ class E{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
-        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE '.$params['name'])." ".$params['name']." ";
-        if($params['type']=='string')
-            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
-        if($params['type']=='int')
-            return self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug);
-        if($params['type']=='text')
-            return self::$db->q($alter_prx."TEXT NOT NULL",self::$debug);
-        if($params['type']=='html')
-            return self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug);
-        if($params['type']=='file')
-            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug);
-        if($params['type']=='image')
-            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"image"}\'',self::$debug);
-        if($params['type']=='select'){
-            if($params['select']['type']=='list'){
-                foreach($params['select']['list'] as $i=>$item) $params['select']['list'][$i]="'$item'";
-                return self::$db->q($alter_prx."ENUM(".implode(',',$params['select']['list']).") NOT NULL",self::$debug);
+        $field=self::getField($type,$params['old_name']);
+        if($field['type']==='elements'){
+            //DROP OLD KEY
+            $sql="
+                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                FROM information_schema.TABLE_CONSTRAINTS i
+                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                AND k.COLUMN_NAME = '".$field['name']."'
+                AND i.TABLE_SCHEMA = DATABASE()
+                AND i.TABLE_NAME = '".$table."'";
+            $foreign_keys=self::$db->q($sql,self::$debug,false);
+            foreach($foreign_keys as $key){
+                self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
             }
         }
-        else return false;
 
+        //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
+        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
+        if($params['type']=='string')
+            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
+        elseif($params['type']=='int')
+            return self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug);
+        elseif($params['type']=='text')
+            return self::$db->q($alter_prx."TEXT NOT NULL",self::$debug);
+        elseif($params['type']=='html')
+            return self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug);
+        elseif($params['type']==='file'|$params['type']=='image')
+            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug);
+        elseif($params['type']=='enum'){
+            foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
+            return self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug);
+        }
+        elseif($params['type']=='elements'){
+            if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
+            if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
+            $params['elements_type']=self::getTypeTableName($params['elements_type']);
+            echo $params['elements_type'];
+            //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+            //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
+            return self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug);
+        }
+        else {
+            self::$error['code']=5;
+            self::$error['desc']='Unknown field type';
+            return false;
+        }
     }
 
     public static function deleteTypeField($type,$field_name){
@@ -308,6 +333,11 @@ class E{
         $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
         $field['name']=$column['COLUMN_NAME'];
         $field['type']=$column['DATA_TYPE'];
+        if($field['type']==='enum') {
+            preg_match('/enum\((.*)\)$/', $column['COLUMN_TYPE'], $matches);
+            $matches[1]=str_replace("'",'',$matches[1]);
+            $field['values'] = explode(',', $matches[1]);
+        }
         $field['default']=$column['COLUMN_DEFAULT'];
         $field['position']=$column['ORDINAL_POSITION'];
         $field['key']=$column['COLUMN_KEY'];
@@ -325,8 +355,10 @@ class E{
                 AND i.TABLE_SCHEMA = DATABASE()
                 AND i.TABLE_NAME = '".$type['table']."'";
             $inf=self::$db->q($sql,self::$debug);
-            if(!empty($inf)) $field['FK']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
-            else $field['FK']=false;
+            if(!empty($inf)) {
+                $field['type']='elements';
+                $field['elements_type']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
+            }
         }
         return $field;
     }
@@ -354,7 +386,7 @@ class E{
     }
 
     public static function translate($text,$ucfirst='auto',$lang='en'){
-        $text=trim($text);
+        $text=trim((string)$text);
         if($ucfirst==='auto') $ucfirst=ctype_upper(substr($text,0,1));
         if($lang==self::$lang) { //Do not translate
             if($ucfirst) return mb_convert_case($text, MB_CASE_TITLE, "UTF-8");

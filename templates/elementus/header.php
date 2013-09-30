@@ -43,7 +43,7 @@
                 else echo '<ul>';
                 foreach($sections as $section){
                     if(empty($section['link'])) $section['link']='/'.$section['path'].'/';
-                    echo '<li><a href="'.$section['link'].'">'.$section['name'].'</a>';
+                    echo '<li><a href="'.$section['link'].'" '.(strpos($section['link'],'http://')!==false ? 'target="_blank"' : '').'>'.$section['name'].'</a>';
                     tree($section['id']);
                     echo '</li>';
                 }
@@ -59,7 +59,7 @@
                     <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                         <li><a href="#">Profile</a></li>
                         <li><a href="/main/act/logout"><?=t('Exit')?></a></li>
-                        <? if(Users::$user['group_id']=='19'):?><li><a href="/admin"><?=t('Admin panel')?></a></li><? endif;?>
+                        <? if(Users::$user['group_id']=='19'):?><li><a href="/admin" target="_blank"><?=t('Admin panel')?></a></li><? endif;?>
                     </ul>
                 </li>
             </ul>
@@ -67,7 +67,7 @@
             <form class="navbar-form form-inline pull-right" method="POST" data-async data-target="#window .modal-body" action="index.php?act=login">
                 <input type="text" name="email" placeholder="Email">
                 <input type="password" name="password" placeholder="Password">
-                <button type="submit" class="btn btn-primary">Войти</button>
+                <button type="submit" class="btn btn-primary btn-small">Войти</button>
             </form>
             <? endif;?>
         </div><!--/.nav-collapse -->

@@ -59,9 +59,9 @@ if($act=='edit'|$act=='copy') {
         <fieldset>
             <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['element_id']:'')?>">
             <? foreach($type['fields'] as $i=>$field):?>
-            <? if(!empty($field['FK'])): ?>
+            <? if($field['type']==='elements'): ?>
                 <?
-                $fk_type=E::getTypeByName($field['FK']);
+                $fk_type=E::getType($field['elements_type']);
                 $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                 if($fk_type['class']['name']::$foreign_select=='select'):
@@ -77,7 +77,17 @@ if($act=='edit'|$act=='copy') {
                         </select>
                     </div>
                 <? endif; ?>
-            <? elseif($field['type']=='image'|$field['type']=='file'): ?>
+            <? elseif($field['type']==='enum'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
+                        <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                        <? foreach($field['values'] as $val):?>
+                            <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
+                        <? endforeach;?>
+                    </select>
+                </div>
+            <? elseif($field['type']==='image'|$field['type']=='file'): ?>
                  <? include("pages/field_types/file.php");?>
             <? elseif($field['name']=='password'): ?>
                 <div class="form-group">
@@ -88,6 +98,11 @@ if($act=='edit'|$act=='copy') {
                     <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
                 </div>
             <? elseif($field['type']=='text'): ?>
+                <div class="form-group">
+                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
+                </div>
+            <? elseif($field['type']=='html'): ?>
                 <div class="form-group">
                     <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
                     <div id="toolbar<?=$field['name']?>" style="display: none;">
