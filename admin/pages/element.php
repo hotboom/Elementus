@@ -44,7 +44,7 @@ if($act=='edit'|$act=='copy') {
             $('.modal-footer').hide();
         });
     </script>
-    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>">
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" class="form-horizontal">
     <? if($act=='delete'):?>
         <p><?=t('delete selected elements')?>?</p>
         <? if(is_array($_GET['elements'])):?>
@@ -68,24 +68,28 @@ if($act=='edit'|$act=='copy') {
                     $fk_elements=E::get(array('type'=>$fk_type['id']));
                     ?>
                     <div class="form-group">
-                        <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                        <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
-                            <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
-                            <? foreach($fk_elements as $fk_element):?>
-                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=$fk_element['name']?></option>
-                            <? endforeach;?>
-                        </select>
+                        <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                        <div class="col-lg-10">
+                            <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
+                                <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                                <? foreach($fk_elements as $fk_element):?>
+                                <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=$fk_element['name']?></option>
+                                <? endforeach;?>
+                            </select>
+                        </div>
                     </div>
                 <? endif; ?>
             <? elseif($field['type']==='enum'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                    <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
-                        <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
-                        <? foreach($field['values'] as $val):?>
-                            <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
-                        <? endforeach;?>
-                    </select>
+                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <div class="col-lg-10">
+                        <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
+                            <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+                            <? foreach($field['values'] as $val):?>
+                                <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
+                            <? endforeach;?>
+                        </select>
+                    </div>
                 </div>
             <? elseif($field['type']==='image'|$field['type']=='file'): ?>
                  <? include("pages/field_types/file.php");?>
@@ -99,33 +103,45 @@ if($act=='edit'|$act=='copy') {
                 </div>
             <? elseif($field['type']=='text'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
+                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <div class="col-lg-10">
+                        <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
+                    </div>
                 </div>
             <? elseif($field['type']=='html'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
+                    <div class="col-lg-10">
                     <div id="toolbar<?=$field['name']?>" style="display: none;">
                     <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
                     </div>
-                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
-                    <script>
-                        var editor = new wysihtml5.Editor("input<?=$field['name']?>", {
-                            toolbar:      "toolbar<?=$field['name']?>",
-                            //stylesheets:  "css/stylesheet.css",
-                            parserRules:  wysihtml5ParserRules
-                        });
-                    </script>
+
+                        <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
+                        <script>
+                            var editor = new wysihtml5.Editor("input<?=$field['name']?>", {
+                                toolbar:      "toolbar<?=$field['name']?>",
+                                //stylesheets:  "css/stylesheet.css",
+                                parserRules:  wysihtml5ParserRules
+                            });
+                        </script>
+                    </div>
                 </div>
             <? else:?>
                 <div class="form-group">
-                    <label for="input<?=$field['name']?>"><?=t($field['name'])?></label>
-                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
+                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?></label>
+                    <div class="col-lg-10">
+                        <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
+                    </div>
                 </div>
             <? endif;?>
             <? endforeach;?>
-            <button type="submit" class="btn btn-success"><?=t($act)?></button>
-            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+            <div class="form-group">
+                <label class="col-lg-2 control-label"></label>
+                <div class="col-lg-10">
+                    <button type="submit" class="btn btn-success"><?=t($act)?></button>
+                    <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                </div>
+            </div>
             <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
             <input type="hidden" name="submit" value="submit">
         </fieldset>

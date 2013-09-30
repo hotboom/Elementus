@@ -1,6 +1,6 @@
 <div class="form-group">
-    <label for="input<?=$field['name']?>"><?=t($field['name'])?></label>
-    <div>
+    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?></label>
+    <div class="col-lg-10">
     <input name="fields[<?=$field['name']?>]" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;">
     <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
         <i class="icon-plus"></i>

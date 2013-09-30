@@ -10,7 +10,7 @@ a.selected{
     width:100% !important;
 }
 .modal-content{
-    width:650px; margin:0 auto;
+    width:780px; margin:0 auto;
 }
 .modal-content .modal-header { cursor: move; }
 
