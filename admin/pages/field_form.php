@@ -61,7 +61,7 @@ else $field=array();
                     'int'=>'Integer',
                     'string'=>'String',
                     'text'=>'Text',
-                    'select'=>'select',
+                    'select'=>'Select',
                     'html'=>'HTML',
                     'file'=>'File',
                     'image'=>'Image'
@@ -72,6 +72,11 @@ else $field=array();
                     <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
                     <? endforeach;?>
                 </select>
+                <script>
+                    $('#input_type').change(function(event){
+                        alert('test');
+                    });
+                </script>
             </div>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
