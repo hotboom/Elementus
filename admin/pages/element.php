@@ -95,11 +95,17 @@ if($act=='edit'|$act=='copy') {
                  <? include("pages/field_types/file.php");?>
             <? elseif($field['name']=='password'): ?>
                 <div class="form-group">
-                    <label for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
-                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
-                    <label for="inputnew<?=$field['name']?>"><?=t('New')?> <?=t($field['name'])?></label>
-                    <input name="fields[new_<?=$field['name']?>]" type="text" class="form-control" id="inputnew<?=$field['name']?>" value="">
-                    <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
+                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
+                    <div class="col-lg-10">
+                        <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="inputnew<?=$field['name']?>"><?=t('New')?> <?=t($field['name'])?></label>
+                    <div class="col-lg-10">
+                        <input name="fields[new_<?=$field['name']?>]" type="text" class="form-control" id="inputnew<?=$field['name']?>" value="">
+                        <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
+                    </div>
                 </div>
             <? elseif($field['type']=='text'): ?>
                 <div class="form-group">
