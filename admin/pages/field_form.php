@@ -103,10 +103,12 @@ else $field=array();
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="col-lg-2 control-label" for="input_name"><a href="#"><?=t('Default')?></a></label>
-                <div class="col-lg-10">
-                    <input name="field[default]" type="text" class="form-control" id="input_name" value="<?=$field['default']?>">
+            <div id="advanced" style="display:none;">
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('Default')?></label>
+                    <div class="col-lg-10">
+                        <input name="field[default]" type="text" class="form-control" id="input_default" value="<?=$field['default']?>">
+                    </div>
                 </div>
             </div>
             <script>
@@ -126,6 +128,7 @@ else $field=array();
                 <div class="col-lg-10">
                     <button type="submit" class="btn btn-success"><?=t($act)?></button>
                     <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                    <a href="#" class="btn btn-default pull-right" onClick="$('#advanced').toggle(); return false;"><?=t('Advanced settings')?></a>
                 </div>
             </div>
             <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
