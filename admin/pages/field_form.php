@@ -105,6 +105,12 @@ else $field=array();
             </div>
             <div id="advanced" style="display:none;">
                 <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_name"><?=t('Name')?></label>
+                    <div class="col-lg-10">
+                        <input name="field[lang]" type="text" class="form-control" id="input_name" value="<?=t($field['name'])?>">
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-lg-2 control-label" for="input_default"><?=t('Default')?></label>
                     <div class="col-lg-10">
                         <input name="field[default]" type="text" class="form-control" id="input_default" value="<?=$field['default']?>">

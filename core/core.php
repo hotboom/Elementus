@@ -163,6 +163,9 @@ class E{
     }
 
     public static function setField($type,$params){
+        if(!(bool)preg_match($params['name'],"/[a-z0-9_-.]")) {
+            self::$error[]='Field name may contain only latin letters and _ or - symbols';
+        }
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
         if(!self::$db->q("SHOW TABLES LIKE '".$table."'")){
@@ -189,21 +192,20 @@ class E{
             }
         }
 
-        //ALTER TABLE  `et_content_products` CHANGE  `fulldescr`  `fulldescr` TEXT CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT  '{"type":"html"}'
         $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='string')
-            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug);
+            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug)) return false;
         elseif($params['type']=='int')
-            return self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug);
+            if(!self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug)) return false;
         elseif($params['type']=='text')
-            return self::$db->q($alter_prx."TEXT NOT NULL",self::$debug);
+            if(!self::$db->q($alter_prx."TEXT NOT NULL",self::$debug)) return false;
         elseif($params['type']=='html')
-            return self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug);
+            if(!self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug)) return false;
         elseif($params['type']==='file'|$params['type']=='image')
-            return self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug);
+            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug)) return false;
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
-            return self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug);
+            if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug)) return false;
         }
         elseif($params['type']=='elements'){
             if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
@@ -212,13 +214,18 @@ class E{
             echo $params['elements_type'];
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
-            return self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug);
+            if(!self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug)) return false;
         }
         else {
             self::$error['code']=5;
             self::$error['desc']='Unknown field type';
             return false;
         }
+
+        if($params['lang']!=$params['name']&&!empty($params['lang'])){
+            return self::setTranslate($params['name'],$params['lang']);
+        }
+        return true;
     }
 
     public static function deleteTypeField($type,$field_name){
@@ -406,6 +413,16 @@ class E{
             }
         }
         return trim($text);
+    }
+
+    static function setTranslate($en,$translate,$lang=''){
+        if(empty($lang)) $lang=self::$lang;
+        if(!empty($translate)){
+            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en' AND `$lang`='$translate' AND `app`='".self::$app."'";
+            if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en' AND `app`='".self::$app."'",self::$debug);
+            else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
+        }
+        else return false;
     }
 }
 ?>
