@@ -215,42 +215,54 @@ INSERT INTO `et_usersgroups` (`element_id`, `name`) VALUES
 
 CREATE TABLE IF NOT EXISTS `lang` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `app` int(11) DEFAULT NULL,
   `en` text NOT NULL,
   `ru` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=32 ;
+  PRIMARY KEY (`id`),
+  KEY `app` (`app`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
 
-INSERT INTO `lang` (`id`, `en`, `ru`) VALUES
-(1, 'sections', 'разделы'),
-(2, 'element', 'элемент'),
-(3, 'add', 'добавить'),
-(4, 'copy', 'копировать'),
-(5, 'delete', 'удалить'),
-(6, 'text', 'текст'),
-(7, 'products', 'товары'),
-(8, 'name', 'название'),
-(24, 'Usersgroups', 'группы пользователей'),
-(10, 'header', 'заголовок'),
-(11, 'content', 'cодержание'),
-(12, 'cancel', 'отмена'),
-(13, 'added', 'добавлено'),
-(14, 'close', 'закрыть'),
-(15, 'descr', 'описание'),
-(16, 'users', 'пользователи'),
-(17, 'delete selected elements', 'удалить выбранные элементы'),
-(18, 'types', 'типы'),
-(19, 'section_id', 'раздел'),
-(20, 'tree', 'дерево'),
-(21, 'edit', 'изменить'),
-(22, 'as', 'как'),
-(23, 'not set', 'не задано'),
-(25, 'subtype', 'субтип'),
-(26, 'settings', 'настройки'),
-(27, 'exit', 'выход'),
-(28, 'type', 'тип'),
-(29, 'fields', 'поля'),
-(30, 'back', 'назад'),
-(31, 'elements', 'элементы');
+INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
+(1, NULL, 'sections', 'разделы'),
+(2, NULL, 'element', 'элемент'),
+(3, NULL, 'add', 'добавить'),
+(4, NULL, 'copy', 'копировать'),
+(5, NULL, 'delete', 'удалить'),
+(6, NULL, 'text', 'текст'),
+(7, NULL, 'products', 'товары'),
+(8, NULL, 'name', 'название'),
+(10, NULL, 'header', 'заголовок'),
+(11, NULL, 'content', 'cодержание'),
+(12, NULL, 'cancel', 'отмена'),
+(13, NULL, 'added', 'добавлено'),
+(14, NULL, 'close', 'закрыть'),
+(15, NULL, 'descr', 'описание'),
+(16, NULL, 'users', 'пользователи'),
+(17, NULL, 'delete selected elements', 'удалить выбранные элементы'),
+(18, NULL, 'types', 'типы'),
+(19, NULL, 'section_id', 'раздел'),
+(20, NULL, 'tree', 'дерево'),
+(21, NULL, 'edit', 'изменить'),
+(22, NULL, 'as', 'как'),
+(23, NULL, 'not set', 'не задано'),
+(24, NULL, 'usersgroups', 'группы пользователей'),
+(25, NULL, 'subtype', 'субтип'),
+(26, NULL, 'settings', 'настройки'),
+(27, NULL, 'exit', 'выход'),
+(28, NULL, 'type', 'тип'),
+(29, NULL, 'fields', 'поля'),
+(30, NULL, 'back', 'назад'),
+(31, NULL, 'elements', 'элементы'),
+(32, NULL, 'field', 'поле'),
+(33, NULL, 'default', 'по-умолчанию'),
+(34, NULL, 'advanced', 'продвинутый'),
+(35, NULL, 'string', 'строка'),
+(36, NULL, 'select', 'выбор'),
+(37, NULL, 'integer', 'целое число'),
+(38, NULL, 'file', 'файл'),
+(39, NULL, 'image', 'изображение'),
+(40, NULL, 'to', 'в'),
+(42, 2, 'platform', 'Платформа');
 
 CREATE TABLE IF NOT EXISTS `types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -289,6 +301,9 @@ ALTER TABLE `et_sections`
 
 ALTER TABLE `et_users`
   ADD CONSTRAINT `et_users_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `et_usersgroups` (`element_id`);
+
+ALTER TABLE `lang`
+  ADD CONSTRAINT `lang_ibfk_1` FOREIGN KEY (`app`) REFERENCES `apps` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `types`
   ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`);
