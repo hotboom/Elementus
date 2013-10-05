@@ -10,7 +10,6 @@ else $type=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    echo '<pre>'.print_r($_POST['fields']).'</pre>';
     //E::debug();
 
     if($act=='delete') $result=E::deleteType($_POST['types']);
@@ -24,7 +23,7 @@ else $type=array();
     <script>
         $(window).hashchange();
         $(function() {
-            $('.modal-title').html('<?=t($type['name'])?> <?=t('added')?> ');
+            $('.modal-title').html('<?=t($type['name'])?> <?=t($act)?> ');
             $('.modal-footer').show();
         });
     </script>
@@ -54,9 +53,19 @@ else $type=array();
                 <label for="input_parent"><?=t('Parent')?></label>
                 <? $allTypes=E::getTypes(); ?>
                 <select name="type[parent]" id="input_parent" class="form-control">
-                    <option value="NULL"><?=t('Root')?></option>
+                    <option value=""><?=t('Root')?></option>
                     <? foreach($allTypes as $t):?>
                         <option value="<?=$t['id']?>" <?=($type['parent']==$t['id'] ? 'selected ' : '')?>><?=t($t['name'],true)?></option>
+                    <?endforeach;?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="input_parent"><?=t('Group')?></label>
+                <? $groups=E::getTypeGroups(); ?>
+                <select name="type[group]" id="input_parent" class="form-control">
+                    <option value=""><?=t('Root')?></option>
+                    <? foreach($groups as $g):?>
+                        <option value="<?=$g['id']?>" <?=($type['group']==$g['id'] ? 'selected ' : '')?>><?=t($g['name'],true)?></option>
                     <?endforeach;?>
                 </select>
             </div>

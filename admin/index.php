@@ -11,7 +11,8 @@ $pages=array(
     'app_form',
     'type',
     'type_fields',
-    'type_form'
+    'type_form',
+    'types'
 );
 
 if(!empty($_GET['exit'])) Users::logout();

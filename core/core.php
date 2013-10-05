@@ -154,55 +154,62 @@ class E{
     }
 
     public static function setType($params){
-        if(empty($params['id'])) $insert=true;
-        else $insert=false;
-        $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." types SET parent=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", name='".$params['name']."'";
-        $sql.=" WHERE id='".$params['id']."'";
+        $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
+        if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
 
         return self::$db->q($sql,self::$debug);
     }
 
     public static function setField($type,$params){
-        if(!(bool)preg_match($params['name'],"/[a-z0-9_-.]")) {
-            self::$error[]='Field name may contain only latin letters and _ or - symbols';
+        if(!preg_match("/[a-z0-9_]/",$params['name'])) {
+            self::$error['code']='12';
+            self::$error['desc']='Field name may contain only latin letters and _ or - symbols';
+            return false;
         }
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
-        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")){
+        if(!self::$db->q("SHOW TABLES LIKE '".$table."'",self::$debug)){
             $sql="CREATE TABLE  ".$table." (
             element_id INT( 11 ) NOT NULL ,
             PRIMARY KEY (  element_id )
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        $field=self::getField($type,$params['old_name']);
-        if($field['type']==='elements'){
-            //DROP OLD KEY
-            $sql="
-                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
-                FROM information_schema.TABLE_CONSTRAINTS i
-                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
-                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
-                AND k.COLUMN_NAME = '".$field['name']."'
-                AND i.TABLE_SCHEMA = DATABASE()
-                AND i.TABLE_NAME = '".$table."'";
-            $foreign_keys=self::$db->q($sql,self::$debug,false);
-            foreach($foreign_keys as $key){
-                self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+        if(!empty($params['old_name'])) {
+            $field=self::getField($type,$params['old_name']);
+            if($field['type']==='elements'){
+                //DROP OLD KEY
+                $sql="
+                    SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                    FROM information_schema.TABLE_CONSTRAINTS i
+                    LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                    WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                    AND k.COLUMN_NAME = '".$field['name']."'
+                    AND i.TABLE_SCHEMA = DATABASE()
+                    AND i.TABLE_NAME = '".$table."'";
+                $foreign_keys=self::$db->q($sql,self::$debug,false);
+                foreach($foreign_keys as $key){
+                    self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+                }
             }
         }
 
         $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
-        if($params['type']=='string')
+        if($params['type']=='string'){
             if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug)) return false;
-        elseif($params['type']=='int')
+        }
+        elseif($params['type']=='int'){
             if(!self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug)) return false;
-        elseif($params['type']=='text')
+        }
+        elseif($params['type']=='text'){
             if(!self::$db->q($alter_prx."TEXT NOT NULL",self::$debug)) return false;
-        elseif($params['type']=='html')
+        }
+        elseif($params['type']=='html'){
             if(!self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug)) return false;
-        elseif($params['type']==='file'|$params['type']=='image')
+        }
+        elseif($params['type']==='file'|$params['type']=='image'){
             if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug)) return false;
+        }
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
             if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug)) return false;
@@ -238,7 +245,7 @@ class E{
             return $return;
         }
         $table=self::getTypeTableName($type);
-        return self::$db->q("ALTER TABLE ".$table." DROP ".$field_name,self::$debug);
+        return self::$db->q("ALTER TABLE ".$table." DROP `".$field_name."`",self::$debug);
     }
 
     public static function getTypeById($type_id){
@@ -392,16 +399,25 @@ class E{
         return $allFields;
     }
 
+    static function getTypeGroups($filter=false){
+        $sql="SELECT * FROM `type_groups` ";
+        if(!empty($filter)){
+            $sql.="WHERE ".$filter;
+        }
+        return self::$db->q($sql,self::$debug,false);
+    }
+
     public static function translate($text,$ucfirst='auto',$lang='en'){
+        mb_internal_encoding('utf-8');
         $text=trim((string)$text);
         if($ucfirst==='auto') $ucfirst=ctype_upper(substr($text,0,1));
         if($lang==self::$lang) { //Do not translate
-            if($ucfirst) return mb_convert_case($text, MB_CASE_TITLE, "UTF-8");
-            else return mb_convert_case(substr($text,0,1), MB_CASE_LOWER, "UTF-8").substr($text,1);
+            if($ucfirst) return mb_ucfirst($text);
+            else return mb_strtolower($text);
         }
-        $sql="SELECT `".self::$lang."` FROM `lang` WHERE `".$lang."`='".$text."'";
+        $sql="SELECT `".self::$lang."` FROM `lang` WHERE `".$lang."`='".$text."' ORDER BY `app` LIMIT 0,1";
         if($translate=self::$db->q($sql)) {
-            $text=($ucfirst ? mb_convert_case($translate, MB_CASE_TITLE, "UTF-8") : mb_convert_case(substr($translate,0,1), MB_CASE_LOWER, "UTF-8").substr($translate,1));
+            $text=($ucfirst ? mb_ucfirst($translate) : mb_strtolower($translate));
         }
         else{ //Try translate by word
             if(strpos($text,' ')) {
@@ -418,7 +434,7 @@ class E{
     static function setTranslate($en,$translate,$lang=''){
         if(empty($lang)) $lang=self::$lang;
         if(!empty($translate)){
-            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en' AND `$lang`='$translate' AND `app`='".self::$app."'";
+            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en' AND `$lang`='$translate' AND `app`='".self::$app['id']."'";
             if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en' AND `app`='".self::$app."'",self::$debug);
             else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
         }

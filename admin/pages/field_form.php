@@ -25,7 +25,7 @@ else $field=array();
     <script>
         $(window).hashchange();
         $(function() {
-            $('.modal-title').html('<?=t($type['name'].' added')?>');
+            $('.modal-title').html('<?=t('Field '.$act)?>');
             $('.modal-footer').show();
         });
     </script>
@@ -105,7 +105,7 @@ else $field=array();
             </div>
             <div id="advanced" style="display:none;">
                 <div class="form-group">
-                    <label class="col-lg-2 control-label" for="input_name"><?=t('Name')?></label>
+                    <label class="col-lg-2 control-label" for="input_name"><?=t('Translate')?></label>
                     <div class="col-lg-10">
                         <input name="field[lang]" type="text" class="form-control" id="input_name" value="<?=t($field['name'])?>">
                     </div>

@@ -23,9 +23,6 @@ require_once($root_path."/core/types/sections.php");
 require_once($root_path."/core/types/users.php");
 Users::init();
 
-/* Shortcut functions */
-//Translate
-function t($text,$ucfirst='auto',$lang='en'){
-    return E::translate($text,$ucfirst,$lang);
-}
+//Helper functions
+require_once($root_path."/core/helper.php");
 ?>
