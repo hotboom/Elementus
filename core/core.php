@@ -71,7 +71,8 @@ class E{
         foreach($types as $i=>$t) {
             $sql.="LEFT JOIN `".$types[$i]['table']."` AS t$i ON e.id=t$i.element_id ";
         }
-        $sql.="WHERE e.app_id='".self::$app['id']."' AND e.type_id='".$type['id']."' ";
+        $sql.="WHERE e.app_id='".self::$app['id']."' ";
+        if(!$params['subtypes']) $sql.="AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
             $sql.=$params['filter'];
@@ -341,7 +342,7 @@ class E{
         return 'et_'.$table;
     }
 
-    public static function getField($type,$field_name){
+    static function getField($type,$field_name){
         $type=self::getType($type);
         $type['table']=self::getTypeTableName($type);
         $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
@@ -377,7 +378,7 @@ class E{
         return $field;
     }
 
-    public static function getTypeFields($type){
+    static function getTypeFields($type){
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
         if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
@@ -389,7 +390,7 @@ class E{
         return $fields;
     }
 
-    public static function getFullTypeFields($type){
+    static function getFullTypeFields($type){
         $types=self::getFullType($type);
         $allFields=array();
         foreach($types as $type){
@@ -405,6 +406,32 @@ class E{
             $sql.="WHERE ".$filter;
         }
         return self::$db->q($sql,self::$debug,false);
+    }
+
+    static function getConnectedTypes($type){
+        $types=self::getFullType($type);
+        $tables=array();
+        foreach($types as $t) $tables[]=self::getTypeTableName($t);
+        $sql="
+        SELECT i.TABLE_NAME, k.COLUMN_NAME, k.REFERENCED_TABLE_NAME
+        FROM information_schema.TABLE_CONSTRAINTS i
+        LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+        WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+        AND i.TABLE_SCHEMA = DATABASE()";
+        if(!empty($tables)){
+            $sql.=" AND (";
+            foreach($tables as $i=>$table) $sql.=($i ? " OR" : "")." k.REFERENCED_TABLE_NAME = '".$table."'";
+            $sql.=")";
+        }
+        $keys=self::$db->q($sql,self::$debug,false);
+
+        $connected_types=array();
+        foreach($keys as $key){
+            $connected['type']=self::getType(substr($key['TABLE_NAME'],strripos($key['TABLE_NAME'],'_')+1));
+            $connected['field']=$key['COLUMN_NAME'];
+            $connected_types[]=$connected;
+        }
+        return $connected_types;
     }
 
     public static function translate($text,$ucfirst='auto',$lang='en'){
