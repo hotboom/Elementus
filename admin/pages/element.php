@@ -21,7 +21,7 @@ if($act=='edit'|$act=='copy') {
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
     ?>
 <? elseif(!empty($_POST['submit'])):
-
+    //E::debug();
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else $result=$type['class']['name']::set($_POST['fields']);
     ?>
@@ -71,15 +71,16 @@ if($act=='edit'|$act=='copy') {
                     <input type="hidden" name="submit" value="submit">
                 <?else:?>
                     <fieldset>
-                        <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['element_id']:'')?>">
+                        <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['id']:'')?>">
                         <? foreach($type['fields'] as $i=>$field):?>
                         <? if($field['type']==='elements'): ?>
                             <?
-                            E::debug();
+                            //E::debug();
                             $fk_type=E::getType($field['elements_type']);
                             $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                             if($fk_type['class']['name']::$foreign_select=='select'):
+                                E::debug();
                                 $fk_elements=E::get(array('type'=>$fk_type['id'],'subtypes'=>true));
                                 ?>
                                 <div class="form-group">
@@ -88,7 +89,7 @@ if($act=='edit'|$act=='copy') {
                                         <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
                                             <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
                                             <? foreach($fk_elements as $fk_element):?>
-                                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=$fk_element['name']?></option>
+                                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=(empty($fk_element['name']) ? $fk_element['header'] : $fk_element['name'])?></option>
                                             <? endforeach;?>
                                         </select>
                                     </div>

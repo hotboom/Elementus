@@ -10,6 +10,8 @@ class E{
     public static $lang='ru';
     public static $template;
 
+    private static $recursion_temp=false;
+
     public static function init($db, $root_path, $debug=false){
         self::$db        = $db;
         self::$debug     = $debug;
@@ -72,7 +74,14 @@ class E{
             $sql.="LEFT JOIN `".$types[$i]['table']."` AS t$i ON e.id=t$i.element_id ";
         }
         $sql.="WHERE e.app_id='".self::$app['id']."' ";
-        if(!$params['subtypes']) $sql.="AND e.type_id='".$type['id']."' ";
+        if($params['subtypes']) {
+            $sub_types=self::getSubTypesList($type);
+            $sub_types[]=$type;
+            $sql.="AND (";
+            foreach($sub_types as $i=>$sub_type) $sql.=($i!=0 ? "OR " : "")."e.type_id='".$sub_type['id']."' ";
+            $sql.=") ";
+        }
+        else $sql.="AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
             $sql.="AND (";
             $sql.=$params['filter'];
@@ -129,12 +138,12 @@ class E{
             $sql=$prx.$type['table']." SET ";
             $sql.="element_id='".$params['element_id']."'";
             foreach($type['fields'] as $field){
-                $sql.=", ".$field['name']."=";
+                $sql.=", `".$field['name']."`=";
                 if($field['val']=='NULL') $sql.="NULL";
                 else $sql.="'".$field['val']."'";
             }
             if($prx=="UPDATE ") $sql.=" WHERE `element_id`='".$params['element_id']."'";
-            return self::$db->q($sql,self::$debug);
+            if(!self::$db->q($sql,self::$debug)) return false;
         }
         if($prx=="INSERT ") return $params['element_id'];
         else return true;
@@ -148,10 +157,14 @@ class E{
             }
         }
         else{
-            if(self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) $log=$element_id;
-            else $log=false;
+            $types=self::getElementFullType($element_id);
+            foreach($types as $type){
+                $type['table']=self::getTypeTableName($type);
+                if(!self::$db->q("DELETE FROM `".$type['table']."` WHERE `element_id`='$element_id'",self::$debug)) return false;
+            }
+            if(!self::$db->q("DELETE FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) return false;
         }
-        return $log;
+        return true;
     }
 
     public static function setType($params){
@@ -432,6 +445,19 @@ class E{
             $connected_types[]=$connected;
         }
         return $connected_types;
+    }
+
+    static function getSubTypesList($type){
+        self::getSubTypesRecursive($type);
+        return self::$recursion_temp;
+    }
+    static function getSubTypesRecursive($type){
+        $type=self::getType($type);
+        $sub_types=self::$db->q("SELECT * FROM `types` WHERE `parent`='".$type['id']."'",self::$debug,false);
+        foreach($sub_types as $sub_type){
+            self::$recursion_temp[]=$sub_type;
+            self::getSubTypesRecursive($sub_type);
+        }
     }
 
     public static function translate($text,$ucfirst='auto',$lang='en'){
