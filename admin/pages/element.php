@@ -80,7 +80,7 @@ if($act=='edit'|$act=='copy') {
                             $fk_type['class']=E::getTypeClass($fk_type['name']);
 
                             if($fk_type['class']['name']::$foreign_select=='select'):
-                                E::debug();
+                                //E::debug();
                                 $fk_elements=E::get(array('type'=>$fk_type['id'],'subtypes'=>true));
                                 ?>
                                 <div class="form-group">
@@ -173,7 +173,8 @@ if($act=='edit'|$act=='copy') {
             <? foreach($connects as $connect):?>
                 <div class="tab-pane fade" id="<?=$connect['type']['name']?>">
                     <?
-                    $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'"));
+                    //E::debug();
+                    $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
                     print_r($cElements);
                     ?>
                 </div>
