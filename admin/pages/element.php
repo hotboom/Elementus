@@ -125,7 +125,7 @@ if($act=='edit'|$act=='copy') {
                     $cType['fields']=E::getTypeFields($cType);
                     $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
                     ?>
-                    <table id="elements" class="table table-hover table-condensed">
+                    <table class="elements" class="table table-hover table-condensed">
                         <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
                         <? foreach($cType['fields'] as $i=>$field):?>
                             <? if($field['name']==$connect['field']) continue; ?>
@@ -133,11 +133,14 @@ if($act=='edit'|$act=='copy') {
                         <? endforeach; ?>
                         <? foreach($cElements as $cElement): ?>
                             <tr>
-                                <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
+                                <td>
+                                    <input type="checkbox" name="connected_elements[]" value="<?=$cElement['id']?>"> <?=$cElement['id']?>
+                                    <input name="connected[<?=$cElement['id']?>][id]" type="hidden" value="<?=$cElement['id']?>">
+                                </td>
                                 <? foreach($cType['fields'] as $i=>$field):?>
                                     <? if($field['name']===$connect['field']) continue; ?>
                                     <? if($field['type']==='elements'):?>
-                                        <td><? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement)); ?></td>
+                                        <td><? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>'connected['.$cElement['id'].']['.$field['name'].']')); ?></td>
                                     <? else: ?>
                                         <td><input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" type="text" value="<?=$cElement[$field['name']]?>"></td>
                                     <? endif; ?>
