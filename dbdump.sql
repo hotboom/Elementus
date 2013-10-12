@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `elements` (
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=89 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=110 ;
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
@@ -44,7 +44,15 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (51, 2, 2),
 (30, 1, 2),
 (29, 1, 2),
-(82, 6, 2);
+(82, 6, 2),
+(89, 15, 2),
+(90, 16, 2),
+(91, 16, 2),
+(92, 17, 2),
+(93, 17, 2),
+(94, 7, 1),
+(109, 18, 2),
+(108, 7, 2);
 
 CREATE TABLE IF NOT EXISTS `et_content` (
   `element_id` int(11) NOT NULL,
@@ -56,64 +64,20 @@ CREATE TABLE IF NOT EXISTS `et_content` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUES
-(15, NULL, 'test', 'test'),
 (16, NULL, 'All is Element', ''),
 (17, 1, 'Все есть Элемент', 'Elementus - это функциональный, гибкий и простой PHP mySQL фреймворк для разработки веб приложений на любом языке программирования.'),
 (18, NULL, 'Все есть Элемент', 'Elemental - test'),
 (19, NULL, 'Все есть Элемент', 'Elemental -'),
 (20, NULL, 'Все есть Элемент', 'Elemental -'),
-(31, NULL, '', ''),
-(32, NULL, '', ''),
-(33, NULL, '', ''),
-(46, NULL, 'первый нах!', ''),
-(47, NULL, 'второй пошел', ''),
-(48, NULL, '', ''),
-(49, NULL, 'test', ''),
-(50, NULL, 'Всем заголовкам заголовок', 'test2'),
 (51, 24, 'О магазине', 'Это&nbsp;пример реализации интернет-магазина на основе <a rel="nofollow" target="_blank" href="http://elementus.org/">Elementus&nbsp;фреймворк</a>. Все материалы на сайте&nbsp;<span>присутствуют исключительно в демострационных целях.</span>'),
-(52, NULL, 'test3', ''),
-(53, NULL, 'test4', ''),
-(54, 28, 'test6', ''),
-(55, NULL, 'test6', ''),
-(56, NULL, 'test6', ''),
-(57, NULL, 'tset769', ''),
-(58, NULL, '4y6drhg', ''),
-(59, NULL, 'tset', 'tset'),
-(60, NULL, '', 'tests'),
-(61, NULL, 'tsetsets', ''),
-(62, NULL, 'sefgi', ''),
-(63, NULL, 'wlitfhrsdio', ''),
-(64, NULL, 'etstse', ''),
-(65, NULL, 'test35r', 'sklfjsklj'),
-(66, NULL, 'test', 'test'),
-(67, NULL, 'test', 'test'),
-(68, NULL, 'test39785', 'test'),
-(69, NULL, 'test39785', 'test'),
-(70, NULL, 'test39785', 'test'),
-(71, NULL, 'test39785', 'test'),
-(72, NULL, 'etset', 'setset'),
-(73, NULL, 'etset', 'setset'),
-(74, NULL, 'etset', 'setset'),
-(75, NULL, 'etsfsetsfs', 'setset'),
-(76, NULL, 'sklfjskl', 'sklfsl'),
-(77, NULL, 'test', ''),
-(78, NULL, '', ''),
-(79, NULL, '', ''),
-(80, NULL, '', ''),
-(81, NULL, '', ''),
-(83, 24, '', ''),
-(84, 24, '', ''),
-(85, 24, 'test', ''),
-(86, 24, '', ''),
-(87, 24, '', ''),
-(88, 24, '', '');
+(108, 24, 'LG PL240', 'Подробное описание товара.');
 
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
   `shortdescr` text NOT NULL,
   `store` int(11) NOT NULL,
   `brand` enum('Samsung','LG','HTC','Sony') NOT NULL,
-  `model` int(11) NOT NULL,
+  `model` varchar(255) NOT NULL,
   `image` varchar(255) NOT NULL COMMENT '{"type":"image"}',
   PRIMARY KEY (`element_id`),
   KEY `brand` (`brand`),
@@ -135,6 +99,11 @@ CREATE TABLE IF NOT EXISTS `et_content_products` (
   KEY `brand_17` (`brand`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+INSERT INTO `et_content_products` (`element_id`, `shortdescr`, `store`, `brand`, `model`, `image`) VALUES
+(104, '', 0, 'Samsung', '0', ''),
+(107, '', 0, 'Samsung', '0', ''),
+(108, 'Тестовое краткое описание.', 2, 'LG', 'PL240', '90133_original.jpg');
+
 CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   `element_id` int(11) NOT NULL,
   `type` enum('смартфон','телефон') NOT NULL,
@@ -149,6 +118,52 @@ CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   `battery` int(11) NOT NULL,
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `et_content_products_phones` (`element_id`, `type`, `platform`, `sims`, `screen_size`, `memory_size`, `card_slot`, `wi-fi`, `Bluetooth`, `gps`, `battery`) VALUES
+(108, '', 'Windows', 1, 0, 2000, 'Да', 'Да', 'Да', 'Да', 1200);
+
+CREATE TABLE IF NOT EXISTS `et_currencies` (
+  `element_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `symbol` varchar(255) NOT NULL,
+  `code` varchar(255) NOT NULL,
+  `rate` varchar(255) NOT NULL,
+  PRIMARY KEY (`element_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `et_currencies` (`element_id`, `name`, `symbol`, `code`, `rate`) VALUES
+(90, 'Российский рубль', 'р.', 'RUB', '1'),
+(91, 'Доллар США', '$', 'USD', '31.5');
+
+CREATE TABLE IF NOT EXISTS `et_price-types` (
+  `element_id` int(11) NOT NULL,
+  `currency` int(11) DEFAULT NULL,
+  `name` varchar(255) NOT NULL,
+  PRIMARY KEY (`element_id`),
+  KEY `currency` (`currency`),
+  KEY `currency_2` (`currency`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `et_price-types` (`element_id`, `currency`, `name`) VALUES
+(92, 90, 'Розничная'),
+(93, 91, 'Оптовая');
+
+CREATE TABLE IF NOT EXISTS `et_prices` (
+  `element_id` int(11) NOT NULL,
+  `price_type` int(11) DEFAULT NULL,
+  `product` int(11) DEFAULT NULL,
+  `value` int(11) NOT NULL,
+  PRIMARY KEY (`element_id`),
+  KEY `price_type` (`price_type`),
+  KEY `product` (`product`),
+  KEY `price_type_2` (`price_type`),
+  KEY `price_type_3` (`price_type`),
+  KEY `price_type_4` (`price_type`),
+  KEY `price_type_5` (`price_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `et_prices` (`element_id`, `price_type`, `product`, `value`) VALUES
+(109, 93, 108, 100);
 
 CREATE TABLE IF NOT EXISTS `et_sections` (
   `element_id` int(11) NOT NULL,
@@ -213,6 +228,17 @@ INSERT INTO `et_usersgroups` (`element_id`, `name`) VALUES
 (18, 'register'),
 (19, 'admin');
 
+CREATE TABLE IF NOT EXISTS `et_widgets` (
+  `element_id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `position` int(11) NOT NULL,
+  `type` int(11) NOT NULL,
+  PRIMARY KEY (`element_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `et_widgets` (`element_id`, `name`, `position`, `type`) VALUES
+(89, 'Товары', 1, 15);
+
 CREATE TABLE IF NOT EXISTS `lang` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app` int(11) DEFAULT NULL,
@@ -220,7 +246,7 @@ CREATE TABLE IF NOT EXISTS `lang` (
   `ru` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `app` (`app`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=43 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72 ;
 
 INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (1, NULL, 'sections', 'разделы'),
@@ -262,32 +288,70 @@ INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (38, NULL, 'file', 'файл'),
 (39, NULL, 'image', 'изображение'),
 (40, NULL, 'to', 'в'),
-(42, 2, 'platform', 'Платформа');
+(42, 2, 'platform', 'Платформа'),
+(45, 2, 'brand', 'бренд'),
+(46, 2, 'store', 'Склад'),
+(47, 2, 'model', 'модель'),
+(48, NULL, 'error', 'ошибка'),
+(49, NULL, 'selected', 'выбранные'),
+(50, NULL, 'succesfuly', 'успешно'),
+(51, 2, 'sims', 'Кол-во SIM'),
+(52, 2, 'screen_size', 'Размер экрана'),
+(53, 2, 'card_slot', 'Слот для карты памяти'),
+(54, 2, 'battery', 'Емкость батареи'),
+(55, NULL, 'translate', 'перевод'),
+(56, 2, 'name', 'position'),
+(57, 2, 'position', 'Позиция'),
+(58, 2, 'name', 'название'),
+(59, 2, 'currency', 'валюта'),
+(60, 2, 'symbol', 'символ'),
+(61, 2, 'rate', 'курс'),
+(63, 2, 'value', 'значение'),
+(64, 2, 'price_type', 'тип цены'),
+(65, NULL, 'currencies', 'валюты'),
+(66, NULL, 'prices', 'цены'),
+(67, NULL, 'price-types', 'типы цен'),
+(68, NULL, 'templates', 'шаблоны'),
+(69, NULL, 'widgets', 'виджеты'),
+(70, NULL, 'properties', 'свойства'),
+(71, NULL, 'e-store', 'магазин');
 
 CREATE TABLE IF NOT EXISTS `types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
+  `group` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `parent` (`parent`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=9 ;
+  KEY `parent` (`parent`),
+  KEY `group` (`group`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
 
-INSERT INTO `types` (`id`, `parent`, `name`) VALUES
-(1, NULL, 'sections'),
-(2, NULL, 'content'),
-(3, 2, 'products'),
-(4, NULL, 'users'),
-(5, NULL, 'usersGroups'),
-(6, NULL, 'templates'),
-(7, 3, 'phones'),
-(8, 3, 'cameras');
+INSERT INTO `types` (`id`, `parent`, `name`, `group`) VALUES
+(1, NULL, 'sections', 3),
+(2, NULL, 'content', 3),
+(3, 2, 'products', 3),
+(4, NULL, 'users', 2),
+(5, NULL, 'usersGroups', 2),
+(6, NULL, 'templates', 4),
+(7, 3, 'phones', 3),
+(8, 3, 'cameras', 3),
+(15, NULL, 'widgets', 4),
+(16, NULL, 'currencies', 1),
+(17, NULL, 'price-types', 1),
+(18, NULL, 'prices', 1);
 
 CREATE TABLE IF NOT EXISTS `type_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `type_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
+  `previous` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+
+INSERT INTO `type_groups` (`id`, `name`, `previous`) VALUES
+(1, 'E-store', 3),
+(2, 'Users', 1),
+(3, 'Содержание', NULL),
+(4, 'Системные', 2);
 
 
 ALTER TABLE `apps`
@@ -295,6 +359,13 @@ ALTER TABLE `apps`
 
 ALTER TABLE `et_content`
   ADD CONSTRAINT `et_content_ibfk_2` FOREIGN KEY (`section_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+ALTER TABLE `et_price-types`
+  ADD CONSTRAINT `et_price@002dtypes_ibfk_1` FOREIGN KEY (`currency`) REFERENCES `et_currencies` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+ALTER TABLE `et_prices`
+  ADD CONSTRAINT `et_prices_ibfk_2` FOREIGN KEY (`product`) REFERENCES `et_content_products` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `et_prices_ibfk_3` FOREIGN KEY (`price_type`) REFERENCES `et_price-types` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `et_sections`
   ADD CONSTRAINT `et_sections_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
@@ -306,7 +377,8 @@ ALTER TABLE `lang`
   ADD CONSTRAINT `lang_ibfk_1` FOREIGN KEY (`app`) REFERENCES `apps` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 ALTER TABLE `types`
-  ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`);
+  ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `types_ibfk_2` FOREIGN KEY (`group`) REFERENCES `type_groups` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
