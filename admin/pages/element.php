@@ -21,6 +21,7 @@ if($act=='edit'|$act=='copy') {
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
     ?>
 <? elseif(!empty($_POST['submit'])):
+    //print_r($_POST);
     //E::debug();
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else $result=$type['class']['name']::set($_POST['fields']);
@@ -73,42 +74,13 @@ if($act=='edit'|$act=='copy') {
                     <fieldset>
                         <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['id']:'')?>">
                         <? foreach($type['fields'] as $i=>$field):?>
-                        <? if($field['type']==='elements'): ?>
-                            <?
-                            //E::debug();
-                            $fk_type=E::getType($field['elements_type']);
-                            $fk_type['class']=E::getTypeClass($fk_type['name']);
-
-                            if($fk_type['class']['name']::$foreign_select=='select'):
-                                //E::debug();
-                                $fk_elements=E::get(array('type'=>$fk_type['id'],'subtypes'=>true));
-                                ?>
-                                <div class="form-group">
-                                    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                                    <div class="col-lg-10">
-                                        <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
-                                            <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
-                                            <? foreach($fk_elements as $fk_element):?>
-                                            <option value="<?=$fk_element['id']?>" <?=($fk_element['id']==$element[$field['name']] ? 'selected':'')?>><?=(empty($fk_element['name']) ? $fk_element['header'] : $fk_element['name'])?></option>
-                                            <? endforeach;?>
-                                        </select>
-                                    </div>
-                                </div>
-                            <? endif; ?>
-                        <? elseif($field['type']==='enum'): ?>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                                <div class="col-lg-10">
-                                    <select name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control">
-                                        <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
-                                        <? foreach($field['values'] as $val):?>
-                                            <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
-                                        <? endforeach;?>
-                                    </select>
-                                </div>
-                            </div>
-                        <? elseif($field['type']==='image'|$field['type']=='file'): ?>
-                             <? include("pages/field_types/file.php");?>
+                        <? if($field['type']==='elements'|$field['type']==='enum'|$field['type']==='text'|$field['type']==='html'|$field['type']==='image'|$field['type']==='file'):
+                            Template::render('pages/field_types/field_group_hor.php',array(
+                                'field'=>$field,
+                                'element'=>$element,
+                                'name'=>'fields['.$field['name'].']')
+                            );
+                             ?>
                         <? elseif($field['name']=='password'): ?>
                             <div class="form-group">
                                 <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
@@ -121,31 +93,6 @@ if($act=='edit'|$act=='copy') {
                                 <div class="col-lg-10">
                                     <input name="fields[new_<?=$field['name']?>]" type="text" class="form-control" id="inputnew<?=$field['name']?>" value="">
                                     <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
-                                </div>
-                            </div>
-                        <? elseif($field['type']=='text'): ?>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                                <div class="col-lg-10">
-                                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
-                                </div>
-                            </div>
-                        <? elseif($field['type']=='html'): ?>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                                <div class="col-lg-10">
-                                <div id="toolbar<?=$field['name']?>" style="display: none;">
-                                <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
-                                </div>
-
-                                    <textarea name="fields[<?=$field['name']?>]" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;"><?=$element[$field['name']]?></textarea>
-                                    <script>
-                                        var editor = new wysihtml5.Editor("input<?=$field['name']?>", {
-                                            toolbar:      "toolbar<?=$field['name']?>",
-                                            //stylesheets:  "css/stylesheet.css",
-                                            parserRules:  wysihtml5ParserRules
-                                        });
-                                    </script>
                                 </div>
                             </div>
                         <? else:?>
@@ -174,9 +121,30 @@ if($act=='edit'|$act=='copy') {
                 <div class="tab-pane fade" id="<?=$connect['type']['name']?>">
                     <?
                     //E::debug();
+                    $cType=E::getType($connect['type']);
+                    $cType['fields']=E::getTypeFields($cType);
                     $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
-                    print_r($cElements);
                     ?>
+                    <table id="elements" class="table table-hover table-condensed">
+                        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
+                        <? foreach($cType['fields'] as $i=>$field):?>
+                            <? if($field['name']==$connect['field']) continue; ?>
+                            <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
+                        <? endforeach; ?>
+                        <? foreach($cElements as $cElement): ?>
+                            <tr>
+                                <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
+                                <? foreach($cType['fields'] as $i=>$field):?>
+                                    <? if($field['name']===$connect['field']) continue; ?>
+                                    <? if($field['type']==='elements'):?>
+                                        <td><? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement)); ?></td>
+                                    <? else: ?>
+                                        <td><input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" type="text" value="<?=$cElement[$field['name']]?>"></td>
+                                    <? endif; ?>
+                                <? endforeach; ?>
+                            </tr>
+                        <? endforeach; ?>
+                    </table>
                 </div>
             <? endforeach;?>
             <? endif; ?>

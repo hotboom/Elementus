@@ -1,18 +1,17 @@
-<div class="form-group">
-    <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?></label>
-    <div class="col-lg-10">
-        <input name="fields[<?=$field['name']?>]" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;">
-        <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
-            <i class="icon-plus"></i>
-            <span><?=t('Upload files...')?></span>
-        </a>
-        <a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
-            <i class="icon-plus"></i>
-            <span><?=t('Select from server...')?></span>
-        </a>
-        <div class="clearfix"></div>
-    </div>
-</div>
+<?
+$field=$data['field'];
+$element=$data['element'];
+?>
+<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;">
+<a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
+    <i class="icon-plus"></i>
+    <span><?=t('Upload files...')?></span>
+</a>
+<a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
+    <i class="icon-plus"></i>
+    <span><?=t('Select from server...')?></span>
+</a>
+<div class="clearfix"></div>
 <script language="Javascript">
     $(function(){
         //Form

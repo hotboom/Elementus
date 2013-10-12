@@ -414,10 +414,11 @@ class E{
     }
 
     static function getTypeGroups($filter=false){
-        $sql="SELECT * FROM `type_groups` ";
+        $sql="SELECT *,id-previous AS sort FROM `type_groups` ";
         if(!empty($filter)){
             $sql.="WHERE ".$filter;
         }
+        $sql.="ORDER BY sort";
         return self::$db->q($sql,self::$debug,false);
     }
 
