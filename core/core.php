@@ -1,15 +1,39 @@
 <?
- //Ядро системы
+/**
+ * Elementus core class
+ *
+ * This is the long description for a DocBlock. This text may contain
+ * multiple lines and even some _markdown_.
+ *
+ * * Markdown style lists function too
+ * * Just try this out once
+ *
+ * The section after the long description contains the tags; which provide
+ * structured meta-data concerning the given element.
+ *
+ * @author  Mike van Riel <huntedbox@gmail.com>
+ *
+ * @since 1.0
+ */
 class E{
+    /** @type object Database object */
     public static $db;
+    /** @type array Current error */
     public static $error=array();
+    /** @type bool Debug mode on/off */
     public static $debug;
+    /** @type array Current app params array */
     public static $app;
+    /** @type string Current app params array */
     public static $foreign_select='select';
+    /** @type string Path to Elementus root directory */
     public static $root_path;
+    /** @type string Interface language */
     public static $lang='ru';
+    /** @type string Template name */
     public static $template;
 
+    /** @type mixed Temp variable for recursion functions results */
     private static $recursion_temp=false;
 
     public static function init($db, $root_path, $debug=false){
