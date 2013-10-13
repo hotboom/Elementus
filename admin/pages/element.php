@@ -15,8 +15,10 @@ if($act=='edit'|$act=='copy') {
 }
 ?>
 <? if(!empty($_FILES)):
+    $_FILES['file']['name']=substr(md5(time().rand(0,99)),0,20).'.'.substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.') + 1);
     $uploaddir = $root_path.'/upload/files/';
     $uploadfile = $uploaddir . basename($_FILES['file']['name']);
+
 
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
     ?>
@@ -24,7 +26,12 @@ if($act=='edit'|$act=='copy') {
     //print_r($_POST);
     //E::debug();
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
-    else $result=$type['class']['name']::set($_POST['fields']);
+    else {
+        $result=$type['class']['name']::set($_POST['fields']);
+        if(!empty($_POST['connected'])){
+            foreach($_POST['connected'] as $connected) $type['class']['name']::set($connected);
+        }
+    }
     ?>
     <? if($result):?>
         <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
@@ -80,7 +87,7 @@ if($act=='edit'|$act=='copy') {
                                 'element'=>$element,
                                 'name'=>'fields['.$field['name'].']')
                             );
-                             ?>
+                            ?>
                         <? elseif($field['name']=='password'): ?>
                             <div class="form-group">
                                 <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
@@ -97,7 +104,7 @@ if($act=='edit'|$act=='copy') {
                             </div>
                         <? else:?>
                             <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?></label>
+                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
                                 <div class="col-lg-10">
                                     <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
                                 </div>
@@ -125,7 +132,7 @@ if($act=='edit'|$act=='copy') {
                     $cType['fields']=E::getTypeFields($cType);
                     $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
                     ?>
-                    <table class="elements" class="table table-hover table-condensed">
+                    <table class="table table-hover table-condensed selectable">
                         <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
                         <? foreach($cType['fields'] as $i=>$field):?>
                             <? if($field['name']==$connect['field']) continue; ?>
@@ -139,15 +146,26 @@ if($act=='edit'|$act=='copy') {
                                 </td>
                                 <? foreach($cType['fields'] as $i=>$field):?>
                                     <? if($field['name']===$connect['field']) continue; ?>
+                                    <td>
                                     <? if($field['type']==='elements'):?>
-                                        <td><? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>'connected['.$cElement['id'].']['.$field['name'].']')); ?></td>
-                                    <? else: ?>
-                                        <td><input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" type="text" value="<?=$cElement[$field['name']]?>"></td>
+                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>'connected['.$cElement['id'].']['.$field['name'].']')); ?></td>
+                                    <? elseif($field['type']==='varchar'|$field['type']==='int'):?>
+                                        <input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" type="text" value="<?=$cElement[$field['name']]?>">
                                     <? endif; ?>
+                                    </td>
                                 <? endforeach; ?>
                             </tr>
                         <? endforeach; ?>
                     </table>
+                    <fieldset>
+                    <div class="form-group">
+                        <label class="col-lg-2 control-label"></label>
+                        <div class="col-lg-10">
+                            <button type="submit" class="btn btn-success"><?=t($act)?></button>
+                            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                        </div>
+                    </div>
+                    </fieldset>
                 </div>
             <? endforeach;?>
             <? endif; ?>

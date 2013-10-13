@@ -12,6 +12,9 @@ $element=$data['element'];
     <span><?=t('Select from server...')?></span>
 </a>
 <div class="clearfix"></div>
+<? if(!empty($element[$field['name']])):?>
+    <img src="/upload/files/<?=$element[$field['name']]?>" style="width:100px; height: auto;">
+<? endif;?>
 <script language="Javascript">
     $(function(){
         //Form
@@ -48,7 +51,7 @@ $element=$data['element'];
                 target.val(file_name);
                 <? if($field['type']=='image'):?>
                 button.parent().find('img').remove();
-                button.parent().append('<img src="/upload/files/'+file_name+'" width="100" height="100">');
+                button.parent().append('<img src="/upload/files/'+file_name+'" style="width:100px; height: auto;">');
                 <? endif;?>
             });
             fileinput.click();

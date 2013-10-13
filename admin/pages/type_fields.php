@@ -23,7 +23,7 @@ $params=array('type'=>$type['name']);
     <a href="#/type/id/<?=$type['id']?>" class="btn btn-primary"><i class="icon-arrow-left"></i> <?=t('Back to elements')?></a>
 </p>
 
-<table id="elements" class="table table-hover table-condensed">
+<table class="table table-hover table-condensed selectable">
     <tr>
         <th>#</th>
         <th><?=t('Name')?></th>

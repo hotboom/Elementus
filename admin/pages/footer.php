@@ -47,9 +47,10 @@
         $('a[data-target]').unbind().click(function(event) {
             target=$(this).attr('data-target');
             url=$(this).attr('href');
-            $('#elements input:checked').each(function(){
+            $('table.selectable input:checked').each(function(){
                 url=url+'&'+$(this).attr('name')+'='+$(this).val();
             });
+            console.log(url);
             $.ajax({
                 url: url,
                 cache:false,
@@ -63,17 +64,17 @@
         });
 
         //Selecting elements
-        $('#elements tr').unbind().click(function(event){
+        $('table.selectable tr').unbind().click(function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
             event.preventDefault();
         });
 
-        $('#elements tr input[type=checkbox]').unbind().click(function(event){
+        $('table.selectable tr input[type=checkbox]').unbind().click(function(event){
             //console.log($(this));
             var tr=$(this).parents('tr');
             tr.toggleClass('active');
-            if($('#elements tr.active').size()){
+            if($('table.selectable tr.active').size()){
                 $('#btn-edit').removeClass('disabled');
                 $('#btn-copy').removeClass('disabled');
                 $('#btn-delete').removeClass('disabled');

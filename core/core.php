@@ -32,6 +32,11 @@ class E{
         self::$debug=$debug;
     }
 
+    private static function error($error){
+        self::$error=$error;
+        return false;
+    }
+
     public static function getApps($params=array()){
         if(empty($params)) return self::$app;
         $sql="SELECT id,name,domain,template_id FROM apps";
@@ -167,19 +172,19 @@ class E{
         return true;
     }
 
-    public static function setType($params){
+    static function setType($params){
+        if(empty($params['name'])) return self::error(array('code'=>6,'Type name is empty'));
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Type name may contain only latin letters and _ or - symbols'));
+
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
 
         return self::$db->q($sql,self::$debug);
     }
 
-    public static function setField($type,$params){
-        if(!preg_match("/[a-z0-9_]/",$params['name'])) {
-            self::$error['code']='12';
-            self::$error['desc']='Field name may contain only latin letters and _ or - symbols';
-            return false;
-        }
+    static function setField($type,$params){
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Field name may contain only latin letters and _ or - symbols'));
+
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
         if(!self::$db->q("SHOW TABLES LIKE '".$table."'",self::$debug)){
@@ -359,6 +364,7 @@ class E{
         $type=self::getType($type);
         $type['table']=self::getTypeTableName($type);
         $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
+        $field['nullable']=($column['IS_NULLABLE']==='YES' ? true : false);
         $field['name']=$column['COLUMN_NAME'];
         $field['type']=$column['DATA_TYPE'];
         if($field['type']==='enum') {
