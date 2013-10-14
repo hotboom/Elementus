@@ -9,8 +9,8 @@
     <title>Admin - Elementus</title>
     <!-- Bootstrap -->
     <link href="/admin/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
-    <link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css">
+    <link href="/admin/static/css/font-awesome.css" rel="stylesheet">
+    <link rel="stylesheet" href="/admin/static/css/jquery-ui.css">
 
     <!--Custom Elementus Admin styles-->
     <link href="/admin/static/css/wysihtml5-custom.css" rel="stylesheet" media="screen">
@@ -21,7 +21,7 @@
     <script src="/admin/static/js/jquery-migrate-1.2.1.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+    <script src="/admin/static/js/bootstrap.min.js"></script>
 
     <!-- wysihtml5 editor -->
     <script src="/admin/static/js/advanced.js"></script>
