@@ -18,7 +18,7 @@
 
     <!-- JavaScript plugins (requires jQuery) -->
     <script type="text/javascript" src="/admin/static/js/jquery-1.9.0.min.js"></script>
-    <script src="http://code.jquery.com/jquery-migrate-1.2.1.js"></script>
+    <script src="/admin/static/js/jquery-migrate-1.2.1.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
