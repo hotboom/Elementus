@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `elements` (
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=110 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=113 ;
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
@@ -50,8 +50,9 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (91, 16, 2),
 (92, 17, 2),
 (93, 17, 2),
-(94, 7, 1),
-(109, 18, 2),
+(110, 7, 2),
+(112, 18, 2),
+(111, 18, 2),
 (108, 7, 2);
 
 CREATE TABLE IF NOT EXISTS `et_content` (
@@ -69,14 +70,15 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (18, NULL, 'Все есть Элемент', 'Elemental - test'),
 (19, NULL, 'Все есть Элемент', 'Elemental -'),
 (20, NULL, 'Все есть Элемент', 'Elemental -'),
-(51, 24, 'О магазине', 'Это&nbsp;пример реализации интернет-магазина на основе <a rel="nofollow" target="_blank" href="http://elementus.org/">Elementus&nbsp;фреймворк</a>. Все материалы на сайте&nbsp;<span>присутствуют исключительно в демострационных целях.</span>'),
-(108, 24, 'LG PL240', 'Подробное описание товара.');
+(51, 24, 'О компании', 'Это&nbsp;пример реализации интернет-магазина на основе <a rel="nofollow" target="_blank" href="http://elementus.org/">Elementus&nbsp;фреймворк</a>. Все материалы на сайте&nbsp;присутствуют исключительно в демострационных целях.'),
+(108, 24, 'Apple iPhone 5  32Gb', 'Подробное описание товара.'),
+(110, 24, 'Apple iPhone 5 16Gb', 'Подробное описание товара.');
 
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
   `shortdescr` text NOT NULL,
   `store` int(11) NOT NULL,
-  `brand` enum('Samsung','LG','HTC','Sony') NOT NULL,
+  `brand` enum('Samsung','LG','HTC','Sony','Apple') NOT NULL,
   `model` varchar(255) NOT NULL,
   `image` varchar(255) NOT NULL COMMENT '{"type":"image"}',
   PRIMARY KEY (`element_id`),
@@ -100,16 +102,15 @@ CREATE TABLE IF NOT EXISTS `et_content_products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content_products` (`element_id`, `shortdescr`, `store`, `brand`, `model`, `image`) VALUES
-(104, '', 0, 'Samsung', '0', ''),
-(107, '', 0, 'Samsung', '0', ''),
-(108, 'Тестовое краткое описание.', 2, 'LG', 'PL240', '90133_original.jpg');
+(108, 'смартфон на платформе iOS\r\nсенсорный экран мультитач (емкостный)\r\nдиагональ экрана 4", разрешение 640x1136\r\nкамера 8 МП, светодиодная вспышка, автофокус\r\nпамять 16 Гб, без слота для карт памяти\r\nподдержка Bluetooth, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС\r\nвес 112 г, ШxВxТ 58.60x123.80x7.60 мм, акк. 1400 мАч', 2, 'Apple', '5  32Gb', '286605ba2275a7397574.jpg'),
+(110, 'смартфон на платформе iOS\r\nсенсорный экран мультитач (емкостный)\r\nдиагональ экрана 4", разрешение 640x1136\r\nкамера 8 МП, светодиодная вспышка, автофокус\r\nпамять 16 Гб, без слота для карт памяти\r\nподдержка Bluetooth, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС\r\nвес 112 г, ШxВxТ 58.60x123.80x7.60 мм, акк. 1400 мАч', 2, 'Apple', '5 16Gb', '286605ba2275a7397574.jpg');
 
 CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   `element_id` int(11) NOT NULL,
   `type` enum('смартфон','телефон') NOT NULL,
   `platform` enum('Android','iOS','Windows','другая') NOT NULL,
   `sims` int(11) NOT NULL,
-  `screen_size` int(11) NOT NULL,
+  `screen_size` varchar(255) NOT NULL,
   `memory_size` int(11) NOT NULL,
   `card_slot` enum('Нет','Да') NOT NULL,
   `wi-fi` enum('Нет','Да') NOT NULL,
@@ -120,7 +121,8 @@ CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content_products_phones` (`element_id`, `type`, `platform`, `sims`, `screen_size`, `memory_size`, `card_slot`, `wi-fi`, `Bluetooth`, `gps`, `battery`) VALUES
-(108, '', 'Windows', 1, 0, 2000, 'Да', 'Да', 'Да', 'Да', 1200);
+(108, '', 'iOS', 1, '640x1136', 32, 'Да', 'Да', 'Да', 'Да', 1400),
+(110, '', 'iOS', 1, '640x1136', 16, 'Да', 'Да', 'Да', 'Да', 1400);
 
 CREATE TABLE IF NOT EXISTS `et_currencies` (
   `element_id` int(11) NOT NULL,
@@ -163,7 +165,8 @@ CREATE TABLE IF NOT EXISTS `et_prices` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_prices` (`element_id`, `price_type`, `product`, `value`) VALUES
-(109, 93, 108, 100);
+(111, 92, 110, 22990),
+(112, 92, 108, 26990);
 
 CREATE TABLE IF NOT EXISTS `et_sections` (
   `element_id` int(11) NOT NULL,
@@ -183,7 +186,6 @@ INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`
 (10, NULL, 'Документация', 'documentation', 'documentation', ''),
 (24, NULL, 'Главная', 'main', 'main', ''),
 (26, NULL, 'Демо', '', '', 'http://demo.elementus.loc'),
-(27, NULL, 'О компании', 'about', 'text', ''),
 (28, NULL, 'Каталог', 'catalog', 'catalog', ''),
 (29, NULL, 'Оплата', 'howtopay', 'text', ''),
 (30, NULL, 'Доставка', 'delivery', 'text', ''),

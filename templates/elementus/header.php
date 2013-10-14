@@ -15,7 +15,7 @@
     <link href="/templates/elementus/static/css/jumbotron.css" rel="stylesheet">
 
     <!-- JavaScript plugins (requires jQuery) -->
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/templates/elementus/static/js/jquery-1.10.2.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="/templates/elementus/static/js/bootstrap.min.js"></script>
 
