@@ -1,5 +1,4 @@
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -7,7 +6,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 
-CREATE TABLE IF NOT EXISTS `apps` (
+CREATE TABLE `apps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `key` varchar(255) NOT NULL,
@@ -15,18 +14,18 @@ CREATE TABLE IF NOT EXISTS `apps` (
   `template_id` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `template_id` (`template_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 INSERT INTO `apps` (`id`, `name`, `key`, `domain`, `template_id`) VALUES
-(1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw', 'elementus.loc', 23),
-(2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.loc', 82);
+(1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw', 'elementus.org', 23),
+(2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.org', 82);
 
-CREATE TABLE IF NOT EXISTS `elements` (
+CREATE TABLE `elements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=113 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=113 ;
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
@@ -55,14 +54,14 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (111, 18, 2),
 (108, 7, 2);
 
-CREATE TABLE IF NOT EXISTS `et_content` (
+CREATE TABLE `et_content` (
   `element_id` int(11) NOT NULL,
   `section_id` int(11) DEFAULT NULL,
   `header` varchar(255) NOT NULL,
   `content` text NOT NULL COMMENT '{"type":"html"}',
   PRIMARY KEY (`element_id`),
   KEY `section_id` (`section_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUES
 (16, NULL, 'All is Element', ''),
@@ -74,7 +73,7 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (108, 24, 'Apple iPhone 5  32Gb', 'Подробное описание товара.'),
 (110, 24, 'Apple iPhone 5 16Gb', 'Подробное описание товара.');
 
-CREATE TABLE IF NOT EXISTS `et_content_products` (
+CREATE TABLE `et_content_products` (
   `element_id` int(11) NOT NULL,
   `shortdescr` text NOT NULL,
   `store` int(11) NOT NULL,
@@ -99,13 +98,13 @@ CREATE TABLE IF NOT EXISTS `et_content_products` (
   KEY `brand_15` (`brand`),
   KEY `brand_16` (`brand`),
   KEY `brand_17` (`brand`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content_products` (`element_id`, `shortdescr`, `store`, `brand`, `model`, `image`) VALUES
 (108, 'смартфон на платформе iOS\r\nсенсорный экран мультитач (емкостный)\r\nдиагональ экрана 4", разрешение 640x1136\r\nкамера 8 МП, светодиодная вспышка, автофокус\r\nпамять 16 Гб, без слота для карт памяти\r\nподдержка Bluetooth, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС\r\nвес 112 г, ШxВxТ 58.60x123.80x7.60 мм, акк. 1400 мАч', 2, 'Apple', '5  32Gb', '286605ba2275a7397574.jpg'),
 (110, 'смартфон на платформе iOS\r\nсенсорный экран мультитач (емкостный)\r\nдиагональ экрана 4", разрешение 640x1136\r\nкамера 8 МП, светодиодная вспышка, автофокус\r\nпамять 16 Гб, без слота для карт памяти\r\nподдержка Bluetooth, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС\r\nвес 112 г, ШxВxТ 58.60x123.80x7.60 мм, акк. 1400 мАч', 2, 'Apple', '5 16Gb', '286605ba2275a7397574.jpg');
 
-CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
+CREATE TABLE `et_content_products_phones` (
   `element_id` int(11) NOT NULL,
   `type` enum('смартфон','телефон') NOT NULL,
   `platform` enum('Android','iOS','Windows','другая') NOT NULL,
@@ -118,39 +117,39 @@ CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   `gps` enum('Нет','Да') NOT NULL,
   `battery` int(11) NOT NULL,
   PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_content_products_phones` (`element_id`, `type`, `platform`, `sims`, `screen_size`, `memory_size`, `card_slot`, `wi-fi`, `Bluetooth`, `gps`, `battery`) VALUES
 (108, '', 'iOS', 1, '640x1136', 32, 'Да', 'Да', 'Да', 'Да', 1400),
 (110, '', 'iOS', 1, '640x1136', 16, 'Да', 'Да', 'Да', 'Да', 1400);
 
-CREATE TABLE IF NOT EXISTS `et_currencies` (
+CREATE TABLE `et_currencies` (
   `element_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `symbol` varchar(255) NOT NULL,
   `code` varchar(255) NOT NULL,
   `rate` varchar(255) NOT NULL,
   PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_currencies` (`element_id`, `name`, `symbol`, `code`, `rate`) VALUES
 (90, 'Российский рубль', 'р.', 'RUB', '1'),
 (91, 'Доллар США', '$', 'USD', '31.5');
 
-CREATE TABLE IF NOT EXISTS `et_price-types` (
+CREATE TABLE `et_price-types` (
   `element_id` int(11) NOT NULL,
   `currency` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`element_id`),
   KEY `currency` (`currency`),
   KEY `currency_2` (`currency`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_price-types` (`element_id`, `currency`, `name`) VALUES
 (92, 90, 'Розничная'),
 (93, 91, 'Оптовая');
 
-CREATE TABLE IF NOT EXISTS `et_prices` (
+CREATE TABLE `et_prices` (
   `element_id` int(11) NOT NULL,
   `price_type` int(11) DEFAULT NULL,
   `product` int(11) DEFAULT NULL,
@@ -161,14 +160,15 @@ CREATE TABLE IF NOT EXISTS `et_prices` (
   KEY `price_type_2` (`price_type`),
   KEY `price_type_3` (`price_type`),
   KEY `price_type_4` (`price_type`),
-  KEY `price_type_5` (`price_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  KEY `price_type_5` (`price_type`),
+  KEY `product_2` (`product`)
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_prices` (`element_id`, `price_type`, `product`, `value`) VALUES
 (111, 92, 110, 22990),
 (112, 92, 108, 26990);
 
-CREATE TABLE IF NOT EXISTS `et_sections` (
+CREATE TABLE `et_sections` (
   `element_id` int(11) NOT NULL,
   `parent_id` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
@@ -178,32 +178,32 @@ CREATE TABLE IF NOT EXISTS `et_sections` (
   PRIMARY KEY (`element_id`),
   UNIQUE KEY `element_id` (`element_id`),
   KEY `parent_id` (`parent_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`, `link`) VALUES
 (1, NULL, 'Главная', 'main', 'main', ''),
 (9, NULL, 'Первые шаги', 'gettingstarted', 'text', ''),
 (10, NULL, 'Документация', 'documentation', 'documentation', ''),
 (24, NULL, 'Главная', 'main', 'main', ''),
-(26, NULL, 'Демо', '', '', 'http://demo.elementus.loc'),
+(26, NULL, 'Демо', '', '', 'http://demo.elementus.org'),
 (28, NULL, 'Каталог', 'catalog', 'catalog', ''),
 (29, NULL, 'Оплата', 'howtopay', 'text', ''),
 (30, NULL, 'Доставка', 'delivery', 'text', ''),
 (34, NULL, 'test', '', '', ''),
 (45, NULL, 'test7', '', '', '');
 
-CREATE TABLE IF NOT EXISTS `et_templates` (
+CREATE TABLE `et_templates` (
   `element_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `path` varchar(255) NOT NULL,
   PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_templates` (`element_id`, `name`, `path`) VALUES
 (23, 'Elementus', 'elementus'),
 (82, 'E-store demo', 'demo');
 
-CREATE TABLE IF NOT EXISTS `et_users` (
+CREATE TABLE `et_users` (
   `element_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `surname` varchar(255) NOT NULL,
@@ -214,41 +214,41 @@ CREATE TABLE IF NOT EXISTS `et_users` (
   PRIMARY KEY (`element_id`),
   KEY `group_id` (`group_id`),
   KEY `group_id_2` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_users` (`element_id`, `name`, `surname`, `email`, `password`, `group_id`, `regdate`) VALUES
 (22, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22'),
 (25, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22');
 
-CREATE TABLE IF NOT EXISTS `et_usersgroups` (
+CREATE TABLE `et_usersgroups` (
   `element_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_usersgroups` (`element_id`, `name`) VALUES
 (18, 'register'),
 (19, 'admin');
 
-CREATE TABLE IF NOT EXISTS `et_widgets` (
+CREATE TABLE `et_widgets` (
   `element_id` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `position` int(11) NOT NULL,
   `type` int(11) NOT NULL,
   PRIMARY KEY (`element_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=INNODB DEFAULT CHARSET=utf8;
 
 INSERT INTO `et_widgets` (`element_id`, `name`, `position`, `type`) VALUES
 (89, 'Товары', 1, 15);
 
-CREATE TABLE IF NOT EXISTS `lang` (
+CREATE TABLE `lang` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `app` int(11) DEFAULT NULL,
   `en` text NOT NULL,
   `ru` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `app` (`app`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=72 ;
 
 INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (1, NULL, 'sections', 'разделы'),
@@ -318,7 +318,7 @@ INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (70, NULL, 'properties', 'свойства'),
 (71, NULL, 'e-store', 'магазин');
 
-CREATE TABLE IF NOT EXISTS `types` (
+CREATE TABLE `types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent` int(11) DEFAULT NULL,
   `name` varchar(255) NOT NULL,
@@ -326,7 +326,7 @@ CREATE TABLE IF NOT EXISTS `types` (
   PRIMARY KEY (`id`),
   KEY `parent` (`parent`),
   KEY `group` (`group`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
 
 INSERT INTO `types` (`id`, `parent`, `name`, `group`) VALUES
 (1, NULL, 'sections', 3),
@@ -342,46 +342,15 @@ INSERT INTO `types` (`id`, `parent`, `name`, `group`) VALUES
 (17, NULL, 'price-types', 1),
 (18, NULL, 'prices', 1);
 
-CREATE TABLE IF NOT EXISTS `type_groups` (
+CREATE TABLE `type_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `previous` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
+) ENGINE=INNODB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
 INSERT INTO `type_groups` (`id`, `name`, `previous`) VALUES
 (1, 'E-store', 3),
 (2, 'Users', 1),
 (3, 'Содержание', NULL),
 (4, 'Системные', 2);
-
-
-ALTER TABLE `apps`
-  ADD CONSTRAINT `apps_ibfk_1` FOREIGN KEY (`template_id`) REFERENCES `et_templates` (`element_id`);
-
-ALTER TABLE `et_content`
-  ADD CONSTRAINT `et_content_ibfk_2` FOREIGN KEY (`section_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `et_price-types`
-  ADD CONSTRAINT `et_price@002dtypes_ibfk_1` FOREIGN KEY (`currency`) REFERENCES `et_currencies` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE `et_prices`
-  ADD CONSTRAINT `et_prices_ibfk_2` FOREIGN KEY (`product`) REFERENCES `et_content_products` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `et_prices_ibfk_3` FOREIGN KEY (`price_type`) REFERENCES `et_price-types` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE `et_sections`
-  ADD CONSTRAINT `et_sections_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
-ALTER TABLE `et_users`
-  ADD CONSTRAINT `et_users_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `et_usersgroups` (`element_id`);
-
-ALTER TABLE `lang`
-  ADD CONSTRAINT `lang_ibfk_1` FOREIGN KEY (`app`) REFERENCES `apps` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-ALTER TABLE `types`
-  ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `types_ibfk_2` FOREIGN KEY (`group`) REFERENCES `type_groups` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
