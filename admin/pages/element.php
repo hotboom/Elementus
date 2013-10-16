@@ -132,12 +132,19 @@ if($act=='edit'|$act=='copy') {
                     $cType['fields']=E::getTypeFields($cType);
                     $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
                     ?>
-                    <table class="table table-hover table-condensed selectable">
-                        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
+                    <p class="pull-left">
+                        <a href="#add" class="btn btn-success" tabindex="1"><i class="icon-plus"></i> <?=t('Add')?></a>
+                        <a href="#copy" class="btn btn-primary disabled" tabindex="3"><i class="icon-copy"></i> <?=t('Copy')?></a>
+                        <a href="#delete" class="btn btn-danger disabled" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
+                    </p>
+                    <table id="connected" class="table table-hover table-condensed selectable">
+                        <tr>
+                        <th class="col-lg-1"><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">#</a></th>
                         <? foreach($cType['fields'] as $i=>$field):?>
                             <? if($field['name']==$connect['field']) continue; ?>
                             <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
                         <? endforeach; ?>
+                        </tr>
                         <? foreach($cElements as $cElement): ?>
                             <tr>
                                 <td>
@@ -150,21 +157,32 @@ if($act=='edit'|$act=='copy') {
                                     <? if($field['type']==='elements'):?>
                                         <? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>'connected['.$cElement['id'].']['.$field['name'].']')); ?></td>
                                     <? elseif($field['type']==='varchar'|$field['type']==='int'):?>
-                                        <input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" type="text" value="<?=$cElement[$field['name']]?>">
+                                        <input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" class="form-control" type="text" value="<?=$cElement[$field['name']]?>">
                                     <? endif; ?>
                                     </td>
                                 <? endforeach; ?>
                             </tr>
                         <? endforeach; ?>
                     </table>
+                    <script>
+                        $(function(){
+                            $("a[href='#add']").click(function(e){
+                                var clone=$('#connected tr:eq(1)').clone();
+                                $('#connected').append(clone);
+                                clone.find('input').val('');
+                                e.preventDefault();
+                            });
+                            $("a[href='#copy']").click(function(e){
+                                $('#connected').append($('#connected tr:eq(1)').clone());
+                                e.preventDefault();
+                            });
+                        })
+                    </script>
                     <fieldset>
-                    <div class="form-group">
-                        <label class="col-lg-2 control-label"></label>
-                        <div class="col-lg-10">
-                            <button type="submit" class="btn btn-success"><?=t($act)?></button>
-                            <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
-                        </div>
-                    </div>
+                    <p>
+                        <button type="submit" class="btn btn-success"><?=t($act)?></button>
+                        <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
+                    </p>
                     </fieldset>
                 </div>
             <? endforeach;?>

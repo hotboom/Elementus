@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `elements` (
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=113 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=114 ;
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
