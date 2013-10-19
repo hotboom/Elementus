@@ -44,13 +44,12 @@
         });
 
         //Ajax links
-        $('a[data-target]').unbind().click(function(event) {
+        $('a[data-target]').unbind().click(function(event){
             target=$(this).attr('data-target');
             url=$(this).attr('href');
             $('table.selectable input:checked').each(function(){
                 url=url+'&'+$(this).attr('name')+'='+$(this).val();
             });
-            console.log(url);
             $.ajax({
                 url: url,
                 cache:false,
@@ -63,14 +62,13 @@
             event.preventDefault();
         });
 
-        //Selecting elements
-        $('table.selectable tr').unbind().click(function(event){
+        $('table.selectable').unbind().on('click','tr', function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
             event.preventDefault();
         });
 
-        $('table.selectable tr input[type=checkbox]').unbind().click(function(event){
+        $('table.selectable').on('click','tr input[type=checkbox]',function(event){
             //console.log($(this));
             var tr=$(this).parents('tr');
             tr.toggleClass('active');

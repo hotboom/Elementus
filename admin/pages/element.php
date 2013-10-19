@@ -9,6 +9,8 @@ if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes
 
 $act=htmlspecialchars($_GET['act']);
 $element=array();
+$connects=E::getConnectedTypes($type['id']);
+
 if($act=='edit'|$act=='copy') {
     $element_id=(int)$_GET['elements'][0];
     $element=E::getById($element_id);
@@ -28,9 +30,7 @@ if($act=='edit'|$act=='copy') {
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else {
         $result=$type['class']['name']::set($_POST['fields']);
-        if(!empty($_POST['connected'])){
-            foreach($_POST['connected'] as $connected) $type['class']['name']::set($connected);
-        }
+        if(!empty($_POST['connected'])) foreach($_POST['connected'] as $connected) $type['class']['name']::set($connected);
     }
     ?>
     <? if($result):?>
@@ -53,7 +53,6 @@ if($act=='edit'|$act=='copy') {
         });
     </script>
     <? if($act!='delete'):?>
-    <? $connects=E::getConnectedTypes($type['id']); ?>
     <? if(!empty($connects)):?>
     <ul id="element-nav" class="nav nav-tabs">
         <li class="active"><a href="#home" data-toggle="tab"><?=t('Properties')?></a></li>
@@ -131,11 +130,12 @@ if($act=='edit'|$act=='copy') {
                     $cType=E::getType($connect['type']);
                     $cType['fields']=E::getTypeFields($cType);
                     $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
+                    if(empty($cElements)) $cElements['example']=array();
                     ?>
                     <p class="pull-left">
                         <a href="#add" class="btn btn-success" tabindex="1"><i class="icon-plus"></i> <?=t('Add')?></a>
                         <a href="#copy" class="btn btn-primary disabled" tabindex="3"><i class="icon-copy"></i> <?=t('Copy')?></a>
-                        <a href="#delete" class="btn btn-danger disabled" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
+                        <a href="#delete" class="btn btn-danger" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
                     </p>
                     <table id="connected" class="table table-hover table-condensed selectable">
                         <tr>
@@ -145,19 +145,21 @@ if($act=='edit'|$act=='copy') {
                             <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
                         <? endforeach; ?>
                         </tr>
-                        <? foreach($cElements as $cElement): ?>
-                            <tr>
+                        <? foreach($cElements as $i=>$cElement): ?>
+                            <tr<?=($i==='example' ? ' style="display:none;"' : ' data-element="1"')?>>
                                 <td>
-                                    <input type="checkbox" name="connected_elements[]" value="<?=$cElement['id']?>"> <?=$cElement['id']?>
-                                    <input name="connected[<?=$cElement['id']?>][id]" type="hidden" value="<?=$cElement['id']?>">
+                                    <input type="checkbox" name="connected_elements[]" value="<?=$cElement['id']?>"> <span class="id"><?=$cElement['id']?></span>
+                                    <input name="id" type="hidden" value="<?=$cElement['id']?>" data-field="id">
+                                    <input name="<?=$connect['field']?>" class="common" type="hidden" value="<?=$element['id']?>" data-field="<?=$connect['field']?>">
+                                    <input name="type" class="common" type="hidden" value="<?=$cType['name']?>" data-field="type">
                                 </td>
-                                <? foreach($cType['fields'] as $i=>$field):?>
+                                <? foreach($cType['fields'] as $j=>$field):?>
                                     <? if($field['name']===$connect['field']) continue; ?>
                                     <td>
                                     <? if($field['type']==='elements'):?>
-                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>'connected['.$cElement['id'].']['.$field['name'].']')); ?></td>
+                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>$field['name'])); ?></td>
                                     <? elseif($field['type']==='varchar'|$field['type']==='int'):?>
-                                        <input name="connected[<?=$cElement['id']?>][<?=$field['name']?>]" class="form-control" type="text" value="<?=$cElement[$field['name']]?>">
+                                        <input name="<?=$field['name']?>" class="form-control" type="text" value="<?=$cElement[$field['name']]?>" data-field="<?=$field['name']?>">
                                     <? endif; ?>
                                     </td>
                                 <? endforeach; ?>
@@ -166,17 +168,33 @@ if($act=='edit'|$act=='copy') {
                     </table>
                     <script>
                         $(function(){
+                            function changeConnectedFieldsNames(){
+                                $("#connected tr[data-element='1']").find('input, select, textarea').attr('name',function( i, val ) {
+                                    if(!$(this).attr('data-field')) return val;
+                                    return 'connected['+$(this).parents('tr').index()+']['+$(this).attr('data-field')+']';
+                                });
+                            }
+                            changeConnectedFieldsNames();
+
                             $("a[href='#add']").click(function(e){
                                 var clone=$('#connected tr:eq(1)').clone();
                                 $('#connected').append(clone);
-                                clone.find('input').val('');
+                                clone.find("input[class!='common']").val('');
+                                clone.find('.id').remove();
+                                clone.attr('data-element',1);
+                                changeConnectedFieldsNames();
+                                clone.show();
                                 e.preventDefault();
                             });
                             $("a[href='#copy']").click(function(e){
                                 $('#connected').append($('#connected tr:eq(1)').clone());
                                 e.preventDefault();
                             });
-                        })
+                            $("a[href='#delete']").click(function(e){
+                                $('#connected tr.active').remove();
+                                e.preventDefault();
+                            });
+                        });
                     </script>
                     <fieldset>
                     <p>

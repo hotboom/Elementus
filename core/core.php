@@ -130,25 +130,25 @@ class E{
     }
 
     public static function set($params=array()){
+        if(!empty($params['type'])){
+            $type=self::getType($params['type']);
+            $types=self::getFullType($type);
+        }
         if(!empty($params['id'])){
             $prx="UPDATE ";
             $params['element_id']=$params['id'];
             unset($params['id']);
-            $types=self::getElementFullType($params['element_id']);
+            if(empty($types)) $types=self::getElementFullType($params['element_id']);
         }
         else{
             $prx="INSERT ";
-            if(!empty($params['type'])){
-                $type=self::getType($params['type']);
-                $types=self::getFullType($type['id']);
-            }
-            else{
+            if(empty($params['type'])){
                 self::$error['code']=2;
-                self::$error['desc']='Missing element type id';
+                self::$error['desc']='Missing element type name or id';
                 if(self::$debug) print_r(self::$error);
                 return false;
             }
-            self::$db->q("INSERT INTO `elements` SET `type_id`='".$params['type']."', `app_id`='".self::$app['id']."'",self::$debug);
+            self::$db->q("INSERT INTO `elements` SET `type_id`='".$type['id']."', `app_id`='".self::$app['id']."'",self::$debug);
             $params['element_id']=self::$db->q("SELECT LAST_INSERT_ID()",self::$debug);
         }
 
@@ -386,7 +386,7 @@ class E{
 
     static function getField($type,$field_name){
         $type=self::getType($type);
-        $type['table']=self::getTypeTableName($type);
+        if(empty($type['table'])) $type['table']=self::getTypeTableName($type);
         $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
         $field['nullable']=($column['IS_NULLABLE']==='YES' ? true : false);
         $field['name']=$column['COLUMN_NAME'];
@@ -423,14 +423,18 @@ class E{
 
     static function getTypeFields($type){
         $type=self::getType($type);
-        $table=self::getTypeTableName($type);
-        if(!self::$db->q("SHOW TABLES LIKE '".$table."'")) return array();
-        $fields=self::$db->q('SHOW COLUMNS FROM `'.$table.'`',self::$debug);
+        $type['table']=self::getTypeTableName($type);
+        if(!self::$db->q("SHOW TABLES LIKE '".$type['table']."'")) return array();
+        $fields=self::$db->q('SHOW COLUMNS FROM `'.$type['table'].'`',self::$debug);
         foreach($fields as $i=>$field){
             if($field['Field']=='element_id') unset($fields[$i]);
-            else $fields[$i]=self::getField($type,$field['Field']);
+            else $fields[$i]=self::getField($type,$field['Field'],$table);
         }
         return $fields;
+    }
+
+    static function getTypeFieldsNames($type){
+
     }
 
     static function getFullTypeFields($type){

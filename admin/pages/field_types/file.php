@@ -2,7 +2,7 @@
 $field=$data['field'];
 $element=$data['element'];
 ?>
-<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;">
+<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;" data-field="<?=$field['name']?>">
 <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
     <i class="icon-plus"></i>
     <span><?=t('Upload files...')?></span>
