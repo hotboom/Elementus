@@ -7,7 +7,9 @@ $type['fields']=E::getFullTypeFields($type);
 
 $type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
-$params=array('type'=>$type);
+$params=array();
+$params['type']=$type;
+if(!empty($_GET['order'])) $params['order']=array($_GET['order'],$_GET['desc']);
 $elements=$type['class']['name']::get($params);
 
 ?>
@@ -24,11 +26,31 @@ $elements=$type['class']['name']::get($params);
 </p>
 
 <table class="table table-hover table-condensed selectable">
+    <thead>
     <tr>
-        <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">id</a></th>
+        <th><a href="#/type/id/<?=$type['id']?>/order/<?=$field['name']?>">id</a></th>
         <? foreach($type['fields'] as $i=>$field):?>
-           <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
+            <?
+            $field['class']='';
+            if($field['name']===$_GET['order']) $field['class'].='order ';
+            if(!empty($_GET['desc'])) $field['class'].='desc ';
+            ?>
+            <th><a href="#/type/id/<?=$type['id']?>/order/<?=$field['name']?><?=(empty($_GET['desc']) ? '/desc/1' :'')?>"<?=(!empty($field['class']) ? ' class="'.trim($field['class']).'"' :'')?>><?=t($field['name'])?></a></th>
         <? endforeach; ?>
+    </tr>
+    <tr class="filter">
+        <th><a href="#/type/id/<?=$type['id']?>/order/<?=$field['name']?>">id</a></th>
+        <? foreach($type['fields'] as $i=>$field):?>
+            <?
+            $field['class']='';
+            if($field['name']===$_GET['order']) $field['class'].='order ';
+            if(!empty($_GET['desc'])) $field['class'].='desc ';
+            ?>
+            <th><? Template::render('pages/field_types/field_filter.php',array('field'=>$field,'element'=>false, 'name'=>$field['name'])); ?></th>
+        <? endforeach; ?>
+    </tr>
+    </thead>
+    <tbody>
         <? foreach($elements as $element): ?>
             <tr>
                 <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
@@ -37,5 +59,6 @@ $elements=$type['class']['name']::get($params);
             <? endforeach; ?>
             </tr>
         <? endforeach; ?>
+    </tbody>
     </tr>
 </table>

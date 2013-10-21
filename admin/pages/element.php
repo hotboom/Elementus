@@ -30,7 +30,12 @@ if($act=='edit'|$act=='copy') {
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else {
         $result=$type['class']['name']::set($_POST['fields']);
-        if(!empty($_POST['connected'])) foreach($_POST['connected'] as $connected) $type['class']['name']::set($connected);
+        if(!empty($_POST['connected'])) {
+            foreach($_POST['connected'] as $connected) {
+                if(!empty($connected['delete'])&&!empty($connected['id'])) $type['class']['name']::delete($connected['id']);
+                $type['class']['name']::set($connected);
+            }
+        }
     }
     ?>
     <? if($result):?>
@@ -79,37 +84,13 @@ if($act=='edit'|$act=='copy') {
                 <?else:?>
                     <fieldset>
                         <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['id']:'')?>">
-                        <? foreach($type['fields'] as $i=>$field):?>
-                        <? if($field['type']==='elements'|$field['type']==='enum'|$field['type']==='text'|$field['type']==='html'|$field['type']==='image'|$field['type']==='file'):
+                        <? foreach($type['fields'] as $i=>$field):
                             Template::render('pages/field_types/field_group_hor.php',array(
                                 'field'=>$field,
                                 'element'=>$element,
                                 'name'=>'fields['.$field['name'].']')
                             );
-                            ?>
-                        <? elseif($field['name']=='password'): ?>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
-                                <div class="col-lg-10">
-                                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="inputnew<?=$field['name']?>"><?=t('New')?> <?=t($field['name'])?></label>
-                                <div class="col-lg-10">
-                                    <input name="fields[new_<?=$field['name']?>]" type="text" class="form-control" id="inputnew<?=$field['name']?>" value="">
-                                    <a href="#" onclick="return false;" class="help-block"><?=t('generate')?></a>
-                                </div>
-                            </div>
-                        <? else:?>
-                            <div class="form-group">
-                                <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
-                                <div class="col-lg-10">
-                                    <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
-                                </div>
-                            </div>
-                        <? endif;?>
-                        <? endforeach;?>
+                        endforeach;?>
                         <div class="form-group">
                             <label class="col-lg-2 control-label"></label>
                             <div class="col-lg-10">
@@ -138,6 +119,7 @@ if($act=='edit'|$act=='copy') {
                         <a href="#delete" class="btn btn-danger" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
                     </p>
                     <table id="connected" class="table table-hover table-condensed selectable">
+                        <thead>
                         <tr>
                         <th class="col-lg-1"><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">#</a></th>
                         <? foreach($cType['fields'] as $i=>$field):?>
@@ -145,6 +127,8 @@ if($act=='edit'|$act=='copy') {
                             <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
                         <? endforeach; ?>
                         </tr>
+                        </thead>
+                        <tbody>
                         <? foreach($cElements as $i=>$cElement): ?>
                             <tr<?=($i==='example' ? ' style="display:none;"' : ' data-element="1"')?>>
                                 <td>
@@ -165,6 +149,7 @@ if($act=='edit'|$act=='copy') {
                                 <? endforeach; ?>
                             </tr>
                         <? endforeach; ?>
+                        </tbody>
                     </table>
                     <script>
                         $(function(){
@@ -187,11 +172,15 @@ if($act=='edit'|$act=='copy') {
                                 e.preventDefault();
                             });
                             $("a[href='#copy']").click(function(e){
-                                $('#connected').append($('#connected tr:eq(1)').clone());
+                                var clone=$('#connected tr:eq(1)').clone();
+                                clone.find('.id').remove();
+                                $('#connected').append(clone);
                                 e.preventDefault();
                             });
                             $("a[href='#delete']").click(function(e){
-                                $('#connected tr.active').remove();
+                                $('#connected tr.active td:eq(0)').append('<input type="hidden" value="1" name="delete" data-field="delete">');
+                                changeConnectedFieldsNames();
+                                $('#connected tr.active').hide();
                                 e.preventDefault();
                             });
                         });

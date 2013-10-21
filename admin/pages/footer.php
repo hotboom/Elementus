@@ -62,13 +62,13 @@
             event.preventDefault();
         });
 
-        $('table.selectable').unbind().on('click','tr', function(event){
+        $('table.selectable tbody').unbind().on('click','tr', function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
             event.preventDefault();
         });
 
-        $('table.selectable').on('click','tr input[type=checkbox]',function(event){
+        $('table.selectable tbody').on('click','tr input[type=checkbox]',function(event){
             //console.log($(this));
             var tr=$(this).parents('tr');
             tr.toggleClass('active');

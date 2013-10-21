@@ -151,30 +151,24 @@ class MySQL {
         if (TRUE === $this->result) {   // simply result
             $return = TRUE;         // successfully (for example: INSERT INTO ...)
         }
-        else if (FALSE === $this->result)
-        {
+        else if (FALSE === $this->result){
             $this->SetError();
-            if($debug)
-            {
+            if($debug){
                 self::ShowDebugInfo("error=".$this->error_desc);
                 self::ShowDebugInfo("number=".$this->error_number);
             }
-            $return = FALSE;        // error occured (for example: syntax error)
+            $return = FALSE; // error occured (for example: syntax error)
         }
-        else // complex result
-        {
+        else{ // complex result
 			$num=mysql_num_rows($this->result);
 			if($num==0){
 				if($smart) $return = NULL; // return NULL rows
 				else $return=array();
-				
 			}
 			elseif($num==1&$smart){ // return one row ...
-				
 				if(1 != mysql_num_fields( $this->result))
 				$return = mysql_fetch_assoc($this->result);    // as array
-				else
-				{
+				else{
 					$row    = mysql_fetch_row($this->result);       // or as single value
 					$return = $row[0];
 				}
@@ -183,6 +177,9 @@ class MySQL {
 				$return = array();
 				while( $row = mysql_fetch_assoc($this->result)) $return[]=$row;
 			}
+        }
+        if($debug==='explain')  {
+            if(substr($this->sql,0,6)=='SELECT') print_r($this->q("EXPLAIN ".$this->sql));
         }
         return $return;
     }

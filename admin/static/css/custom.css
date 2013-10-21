@@ -1,3 +1,6 @@
+body{
+    font-size: 12px;
+}
 table.table-hover{
     cursor: pointer;
 }
@@ -42,3 +45,7 @@ a.selected{
 .container{max-width:1920px;}
 
 #element-nav{margin: 0 0 20px 0;}
+
+a.order.desc:after{ content: " \F106"; font-family: FontAwesome;}
+a.order:after{ content: " \F107"; font-family: FontAwesome;}
+a.order{white-space: nowrap;}

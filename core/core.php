@@ -116,6 +116,10 @@ class E{
             $sql.=$params['filter'];
             $sql.=") ";
         }
+        if(!empty($params['order'])) {
+            if(is_array($params['order'])) $sql.="ORDER BY `".$params['order'][0]."` ".($params['order'][1] ? 'DESC' : 'ASC')." ";
+            else $sql.="ORDER BY `".$params['order']."` ";
+        }
         $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
         $elements=self::$db->q($sql,self::$debug,false);
         return $elements;
