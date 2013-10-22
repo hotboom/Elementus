@@ -6,7 +6,9 @@ $url['path'] = array_slice($url['path'], 2);
 $_GET['page']=$url['path'][0];
 $url['path'] = array_slice($url['path'], 1);
 for($i=0; $i<count($url['path']); $i=$i+2){
-    $_GET[$url['path'][$i]]=$url['path'][$i+1];
+    $query.=$url['path'][$i].'='.$url['path'][$i+1].'&';
 }
+parse_str($query,$arr);
+$_GET=array_merge($_GET,$arr);
 if(!empty($_GET['page'])) require_once("index.php");
 ?>

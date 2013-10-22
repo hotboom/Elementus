@@ -10,6 +10,18 @@ if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array();
 $params['type']=$type;
 if(!empty($_GET['order'])) $params['order']=array($_GET['order'],$_GET['desc']);
+if(!empty($_GET['filter'])) {
+    $params['filter']='';
+    if(is_array($_GET['filter'])) {
+        $i=0;
+        foreach($_GET['filter'] as $name=>$val) {
+            $params['filter'].=($i!=0 ? 'AND ': '')."`".$name."`='".$val."' ";
+            $i++;
+        }
+
+    }
+}
+//E::debug();
 $elements=$type['class']['name']::get($params);
 
 ?>
@@ -62,3 +74,16 @@ $elements=$type['class']['name']::get($params);
     </tbody>
     </tr>
 </table>
+<script>
+    $('table tr.filter').keypress(function(e){
+        if(e.which==13) {
+            var q='';
+            $(this).find('input, select').each(function(i){
+                //console.log($(this));
+                if($(this).val()) q+='/filter['+$(this).attr('name')+']/'+$(this).val();
+            });
+            //console.log('/type/id/<?=(int)$_GET['id']?>'+q);
+            location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
+        }
+    });
+</script>
