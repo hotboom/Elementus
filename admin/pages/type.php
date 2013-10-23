@@ -15,7 +15,7 @@ if(!empty($_GET['filter'])) {
     if(is_array($_GET['filter'])) {
         $i=0;
         foreach($_GET['filter'] as $name=>$val) {
-            $params['filter'].=($i!=0 ? 'AND ': '')."`".$name."`='".$val."' ";
+            $params['filter'].=($i!=0 ? 'AND ': '')."CONCAT(' ',`".$name."`) LIKE '%".$val."%' ";
             $i++;
         }
 
@@ -58,7 +58,15 @@ $elements=$type['class']['name']::get($params);
             if($field['name']===$_GET['order']) $field['class'].='order ';
             if(!empty($_GET['desc'])) $field['class'].='desc ';
             ?>
-            <th><? Template::render('pages/field_types/field_filter.php',array('field'=>$field,'element'=>false, 'name'=>$field['name'])); ?></th>
+            <th>
+                <? Template::render('pages/field_types/field_filter.php',array(
+                    'field'=>$field,
+                    'value'=>htmlspecialchars($_GET['filter'][$field['name']]),
+                    'name'=>'filter['.$field['name'].']',
+                    'id'=>'filter_'.$field['name']
+                ));
+                ?>
+            </th>
         <? endforeach; ?>
     </tr>
     </thead>
@@ -80,7 +88,7 @@ $elements=$type['class']['name']::get($params);
             var q='';
             $(this).find('input, select').each(function(i){
                 //console.log($(this));
-                if($(this).val()) q+='/filter['+$(this).attr('name')+']/'+$(this).val();
+                if($(this).val()) q+='/'+$(this).attr('name')+'/'+$(this).val();
             });
             //console.log('/type/id/<?=(int)$_GET['id']?>'+q);
             location.hash='/type/id/<?=(int)$_GET['id']?>'+q;

@@ -2,9 +2,9 @@
 $field=$data['field'];
 $element=$data['element'];
 ?>
-<select name="<?=$data['name']?>" id="input<?=$field['name']?>" class="form-control" data-field="<?=$field['name']?>">
-    <? if($field['Null']=='YES'):?><option value="NULL"><?=t('not set')?></option><? endif;?>
+<select name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" class="form-control" data-field="<?=$field['name']?>">
+    <option value=""><?=t('not set')?></option>
     <? foreach($field['values'] as $val):?>
-        <option value="<?=$val?>" <?=($val==$element[$field['name']] ? 'selected':'')?>><?=$val?></option>
+        <option value="<?=$val?>" <?=($val==$data['value'] ? 'selected':'')?>><?=$val?></option>
     <? endforeach;?>
 </select>

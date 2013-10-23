@@ -7,9 +7,9 @@ $element=$data['element'];
     <? include($root_path."/admin/static/html/toolbar.tpl.html");?>
 </div>
 
-<textarea name="<?=$data['name']?>" id="input<?=$field['name']?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;" data-field="<?=$field['name']?>"><?=$element[$field['name']]?></textarea>
+<textarea name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" class="form-control" rows="6" placeholder="Enter text ..." style="width:100%;" data-field="<?=$field['name']?>"><?=$data['value']?></textarea>
 <script>
-    var editor = new wysihtml5.Editor("input<?=$field['name']?>", {
+    var editor = new wysihtml5.Editor("<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>", {
         toolbar:      "toolbar<?=$field['name']?>",
         //stylesheets:  "css/stylesheet.css",
         parserRules:  wysihtml5ParserRules

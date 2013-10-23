@@ -87,7 +87,7 @@ if($act=='edit'|$act=='copy') {
                         <? foreach($type['fields'] as $i=>$field):
                             Template::render('pages/field_types/field_group_hor.php',array(
                                 'field'=>$field,
-                                'element'=>$element,
+                                'value'=>$element[$field['name']],
                                 'name'=>'fields['.$field['name'].']')
                             );
                         endforeach;?>
@@ -141,7 +141,7 @@ if($act=='edit'|$act=='copy') {
                                     <? if($field['name']===$connect['field']) continue; ?>
                                     <td>
                                     <? if($field['type']==='elements'):?>
-                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'element'=>$cElement, 'name'=>$field['name'])); ?></td>
+                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'value'=>$cElement[$field['name']], 'name'=>$field['name'])); ?></td>
                                     <? elseif($field['type']==='varchar'|$field['type']==='int'):?>
                                         <input name="<?=$field['name']?>" class="form-control" type="text" value="<?=$cElement[$field['name']]?>" data-field="<?=$field['name']?>">
                                     <? endif; ?>

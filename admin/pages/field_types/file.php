@@ -2,18 +2,18 @@
 $field=$data['field'];
 $element=$data['element'];
 ?>
-<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>" style="width:auto;" data-field="<?=$field['name']?>">
-<a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
+<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" value="<?=$data['value']?>" style="width:auto;" data-field="<?=$field['name']?>">
+<a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
     <i class="icon-plus"></i>
     <span><?=t('Upload files...')?></span>
 </a>
-<a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#input<?=$field['name']?>">
+<a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
     <i class="icon-plus"></i>
     <span><?=t('Select from server...')?></span>
 </a>
 <div class="clearfix"></div>
-<? if(!empty($element[$field['name']])):?>
-    <img src="/upload/files/<?=$element[$field['name']]?>" style="width:100px; height: auto;">
+<? if(!empty($data['value'])):?>
+    <img src="/upload/files/<?=$data['value']?>" style="width:100px; height: auto;">
 <? endif;?>
 <script language="Javascript">
     $(function(){

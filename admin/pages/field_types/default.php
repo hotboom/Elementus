@@ -1,1 +1,1 @@
-<input name="<?=$data['field']['name']?>" type="text" class="form-control" id="input<?=$data['field']['name']?>" value="<?=$data['element'][$data['field']['name']]?>">
+<input name="<?=$data['name']?>" type="text" class="form-control" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" value="<?=$data['value']?>" data-field="<?=$data['field']['name']?>">
