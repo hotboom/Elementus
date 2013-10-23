@@ -4,11 +4,11 @@ $element=$data['element'];
 ?>
 <input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" value="<?=$data['value']?>" style="width:auto;" data-field="<?=$field['name']?>">
 <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
-    <i class="icon-plus"></i>
+    <i class="fa fa-plus"></i>
     <span><?=t('Upload files...')?></span>
 </a>
 <a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
-    <i class="icon-plus"></i>
+    <i class="fa fa-plus"></i>
     <span><?=t('Select from server...')?></span>
 </a>
 <div class="clearfix"></div>

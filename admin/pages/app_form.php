@@ -19,11 +19,11 @@ else $app=array();
     else $result=E::setApp($_POST['app']);
     ?>
     <? if($result):?>
-        <div class="alert alert-success"><i class="icon-ok"></i> <?=t('Field succesfuly '.$act)?></div>
+        <div class="alert alert-success"><i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?></div>
     <? else:?>
-        <div class="alert alert-warning"><i class="icon-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?></div>
+        <div class="alert alert-warning"><i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?></div>
     <? endif;?>
-    <a href="#/app_form/act/edit/id/<?=(int)$_POST['app']['id']?>/form" class="btn btn-default"><i class="icon-arrow-left"></i> <?=t('Back to form')?></a>
+    <a href="#/app_form/act/edit/id/<?=(int)$_POST['app']['id']?>/form" class="btn btn-default"><i class="fa fa-arrow-left"></i> <?=t('Back to form')?></a>
 <? else:?>
     <script>
         $(function() {

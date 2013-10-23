@@ -295,7 +295,7 @@ class E{
         return self::$db->q("ALTER TABLE ".$table." DROP `".$field_name."`",self::$debug);
     }
 
-    public static function getTypeById($type_id){
+    static function getTypeById($type_id){
         $types=self::getTypes("id='".$type_id."'");
         if(!empty($types)) return $types[0];
         else {
@@ -306,20 +306,24 @@ class E{
         }
     }
 
-    public static function getType($type_name_or_id){
+    static function getType($type_name_or_id){
         if(is_array($type_name_or_id)) return $type_name_or_id;
         if(is_numeric($type_name_or_id)) $type=self::getTypeById($type_name_or_id);
         else $type=self::getTypeByName($type_name_or_id);
         return $type;
     }
 
-    public static function getTypes($filter=false){
+    static function getTypes($filter=false){
         $sql="SELECT * FROM `types` ";
 
         if(!empty($filter)){
             $sql.="WHERE ".$filter;
         }
         return self::$db->q($sql,self::$debug,false);
+    }
+
+    static function getTypeView(){
+        return array('view'=>'','fields'=>array());
     }
 
     private static function getElementType($element_id){

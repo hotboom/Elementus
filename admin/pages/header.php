@@ -72,20 +72,20 @@
     <a class="navbar-brand" href="#/dashboard">Elementus</a>
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <span class="fa fa-bar"></span>
+            <span class="fa fa-bar"></span>
+            <span class="fa fa-bar"></span>
         </button>
     </div>
     <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
-            <li class="active"><a href="#/dashboard"><i class="icon-th"></i> Dashboard</a></li>
-            <li><a href="#/app_form/act/edit/id/<?=E::$app['id']?>"><i class="icon-cog"></i> <?=t('Settings')?></a></li>
-            <li><a href="#/types"><i class="icon-code-fork"></i> <?=t('Types')?></a></li>
-            <li><a href="#/files"><i class="icon-columns"></i> Files</a></li>
+            <li class="active"><a href="#/dashboard"><i class="fa fa-th"></i> Dashboard</a></li>
+            <li><a href="#/app_form/act/edit/id/<?=E::$app['id']?>"><i class="fa fa-cog"></i> <?=t('Settings')?></a></li>
+            <li><a href="#/types"><i class="fa fa-code-fork"></i> <?=t('Types')?></a></li>
+            <li><a href="#/files"><i class="fa fa-columns"></i> Files</a></li>
         </ul>
         <form class="navbar-form form-inline pull-right">
-            <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><i class="icon-code-right"></i>  <?=t('Exit')?></a>
+            <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><i class="fa fa-code-right"></i>  <?=t('Exit')?></a>
         </form>
     </div><!--/.nav-collapse -->
 </div>

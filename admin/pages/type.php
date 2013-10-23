@@ -26,15 +26,15 @@ $elements=$type['class']['name']::get($params);
 
 ?>
 <p class="pull-left">
-    <a href="element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window" tabindex="1"><i class="icon-plus"></i> <?=t('Add')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit" tabindex="2"><i class="icon-edit"></i> <?=t('Edit')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=copy" class="btn btn-primary disabled" data-target="#window" id="btn-copy" tabindex="3"><i class="icon-copy"></i> <?=t('Copy')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
+    <a href="element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window" tabindex="1"><i class="fa fa-plus"></i> <?=t('Add')?></a>
+    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit" tabindex="2"><i class="fa fa-edit"></i> <?=t('Edit')?></a>
+    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=copy" class="btn btn-primary disabled" data-target="#window" id="btn-copy" tabindex="3"><i class="fa fa-copy"></i> <?=t('Copy')?></a>
+    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete" tabindex="4"><i class="fa fa-times"></i> <?=t('Delete')?></a>
 </p>
 <p class="pull-right">
-    <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="icon-cog"></i> <?=t('Settings')?></a>
-    <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="icon-cog"></i> <?=t('Fields')?></a>
-    <a href="/admin/index.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="icon-plus"></i> <?=t('Add subtype')?></a>
+    <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-cog"></i> <?=t('Settings')?></a>
+    <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="fa fa-cog"></i> <?=t('Fields')?></a>
+    <a href="/admin/index.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add subtype')?></a>
 </p>
 
 <table class="table table-hover table-condensed selectable">
@@ -51,7 +51,13 @@ $elements=$type['class']['name']::get($params);
         <? endforeach; ?>
     </tr>
     <tr class="filter">
-        <th><a href="#/type/id/<?=$type['id']?>/order/<?=$field['name']?>">id</a></th>
+        <th>
+            <? Template::render('pages/field_types/field_filter.php',array(
+                'field'=>array('name'=>'id'),
+                'element'=>false,
+                'name'=>'id'
+            )); ?>
+        </th>
         <? foreach($type['fields'] as $i=>$field):?>
             <?
             $field['class']='';

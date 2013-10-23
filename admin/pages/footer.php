@@ -5,9 +5,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <div class="btn-group btn-group-sm pull-right">
-                        <a href="#" class="btn btn-default icon-minus" onclick="$('#window').removeClass('fullscreen'); $('#window').toggleClass('minimizated'); return false;"></a>
-                        <a href="#" class="btn btn-default icon-fullscreen" onclick="$('#window').toggleClass('fullscreen'); return false;"></a>
-                        <a href="#" class="btn btn-danger icon-remove"  data-dismiss="modal" aria-hidden="true"></a>
+                        <a href="#" class="btn btn-default fa fa-minus" onclick="$('#window').removeClass('fullscreen'); $('#window').toggleClass('minimizated'); return false;"></a>
+                        <a href="#" class="btn btn-default fa fa-fullscreen" onclick="$('#window').toggleClass('fullscreen'); return false;"></a>
+                        <a href="#" class="btn btn-danger fa fa-times"  data-dismiss="modal" aria-hidden="true"></a>
                     </div>
                     <h4 class="modal-title">Modal title</h4>
                 </div>
@@ -84,6 +84,15 @@
             }
             event.stopPropagation();
         });
+
+        $("table tr.filter th input[type='text']").keypress(function(e){
+            if(e.which==13) {
+                console.log(location.hash);
+                location.hash='#/type/id/7';
+                e.preventDefault();
+            }
+
+        })
     });
 </script>
 </body>

@@ -9,7 +9,7 @@
                         <div class="panel-heading">
                             <h4 class="panel-title">
                                 <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse<?=$i?>">
-                                    <?=t($group['name'])?> <i class="icon-angle-<?=(!$i ? 'up' : 'down')?>"></i>
+                                    <?=t($group['name'])?> <i class="fa fa-angle-<?=(!$i ? 'up' : 'down')?>"></i>
                                 </a>
                             </h4>
                         </div>
@@ -23,10 +23,10 @@
                 </div>
                 <script>
                     $('.collapse').on('hidden.bs.collapse', function () {
-                        $(this).parent().find('.icon-angle-up').attr('class','icon-angle-down');
+                        $(this).parent().find('.fa.fa-angle-up').attr('class','fa fa-angle-down');
                     });
                     $('.collapse').on('shown.bs.collapse', function () {
-                        $(this).parent().find('.icon-angle-down').attr('class','icon-angle-up');
+                        $(this).parent().find('.fa.fa-angle-down').attr('class','fa fa-angle-up');
                     });
                 </script>
 

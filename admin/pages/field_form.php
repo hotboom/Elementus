@@ -18,9 +18,9 @@ else $field=array();
 
     ?>
     <? if($result):?>
-    <i class="icon-ok"></i> <?=t('Field succesfuly '.$act)?>
+    <i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?>
     <? else:?>
-    <i class="icon-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?>
+    <i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?>
     <? endif;?>
     <script>
         $(window).hashchange();
@@ -89,7 +89,7 @@ else $field=array();
                     <? else:?>
                         <input name="field[enum][list][]" type="text" class="form-control select_value" value="">
                     <? endif;?>
-                    <a href="#" class="btn btn-default" id="add_select_value"><i class="icon-plus"></i> <?=t('More')?></a>
+                    <a href="#" class="btn btn-default" id="add_select_value"><i class="fa fa-plus"></i> <?=t('More')?></a>
                 </div>
             </div>
             <div class="form-group extra" id="extra_elements" style="<?=($field['type']!='elements' ? 'display:none;' : '')?>">

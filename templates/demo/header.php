@@ -28,9 +28,9 @@
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
+            <span class="fa fa-bar"></span>
+            <span class="fa fa-bar"></span>
+            <span class="fa fa-bar"></span>
         </button>
         <a class="navbar-brand" href="/">Elemental</a>
         <div class="nav-collapse collapse">

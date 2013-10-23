@@ -114,9 +114,9 @@ if($act=='edit'|$act=='copy') {
                     if(empty($cElements)) $cElements['example']=array();
                     ?>
                     <p class="pull-left">
-                        <a href="#add" class="btn btn-success" tabindex="1"><i class="icon-plus"></i> <?=t('Add')?></a>
-                        <a href="#copy" class="btn btn-primary disabled" tabindex="3"><i class="icon-copy"></i> <?=t('Copy')?></a>
-                        <a href="#delete" class="btn btn-danger" tabindex="4"><i class="icon-remove"></i> <?=t('Delete')?></a>
+                        <a href="#add" class="btn btn-success" tabindex="1"><i class="fa fa-plus"></i> <?=t('Add')?></a>
+                        <a href="#copy" class="btn btn-primary disabled" tabindex="3"><i class="fa fa-copy"></i> <?=t('Copy')?></a>
+                        <a href="#delete" class="btn btn-danger" tabindex="4"><i class="fa fa-times"></i> <?=t('Delete')?></a>
                     </p>
                     <table id="connected" class="table table-hover table-condensed selectable">
                         <thead>
