@@ -1,4 +1,6 @@
 <?
+print_r($_POST);
+E::debug();
 if(!empty($_GET['act'])) $act=htmlspecialchars($_GET['act']);
 else $act='add';
 
@@ -6,6 +8,7 @@ if($act=='edit'|$act=='copy') {
     $type_id=(int)$_GET['type'];
     $type=E::getType($type_id);
     $type['view']=E::getTypeView($type);
+    $type['view']=(empty($type['view']) ? array('view'=>'','fields'=>'') : $type['view']);
 }
 else $type=array();
 ?>
@@ -85,7 +88,7 @@ else $type=array();
                 </div>
                 <div class="form-group" style="display:none;" id="group_view_fields">
                     <label for="input_view_fields"><?=t('Comma-Separated fields')?></label>
-                    <input name="type[view][fields]" type="text" class="form-control" id="input_view_fields" value="<?=implode(', ',$type['view']['fields'])?>">
+                    <input name="type[view][fields]" type="text" class="form-control" id="input_view_fields" value="<?=$type['view']['fields']?>">
                 </div>
             </div>
             <script>
@@ -99,7 +102,6 @@ else $type=array();
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
             <a href="#" class="btn btn-default pull-right" onClick="$('#advanced').toggle(); $(this).find('i').toggleClass('fa-angle-down').toggleClass('fa-angle-up'); return false;"><i class="fa fa-angle-down"></i> <?=t('Advanced settings')?></a>
-            <input type="hidden" name="fields[type]" value="<?=$type['id']?>">
             <input type="hidden" name="submit" value="submit">
         </fieldset>
     <?endif;?>

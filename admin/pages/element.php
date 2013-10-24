@@ -1,4 +1,5 @@
 <?
+//E::debug();
 $type_id=(int)$_GET['type'];
 $type=E::getType($type_id);
 $types=E::getFullType($type_id);

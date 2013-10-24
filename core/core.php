@@ -172,7 +172,7 @@ class E{
             $sql.="element_id='".$params['element_id']."'";
             foreach($type['fields'] as $field){
                 $sql.=", `".$field['name']."`=";
-                if($field['val']=='NULL') $sql.="NULL";
+                if(empty($field['val'])&&$field['nullable']) $sql.="NULL";
                 else $sql.="'".$field['val']."'";
             }
             if($prx=="UPDATE ") $sql.=" WHERE `element_id`='".$params['element_id']."'";
@@ -201,13 +201,26 @@ class E{
     }
 
     static function setType($params){
+        print_r($params);
+        $type=$params;
         if(empty($params['name'])) return self::error(array('code'=>6,'Type name is empty'));
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Type name may contain only latin letters and _ or - symbols'));
+        if(!empty($params['view'])&&!is_array($params['view'])) return self::error(array('code'=>'8','Incorrect view format'));
 
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
+        if(!self::$db->q($sql,self::$debug)) return false;
+        if(empty($params['id'])) $type['id']=self::$db->q("SELECT LAST_INSERT_ID()",self::$debug);
+        if(!empty($params['view'])){
+            $view=self::getTypeView($type['id']);
+            $sql=(empty($view) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='view', `value`='".json_encode($params['view'])."' ";
+            if(empty($view)) $sql.=", `type_id`='".$type['id']."'";
+            else $sql.="WHERE `type_id`='".$type['id']."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
+        }
 
-        return self::$db->q($sql,self::$debug);
+        if(empty($params['id'])) return $type['id'];
+        else return true;
     }
 
     static function setField($type,$params){
@@ -322,8 +335,10 @@ class E{
         return self::$db->q($sql,self::$debug,false);
     }
 
-    static function getTypeView(){
-        return array('view'=>'','fields'=>array());
+    static function getTypeView($type_id){
+        return self::$db->q("SELECT value FROM `types_settings` WHERE `name`='view' AND `type_id`='$type_id'",self::$debug);
+        if(!empty($view)) return json_decode($view);
+        else return false;
     }
 
     private static function getElementType($element_id){

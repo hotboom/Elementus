@@ -4,7 +4,17 @@ $type=E::getTypeById((int)$_GET['id']);
 
 $type['fields']=array();
 $type['fields']=E::getFullTypeFields($type);
-
+$type['view']=E::getTypeView($type['id']);
+$type['view']['fields']=explode(',',$type['view']['fields']);
+print_r($type['view']);
+if($type['view']['type']==='except'){
+    foreach($type['view']['fields'] as $field_name) unset($type['fields'][trim($field_name)]);
+}
+elseif($type['view']['type']==='only'){
+    foreach($type['fields'] as $i=>$field){
+        if(!in_array($field['name'],$type['view']['fields'])) unset($type['fields'][$i]);
+    }
+}
 $type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array();
@@ -80,8 +90,8 @@ $elements=$type['class']['name']::get($params);
         <? foreach($elements as $element): ?>
             <tr>
                 <td><input type="checkbox" name="elements[]" value="<?=$element['id']?>"> <?=$element['id']?></td>
-            <? foreach($type['fields'] as $i=>$field):?>
-                <td><?=(strlen($element[$field['name']])>100 ? trim(substr($element[$field['name']],0,100)).'...' : $element[$field['name']])?></td>
+            <? foreach($type['fields'] as $i=>$field): $value=htmlspecialchars($element[$field['name']]); ?>
+                <td><?=(strlen($value)>100 ? trim(mb_substr($value,0,100)).'...' : $value)?></td>
             <? endforeach; ?>
             </tr>
         <? endforeach; ?>
