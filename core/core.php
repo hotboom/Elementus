@@ -201,7 +201,6 @@ class E{
     }
 
     static function setType($params){
-        print_r($params);
         $type=$params;
         if(empty($params['name'])) return self::error(array('code'=>6,'Type name is empty'));
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Type name may contain only latin letters and _ or - symbols'));
@@ -336,8 +335,14 @@ class E{
     }
 
     static function getTypeView($type_id){
-        return self::$db->q("SELECT value FROM `types_settings` WHERE `name`='view' AND `type_id`='$type_id'",self::$debug);
-        if(!empty($view)) return json_decode($view);
+        if(is_array($type_id)) $type_id=$type_id['id'];
+        $view=self::$db->q("SELECT value FROM `types_settings` WHERE `name`='view' AND `type_id`='$type_id'",self::$debug);
+        if(!empty($view)) {
+            $view=json_decode($view,true);
+            $view['fields']=explode(',',$view['fields']);
+            foreach($view['fields'] as $i=>$field_name) $view['fields'][$i]=trim($field_name);
+            return $view;
+        }
         else return false;
     }
 

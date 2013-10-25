@@ -1,14 +1,14 @@
 <?
-print_r($_POST);
-E::debug();
+//print_r($_POST);
+//E::debug();
 if(!empty($_GET['act'])) $act=htmlspecialchars($_GET['act']);
 else $act='add';
 
 if($act=='edit'|$act=='copy') {
     $type_id=(int)$_GET['type'];
     $type=E::getType($type_id);
-    $type['view']=E::getTypeView($type);
-    $type['view']=(empty($type['view']) ? array('view'=>'','fields'=>'') : $type['view']);
+    $type['view']=E::getTypeView($type['id']);
+    $type['view']=(empty($type['view']) ? array('view'=>'','fields'=>array()) : $type['view']);
 }
 else $type=array();
 ?>
@@ -82,13 +82,13 @@ else $type=array();
                     <label for="input_view"><?=t('Show fields in list')?></label>
                     <select name="type[view][type]" id="input_view" class="form-control">
                         <option value=""><?=t('All')?></option>
-                        <option value="except"><?=t('Except defined')?></option>
-                        <option value="only"><?=t('Only defined')?></option>
+                        <option value="except" <?=($type['view']['type']=='except' ? 'selected' : '')?>><?=t('Except defined')?></option>
+                        <option value="only" <?=($type['view']['type']=='only' ? 'selected' : '')?>><?=t('Only defined')?></option>
                     </select>
                 </div>
-                <div class="form-group" style="display:none;" id="group_view_fields">
+                <div class="form-group" id="group_view_fields" <?=(empty($type['view']['type']) ? 'style="display:none;"' : '')?>>
                     <label for="input_view_fields"><?=t('Comma-Separated fields')?></label>
-                    <input name="type[view][fields]" type="text" class="form-control" id="input_view_fields" value="<?=$type['view']['fields']?>">
+                    <input name="type[view][fields]" type="text" class="form-control" id="input_view_fields" value="<?=implode(', ',$type['view']['fields'])?>">
                 </div>
             </div>
             <script>

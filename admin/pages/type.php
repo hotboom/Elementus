@@ -5,16 +5,14 @@ $type=E::getTypeById((int)$_GET['id']);
 $type['fields']=array();
 $type['fields']=E::getFullTypeFields($type);
 $type['view']=E::getTypeView($type['id']);
-$type['view']['fields']=explode(',',$type['view']['fields']);
-print_r($type['view']);
+
 if($type['view']['type']==='except'){
-    foreach($type['view']['fields'] as $field_name) unset($type['fields'][trim($field_name)]);
-}
-elseif($type['view']['type']==='only'){
     foreach($type['fields'] as $i=>$field){
-        if(!in_array($field['name'],$type['view']['fields'])) unset($type['fields'][$i]);
+        if(in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='except') unset($type['fields'][$i]);
+        if(!in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='only') unset($type['fields'][$i]);
     }
 }
+
 $type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array();
