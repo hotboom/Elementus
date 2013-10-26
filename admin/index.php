@@ -12,7 +12,8 @@ $pages=array(
     'type',
     'type_fields',
     'type_form',
-    'types'
+    'types',
+    'import'
 );
 
 if(!empty($_GET['exit'])) Users::logout();
