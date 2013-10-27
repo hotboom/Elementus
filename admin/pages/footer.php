@@ -92,7 +92,11 @@
                 e.preventDefault();
             }
 
-        })
+        });
+
+        $('.selectpicker').selectpicker({
+            'selectedText': 'cat'
+        });
     });
 </script>
 </body>

@@ -25,7 +25,7 @@ $element=$data['element'];
 <div class="form-group">
     <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'])?> <?=t('hash')?></label>
     <div class="col-lg-10">
-        <input name="fields[<?=$field['name']?>]" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$element[$field['name']]?>">
+        <input name="<?=$data['name']?>" type="text" class="form-control" id="input<?=$field['name']?>" value="<?=$data['value']?>">
     </div>
 </div>
 <div class="form-group">

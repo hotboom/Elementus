@@ -33,6 +33,10 @@
     <!--Hashchange event-->
     <script type="text/javascript" src="/admin/static/js/jquery.ba-hashchange.js"></script>
 
+    <!--Bootstrap-select v1.3.5-->
+    <script type="text/javascript" src="/admin/static/js/bootstrap-select.js"></script>
+    <link rel="stylesheet" type="text/css" href="/admin/static/css/bootstrap-select.css">
+
     <script type="text/javascript">
 
         $(function(){
@@ -69,7 +73,7 @@
 <body>
 <!-- Static navbar -->
 <div class="navbar navbar-default navbar-static-top">
-    <a class="navbar-brand" href="#/dashboard">Elementus</a>
+    <a class="navbar-brand logo" href="#/dashboard"><img src="static/images/logo.png"></a>
     <div class="navbar-header">
         <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="fa fa-bar"></span>

@@ -4,13 +4,11 @@ $type=E::getTypeById((int)$_GET['id']);
 
 $type['fields']=array();
 $type['fields']=E::getFullTypeFields($type);
-$type['view']=E::getTypeView($type['id']);
+$type['view']=E::getTypeOpt($type['id'],'view');
 
-if($type['view']['type']==='except'){
-    foreach($type['fields'] as $i=>$field){
-        if(in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='except') unset($type['fields'][$i]);
-        if(!in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='only') unset($type['fields'][$i]);
-    }
+foreach($type['fields'] as $i=>$field){
+    if(in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='except') unset($type['fields'][$i]);
+    if(!in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='only') unset($type['fields'][$i]);
 }
 
 $type['class']=E::getTypeClass($type['name']);

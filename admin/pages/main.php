@@ -1,6 +1,5 @@
 <? require_once("pages/header.php"); ?>
             <div class="leftBar">
-                <h3><?=t('Types');?></h3>
                 <div class="panel-group" id="accordion">
                     <? //E::debug();
                     $groups=E::getTypeGroups();
@@ -51,6 +50,12 @@
                     return true;
                 }
                 ?>
+                <div class="panel panel-info">
+                    <div class="panel-heading"><?=t('Tip')?></div>
+                    <div class="panel-body">
+                        <?=t('To specify fields columns showing in type elements table go to "settings > advanced settings" in type menu')?>
+                    </div>
+                </div>
             </div>
             <div id="page" class="container mainBar">
                 <?=t('Loading').'...'?>

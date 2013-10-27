@@ -33,7 +33,6 @@ a.selected{
     position: fixed;
     left: 0;
     top: 0;
-    background: #fafafa;
     padding: 40px 0;
     min-height: 100%;
 }
@@ -49,3 +48,14 @@ a.selected{
 a.order.desc:after{ content: " \F106"; font-family: FontAwesome;}
 a.order:after{ content: " \F107"; font-family: FontAwesome;}
 a.order{white-space: nowrap;}
+
+.leftBar .panel{margin-top: 30px;}
+.navbar-brand.logo{padding:10px 0 0 12px;}
+
+.filter .bootstrap-select.btn-group,
+.filter .bootstrap-select.btn-group[class*="span"] {
+    float: none;
+    display: inline-block;
+    margin-bottom: 0px;
+    margin-left: 0;
+}

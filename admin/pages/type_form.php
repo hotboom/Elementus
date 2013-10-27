@@ -7,15 +7,16 @@ else $act='add';
 if($act=='edit'|$act=='copy') {
     $type_id=(int)$_GET['type'];
     $type=E::getType($type_id);
-    $type['view']=E::getTypeView($type['id']);
-    $type['view']=(empty($type['view']) ? array('view'=>'','fields'=>array()) : $type['view']);
+    $type['view']=E::getTypeOpt($type['id'],'view');
+    $type['fields']=E::getTypeFields($type);
+    if(empty($type['view'])) $type['view']=array('view'=>'','fields'=>array());
 }
 else $type=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
-
+    print_r($_POST);
     if($act=='delete') $result=E::deleteType($_POST['types']);
     else $result=E::setType($_POST['type']);
 
@@ -80,15 +81,17 @@ else $type=array();
             <div id="advanced" style="display:none;">
                 <div class="form-group">
                     <label for="input_view"><?=t('Show fields in list')?></label>
-                    <select name="type[view][type]" id="input_view" class="form-control">
+                    <select name="type[view][type]" id="input_view" class="form-control selectpicker">
                         <option value=""><?=t('All')?></option>
                         <option value="except" <?=($type['view']['type']=='except' ? 'selected' : '')?>><?=t('Except defined')?></option>
                         <option value="only" <?=($type['view']['type']=='only' ? 'selected' : '')?>><?=t('Only defined')?></option>
                     </select>
                 </div>
                 <div class="form-group" id="group_view_fields" <?=(empty($type['view']['type']) ? 'style="display:none;"' : '')?>>
-                    <label for="input_view_fields"><?=t('Comma-Separated fields')?></label>
-                    <input name="type[view][fields]" type="text" class="form-control" id="input_view_fields" value="<?=implode(', ',$type['view']['fields'])?>">
+                    <label for="input_view_fields"><?=t('Fields')?></label>
+                    <select name="type[view][fields][]" class="selectpicker form-control" multiple title="<?=t('Choose fields...')?>">
+                        <? foreach($type['fields'] as $field):?><option value="<?=$field['name']?>"<?=(in_array($field['name'],$type['view']['fields']) ? ' selected' : '')?>><?=$field['name']?></option><?endforeach;?>
+                    </select>
                 </div>
             </div>
             <script>

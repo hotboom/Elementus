@@ -1,7 +1,7 @@
 <?
-//E::debug();
 $type_id=(int)$_GET['type'];
 $type=E::getType($type_id);
+$import=E::getTypeOpt($type['id'],'import');
 ?>
 <? if(!empty($_FILES)):
     $_FILES['file']['name']=substr(md5(time().rand(0,99)),0,20).'.'.substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.') + 1);
@@ -11,18 +11,22 @@ $type=E::getType($type_id);
 
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
 ?>
-<? elseif(!empty($_POST['submit'])):
-    //echo '<pre>'.print_r($_POST['fields']).'</pre>';
+<? elseif(!empty($_POST['step1'])):
+    //echo '<pre>'.print_r($_POST).'</pre>';
     //E::debug();
-    //if($act=='delete') $result=E::deleteApp($_POST['app']);
+    $result=E::setTypeOpt('import',$_POST['import'],$type['id']);
     //else $result=E::setApp($_POST['app']);
     ?>
-    <? if($result):?>
-    <div class="alert alert-success"><i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?></div>
+    <? if($result):
+    $file=array('name'=>$_POST['import']['file']);
+    if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'){
+        require($root_path.'/modules/import/xmlparser.php');
+        echo 'xml detected';
+    }
+    ?>
     <? else:?>
     <div class="alert alert-warning"><i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?></div>
     <? endif;?>
-    <a href="#/app_form/act/edit/id/<?=(int)$_POST['app']['id']?>/form" class="btn btn-default"><i class="fa fa-arrow-left"></i> <?=t('Back to form')?></a>
 <? else:?>
     <script>
         $(function() {
@@ -30,23 +34,22 @@ $type=E::getType($type_id);
             $('.modal-footer').hide();
         });
     </script>
-    <form method="POST" data-async data-target="#page" action="/admin/index.php?page=app_form&act=<?=$act?>" class="form-horizontal">
+    <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=import&type=<?=$type['id']?>" class="form-horizontal">
         <fieldset>
-            <input name="import[type]" type="hidden" value="<?=$type['id']?>">
             <div class="form-group">
                 <label class="col-lg-2 control-label" for="input_type"><?=t('Import')?></label>
                 <div class="col-lg-10">
-                    <select name="app[template_id]" id="input_type" class="form-control">
-                        <option value=""><?=t('Once')?></option>
-                        <option value=""><?=t('Schedule')?></option>
+                    <select id="input_type" class="form-control">
+                        <option value="once"><?=t('Once')?></option>
+                        <option value="schedule"><?=t('Schedule')?></option>
                     </select>
                 </div>
             </div>
-            <div class="impotr_once">
+            <div class="import_once">
                 <div class="form-group">
                     <label class="col-lg-2 control-label" for="input_name"><?=t('File')?></label>
                     <div class="col-lg-10">
-                        <input name="import_file" type="text" class="form-control pull-left clearfix" id="import_file" style="width:auto;" data-field="<?=$field['name']?>">
+                        <input name="import[file]" type="text" class="form-control pull-left clearfix" id="import_file" style="width:auto;" value="<?=$import['file']?>">
                         <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=import&type=<?=$type['id']?>" data-fileupload-target="#import_file">
                             <i class="fa fa-plus"></i>
                             <span><?=t('Upload files...')?></span>
@@ -105,7 +108,7 @@ $type=E::getType($type_id);
                     <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
                 </div>
             </div>
-            <input type="hidden" name="submit" value="submit">
+            <input type="hidden" name="step1" value="submit">
         </fieldset>
     </form>
 <? endif;?>

@@ -211,7 +211,8 @@ class E{
         if(!self::$db->q($sql,self::$debug)) return false;
         if(empty($params['id'])) $type['id']=self::$db->q("SELECT LAST_INSERT_ID()",self::$debug);
         if(!empty($params['view'])){
-            $view=self::getTypeView($type['id']);
+            $view=self::getTypeOpt($type['id'],'view');
+            $params['view']['fields']=str_replace(' ','',$params['view']['fields']);
             $sql=(empty($view) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='view', `value`='".json_encode($params['view'])."' ";
             if(empty($view)) $sql.=", `type_id`='".$type['id']."'";
             else $sql.="WHERE `type_id`='".$type['id']."'";
@@ -294,6 +295,16 @@ class E{
         return true;
     }
 
+    static function setTypeOpt($name,$value,$type_id){
+        $opt=self::getTypeOpt($type_id,$name);
+        if(is_array($value)) $value=json_encode($value);
+        $sql=(empty($opt) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='$name', `value`='".$value."' ";
+        if(empty($opt)) $sql.=", `type_id`='$type_id'";
+        else $sql.="WHERE `type_id`='$type_id'";
+        if(!self::$db->q($sql,self::$debug)) return false;
+        return true;
+    }
+
     public static function deleteTypeField($type,$field_name){
         $type=self::getType($type);
         if(is_array($field_name)){
@@ -334,16 +345,14 @@ class E{
         return self::$db->q($sql,self::$debug,false);
     }
 
-    static function getTypeView($type_id){
+    static function getTypeOpt($type_id,$option_name=false){
         if(is_array($type_id)) $type_id=$type_id['id'];
-        $view=self::$db->q("SELECT value FROM `types_settings` WHERE `name`='view' AND `type_id`='$type_id'",self::$debug);
-        if(!empty($view)) {
-            $view=json_decode($view,true);
-            $view['fields']=explode(',',$view['fields']);
-            foreach($view['fields'] as $i=>$field_name) $view['fields'][$i]=trim($field_name);
-            return $view;
-        }
-        else return false;
+        $sql="SELECT value FROM `types_settings` WHERE `type_id`='$type_id' ";
+        if(!empty($option_name)) $sql.="AND `name`='$option_name'";
+
+        if(!$opt=self::$db->q($sql,self::$debug)) return false;
+        if($res=json_decode($opt,true)) return $res;
+        else return $opt;
     }
 
     private static function getElementType($element_id){
