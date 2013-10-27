@@ -3,8 +3,15 @@
 $type_id=(int)$_GET['type'];
 $type=E::getType($type_id);
 ?>
+<? if(!empty($_FILES)):
+    $_FILES['file']['name']=substr(md5(time().rand(0,99)),0,20).'.'.substr($_FILES['file']['name'], strrpos($_FILES['file']['name'], '.') + 1);
+    $uploaddir = $root_path.'/upload/';
+    $uploadfile = $uploaddir . basename($_FILES['file']['name']);
 
-<? if(!empty($_POST['submit'])):
+
+    if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
+?>
+<? elseif(!empty($_POST['submit'])):
     //echo '<pre>'.print_r($_POST['fields']).'</pre>';
     //E::debug();
     //if($act=='delete') $result=E::deleteApp($_POST['app']);
@@ -40,11 +47,11 @@ $type=E::getType($type_id);
                     <label class="col-lg-2 control-label" for="input_name"><?=t('File')?></label>
                     <div class="col-lg-10">
                         <input name="import_file" type="text" class="form-control pull-left clearfix" id="import_file" style="width:auto;" data-field="<?=$field['name']?>">
-                        <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>" data-fileupload-target="import_file">
+                        <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=import&type=<?=$type['id']?>" data-fileupload-target="#import_file">
                             <i class="fa fa-plus"></i>
                             <span><?=t('Upload files...')?></span>
                         </a>
-                        <a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>" data-fileupload-target="#import_file">
+                        <a class="btn btn-default" data-fileupload-target="#import_file">
                             <i class="fa fa-plus"></i>
                             <span><?=t('Select from server...')?></span>
                         </a>
