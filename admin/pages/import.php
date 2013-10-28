@@ -16,12 +16,28 @@ $import=E::getTypeOpt($type['id'],'import');
     //E::debug();
     $result=E::setTypeOpt('import',$_POST['import'],$type['id']);
     //else $result=E::setApp($_POST['app']);
-    ?>
-    <? if($result):
+    if($result):
     $file=array('name'=>$_POST['import']['file']);
     if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'){
         require($root_path.'/modules/import/xmlparser.php');
-        echo 'xml detected';
+        $xml_parser = new xml();
+
+        $xmlfile=$root_path.'upload/f56d2af56e09d54f78c2.xml';
+        if (!($fp = fopen($xmlfile, "r"))) die("could not open XML input");
+
+        while ($data = fgets($fp))
+        {
+            if (!$xml_parser->parse($data,feof($fp))) break;
+        }
+
+        $depth=0;
+        foreach($xml_parser->tags as $tag){
+            if($tag['depth']>$depth) echo '<ul>';
+            if($tag['depth']<$depth) echo '</ul>';
+            $depth=$tag['depth'];
+
+            echo '<li>'.$tag['name'].'</li>';
+        }
     }
     ?>
     <? else:?>

@@ -16,7 +16,7 @@ else $type=array();
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
-    print_r($_POST);
+    //print_r($_POST);
     if($act=='delete') $result=E::deleteType($_POST['types']);
     else $result=E::setType($_POST['type']);
 

@@ -211,12 +211,7 @@ class E{
         if(!self::$db->q($sql,self::$debug)) return false;
         if(empty($params['id'])) $type['id']=self::$db->q("SELECT LAST_INSERT_ID()",self::$debug);
         if(!empty($params['view'])){
-            $view=self::getTypeOpt($type['id'],'view');
-            $params['view']['fields']=str_replace(' ','',$params['view']['fields']);
-            $sql=(empty($view) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='view', `value`='".json_encode($params['view'])."' ";
-            if(empty($view)) $sql.=", `type_id`='".$type['id']."'";
-            else $sql.="WHERE `type_id`='".$type['id']."'";
-            if(!self::$db->q($sql,self::$debug)) return false;
+            if(!self::setTypeOpt('view',$params['view'],$type['id'])) return false;
         }
 
         if(empty($params['id'])) return $type['id'];

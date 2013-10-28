@@ -16,6 +16,8 @@ if(strtotime($r[0])>filectime($file)) die('Arhiv not updated');
 class xml  {
     var $parser;
     var $tags;
+    var $temp;
+    var $depth;
 
     function xml()
     {
@@ -26,6 +28,8 @@ class xml  {
         xml_set_character_data_handler($this->parser, "cdata");
 
         $this->tags=array();
+        $this->temp=array();
+        $this->depth=0;
     }
 
     function parse($data, $is_final=false)
@@ -35,34 +39,26 @@ class xml  {
 
     function tag_open($parser, $tag, $attributes)
     {
-        if(!in_array($tag,$this->tags)) $this->tags[]=$tag;
-        echo "open:<br>";
-        var_dump($tag, $attributes);
+
+        //if(!in_array($tag,$this->tags)) $this->tags[]=$tag;
+        $this->temp[count($this->temp)]=array('name'=>$tag,'depth'=>$this->depth);
+        if(!empty($attributes)) $this->temp[count($this->temp)-1]['attr']=$attributes;
+        $this->depth++;
     }
 
     function cdata($parser, $cdata)
     {
-        echo 'cdata:<br>';
-        var_dump($cdata);
+        $cdata=trim($cdata);
+        if(!empty($cdata)) $this->temp[count($this->temp)-1]['value']=$cdata;
     }
 
     function tag_close($parser, $tag)
     {
-        echo 'close:<br>';
-        var_dump($tag);
+        $this->tags=array_merge($this->tags,$this->temp);
+        $this->temp=array();
+        $this->depth=$this->depth-1;
     }
 
 } // окончание определения класса xml
 
-$xml_parser = new xml();
-
-$xmlfile=$root_path.'upload/f56d2af56e09d54f78c2.xml';
-if (!($fp = fopen($xmlfile, "r"))) die("could not open XML input");
-
-while ($data = fgets($fp))
-{
-    if (!$xml_parser->parse($data,feof($fp))) break;
-}
-
-print_r($xml_parser->tags);
 ?>
