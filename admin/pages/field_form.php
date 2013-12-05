@@ -62,7 +62,7 @@ else $field=array();
                 <?
                 $ftypes=array(
                     'int'=>'Integer',
-                    'string'=>'String',
+                    'varchar'=>'String',
                     'text'=>'Text',
                     'elements'=>'Elements select',
                     'enum'=>'Values select',

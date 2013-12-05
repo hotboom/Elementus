@@ -23,7 +23,9 @@ else $type=array();
     if($result):?>
         <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
     <? else:?>
-        <div class="alert alert-warning"><?=t('Error occurred:'.E::$error['desc'])?></div>
+        <? foreach(E::$errors as $error):?>
+        <div class="alert alert-warning"><?=t('Error '.$error['code'].':'.$error['desc'])?></div>
+        <? endforeach;?>
     <? endif;?>
     <script>
         $(window).hashchange();

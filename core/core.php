@@ -11,7 +11,7 @@
  * The section after the long description contains the tags; which provide
  * structured meta-data concerning the given element.
  *
- * @author  Mike van Riel <huntedbox@gmail.com>
+ * @author  Andrey Nedorostkov <huntedbox@gmail.com>
  *
  * @since 1.0
  */
@@ -19,7 +19,7 @@ class E{
     /** @type object Database object */
     public static $db;
     /** @type array Current error */
-    public static $error=array();
+    public static $errors=array();
     /** @type bool Debug mode on/off */
     public static $debug;
     /** @type array Current app params array */
@@ -56,8 +56,8 @@ class E{
         self::$debug=$debug;
     }
 
-    private static function error($error){
-        self::$error=$error;
+    private static function error($code,$desr){
+        self::$errors[]=array('code'=>$code,'desc'=>$desr);
         return false;
     }
 
@@ -85,6 +85,7 @@ class E{
     }
 
     public static function get($params=array()){
+        if(!is_array($params)) $params=array('type'=>$params);
         if(empty($params['limit'])) $params['limit']=30;
         if(empty($params['page'])) $params['page']=0;
 
@@ -147,9 +148,8 @@ class E{
         else{
             $prx="INSERT ";
             if(empty($params['type'])){
-                self::$error['code']=2;
-                self::$error['desc']='Missing element type name or id';
-                if(self::$debug) print_r(self::$error);
+                self::error(2,'Missing element type name or id');
+                if(self::$debug) print_r(self::$errors);
                 return false;
             }
             self::$db->q("INSERT INTO `elements` SET `type_id`='".$type['id']."', `app_id`='".self::$app['id']."'",self::$debug);
@@ -202,9 +202,10 @@ class E{
 
     static function setType($params){
         $type=$params;
-        if(empty($params['name'])) return self::error(array('code'=>6,'Type name is empty'));
-        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Type name may contain only latin letters and _ or - symbols'));
-        if(!empty($params['view'])&&!is_array($params['view'])) return self::error(array('code'=>'8','Incorrect view format'));
+        if(empty($params['name'])) self::error(6,'Type name is empty');
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  self::error(7,'Type name may contain only latin letters and _ or - symbols');
+        if(!empty($params['view'])&&!is_array($params['view'])) self::error(8,'Incorrect view format');
+        if(!empty(self::$errors)) return false;
 
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
@@ -219,7 +220,7 @@ class E{
     }
 
     static function setField($type,$params){
-        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Field name may contain only latin letters and _ or - symbols'));
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
@@ -250,37 +251,35 @@ class E{
         }
 
         $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
-        if($params['type']=='string'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug)) return false;
+        if($params['type']=='varchar'){
+            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
         }
         elseif($params['type']=='int'){
-            if(!self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug)) return false;
+            if(!self::$db->q($alter_prx.'INT(11) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
         }
         elseif($params['type']=='text'){
-            if(!self::$db->q($alter_prx."TEXT NOT NULL",self::$debug)) return false;
+            if(!self::$db->q($alter_prx."TEXT NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
         }
         elseif($params['type']=='html'){
-            if(!self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug)) return false;
+            if(!self::$db->q($alter_prx.'TEXT NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"html"}\'',self::$debug)) return false;
         }
         elseif($params['type']==='file'|$params['type']=='image'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug)) return false;
+            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"file"}\'',self::$debug)) return false;
         }
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
-            if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug)) return false;
+            if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
         }
         elseif($params['type']=='elements'){
             if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
             $params['elements_type']=self::getTypeTableName($params['elements_type']);
-            echo $params['elements_type'];
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug)) return false;
         }
         else {
-            self::$error['code']=5;
-            self::$error['desc']='Unknown field type';
+            self::error(5,'Unknown field type');
             return false;
         }
 
@@ -317,9 +316,8 @@ class E{
         $types=self::getTypes("id='".$type_id."'");
         if(!empty($types)) return $types[0];
         else {
-            self::$error['code']=3;
-            self::$error['desc']='Type id:'.$type_id.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(3,'Type id:'.$type_id.' not found');
+            if(self::$debug) print_r(self::$errors);
             return false;
         }
     }
@@ -365,9 +363,7 @@ class E{
     private static function getElementById($element_id){
         if($element=self::$db->q("SELECT * FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) return $element;
         else{
-            self::$error['code']='1';
-            self::$error['desc']='Element id:'.$element_id.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(1,'Element id:'.$element_id.' not found');
             return false;
         }
     }
@@ -376,9 +372,7 @@ class E{
         $types=self::getTypes("name='".$type_name."'");
         if(!empty($types)) return $types[0];
         else {
-            self::$error['code']=4;
-            self::$error['desc']='Type name:'.$type_name.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(4,'Type name:'.$type_name.' not found');
             return false;
         }
     }

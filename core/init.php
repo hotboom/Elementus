@@ -18,6 +18,7 @@ Template::init();
 
 //Sections
 require_once($root_path."/core/types/sections.php");
+S::init();
 
 //Users
 require_once($root_path."/core/types/users.php");
