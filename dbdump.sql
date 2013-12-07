@@ -1,11 +1,30 @@
+-- phpMyAdmin SQL Dump
+-- version 3.5.1
+-- http://www.phpmyadmin.net
+--
+-- Хост: 127.0.0.1
+-- Время создания: Дек 03 2013 г., 15:04
+-- Версия сервера: 5.5.25
+-- Версия PHP: 5.3.13
+
 SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
+
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
+--
+-- База данных: `elementus`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `apps`
+--
 
 CREATE TABLE IF NOT EXISTS `apps` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -17,16 +36,30 @@ CREATE TABLE IF NOT EXISTS `apps` (
   KEY `template_id` (`template_id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
+--
+-- Дамп данных таблицы `apps`
+--
+
 INSERT INTO `apps` (`id`, `name`, `key`, `domain`, `template_id`) VALUES
-(1, 'Тестовый сайт', 'th3Ge8nWdi2bJpH7Sw', 'elementus.loc', 23),
+(1, 'Первый строй центр', 'th3Ge8nWdi2bJpH7Sw', 'elementus.loc', 23),
 (2, 'Демо сайт', 'sdf42d78c2vft90tas254svswr', 'demo.elementus.loc', 82);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `elements`
+--
 
 CREATE TABLE IF NOT EXISTS `elements` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type_id` int(11) NOT NULL,
   `app_id` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=137 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=139 ;
+
+--
+-- Дамп данных таблицы `elements`
+--
 
 INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (1, 1, 1),
@@ -68,7 +101,15 @@ INSERT INTO `elements` (`id`, `type_id`, `app_id`) VALUES
 (129, 18, 2),
 (131, 18, 2),
 (135, 7, 2),
-(136, 18, 2);
+(136, 18, 2),
+(137, 1, 1),
+(138, 1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_content`
+--
 
 CREATE TABLE IF NOT EXISTS `et_content` (
   `element_id` int(11) NOT NULL,
@@ -79,6 +120,10 @@ CREATE TABLE IF NOT EXISTS `et_content` (
   KEY `section_id` (`section_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_content`
+--
+
 INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUES
 (16, NULL, 'All is Element', ''),
 (17, 1, 'Все есть Элемент', 'Elementus - это функциональный, гибкий и простой PHP mySQL фреймворк для разработки веб приложений на любом языке программирования.'),
@@ -87,6 +132,12 @@ INSERT INTO `et_content` (`element_id`, `section_id`, `header`, `content`) VALUE
 (110, 24, 'Apple iPhone 5 16Gb', 'Подробное описание товара.'),
 (128, 28, 'Samsung Galaxy S4 16Gb GT-I9500', '<ul><li>смартфон на платформе Android</li><li>сенсорный экран мультитач (емкостный)</li><li>диагональ экрана 5", разрешение 1080x1920</li><li>камера 13 МП, светодиодная вспышка, автофокус</li><li>память 16 Гб, карты памяти microSD (TransFlash)</li><li>поддержка Bluetooth, NFC, Wi-Fi, 3G, GPS, ГЛОНАСС</li><li>вес 130 г, ШxВxТ 69.80x136.60x7.90 мм, акк. 2600 мАч</li></ul>'),
 (135, 28, 'HTC One 32Gb', '<ul><li>смартфон на платформе Android</li><li>сенсорный экран мультитач (емкостный)</li><li>диагональ экрана 4.7", разрешение 1080x1920</li><li>камера 4 МП, вспышка, автофокус</li><li>память 32 Гб, без слота для карт памяти</li><li>поддержка Bluetooth, NFC, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС</li><li>вес 143 г, ШxВxТ 68.20x137.40x9.30 мм, акк. 2300 мАч</li></ul>');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_content_products`
+--
 
 CREATE TABLE IF NOT EXISTS `et_content_products` (
   `element_id` int(11) NOT NULL,
@@ -115,11 +166,21 @@ CREATE TABLE IF NOT EXISTS `et_content_products` (
   KEY `brand_17` (`brand`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='{"view":{"type":"except","fields":{"some","another"}}';
 
+--
+-- Дамп данных таблицы `et_content_products`
+--
+
 INSERT INTO `et_content_products` (`element_id`, `shortdescr`, `store`, `brand`, `model`, `image`) VALUES
 (108, '', 4, 'Apple', '5 32Gb', '286605ba2275a7397574.jpg'),
 (110, 'смартфон на платформе iOS\r\nсенсорный экран мультитач (емкостный)\r\nдиагональ экрана 4", разрешение 640x1136\r\nкамера 8 МП, светодиодная вспышка, автофокус\r\nпамять 16 Гб, без слота для карт памяти\r\nподдержка Bluetooth, Wi-Fi, 3G, LTE, GPS, ГЛОНАСС\r\nвес 112 г, ШxВxТ 58.60x123.80x7.60 мм, акк. 1400 мАч', 2, 'Apple', '5 16Gb', '286605ba2275a7397574.jpg'),
 (128, '', 4, 'Samsung', 'GT-I9500', 'ac87a8ba2af77880e8c2.jpg'),
 (135, '', 2, 'HTC', 'One 32Gb', 'fdad31a54e2f7a672ca9.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_content_products_phones`
+--
 
 CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   `element_id` int(11) NOT NULL,
@@ -136,11 +197,21 @@ CREATE TABLE IF NOT EXISTS `et_content_products_phones` (
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='{"view":{"type":"except","fields":""}}';
 
+--
+-- Дамп данных таблицы `et_content_products_phones`
+--
+
 INSERT INTO `et_content_products_phones` (`element_id`, `type`, `platform`, `sims`, `screen_size`, `memory_size`, `card_slot`, `wi-fi`, `bluetooth`, `gps`, `battery`) VALUES
 (108, '', 'iOS', 1, '640x1136', 32, 'Да', 'Да', 'Да', 'Да', 1400),
 (110, '', 'iOS', 1, '640x1136', 16, 'Да', 'Да', 'Да', 'Да', 1400),
 (128, '', 'Android', 1, '1080x1920', 16, 'Да', 'Да', 'Да', 'Да', 2600),
 (135, '', 'Android', 1, '1080x1920', 32, 'Да', 'Да', 'Да', 'Да', 2300);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_currencies`
+--
 
 CREATE TABLE IF NOT EXISTS `et_currencies` (
   `element_id` int(11) NOT NULL,
@@ -151,9 +222,19 @@ CREATE TABLE IF NOT EXISTS `et_currencies` (
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_currencies`
+--
+
 INSERT INTO `et_currencies` (`element_id`, `name`, `symbol`, `code`, `rate`) VALUES
 (90, 'Российский рубль', 'р.', 'RUB', '1'),
 (91, 'Доллар США', '$', 'USD', '31.5');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_price-types`
+--
 
 CREATE TABLE IF NOT EXISTS `et_price-types` (
   `element_id` int(11) NOT NULL,
@@ -164,9 +245,19 @@ CREATE TABLE IF NOT EXISTS `et_price-types` (
   KEY `currency_2` (`currency`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_price-types`
+--
+
 INSERT INTO `et_price-types` (`element_id`, `currency`, `name`) VALUES
 (92, 90, 'Розничная'),
 (93, 91, 'Оптовая');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_prices`
+--
 
 CREATE TABLE IF NOT EXISTS `et_prices` (
   `element_id` int(11) NOT NULL,
@@ -182,12 +273,22 @@ CREATE TABLE IF NOT EXISTS `et_prices` (
   KEY `price_type_5` (`price_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_prices`
+--
+
 INSERT INTO `et_prices` (`element_id`, `price_type`, `product`, `value`) VALUES
 (125, 93, 110, 12600),
 (126, 92, 108, 16900),
 (127, 93, 108, 34500),
 (129, 92, 128, 22970),
 (136, 92, 135, 21850);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_sections`
+--
 
 CREATE TABLE IF NOT EXISTS `et_sections` (
   `element_id` int(11) NOT NULL,
@@ -201,15 +302,27 @@ CREATE TABLE IF NOT EXISTS `et_sections` (
   KEY `parent_id` (`parent_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_sections`
+--
+
 INSERT INTO `et_sections` (`element_id`, `parent_id`, `name`, `path`, `template`, `link`) VALUES
-(1, NULL, 'Главная', 'main', 'main', ''),
-(9, NULL, 'Первые шаги', 'gettingstarted', 'text', ''),
-(10, NULL, 'Документация', 'documentation', 'documentation', ''),
+(1, NULL, 'Главная', 'main', 'index', ''),
+(9, NULL, 'Продукция', 'products', 'text', ''),
+(10, NULL, 'Интернет-магазин', 'estore', 'text', ''),
 (24, NULL, 'Главная', 'main', 'main', ''),
-(26, NULL, 'Демо', '', '', 'http://demo.elementus.loc'),
+(26, NULL, 'Услуги', 'service', 'text', ''),
 (28, NULL, 'Каталог', 'catalog', 'catalog', ''),
 (29, NULL, 'Оплата', 'howtopay', 'text', ''),
-(30, NULL, 'Доставка', 'delivery', 'text', '');
+(30, NULL, 'Доставка', 'delivery', 'text', ''),
+(137, NULL, 'Контакты', 'contact', 'text', ''),
+(138, 9, 'Кровля и гидроизоляция', 'krovlya_i_gidroizolyaciya', 'text', '');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_templates`
+--
 
 CREATE TABLE IF NOT EXISTS `et_templates` (
   `element_id` int(11) NOT NULL,
@@ -218,9 +331,19 @@ CREATE TABLE IF NOT EXISTS `et_templates` (
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_templates`
+--
+
 INSERT INTO `et_templates` (`element_id`, `name`, `path`) VALUES
-(23, 'Elementus', 'elementus'),
+(23, 'PST', 'psc'),
 (82, 'E-store demo', 'demo');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_users`
+--
 
 CREATE TABLE IF NOT EXISTS `et_users` (
   `element_id` int(11) NOT NULL,
@@ -235,9 +358,19 @@ CREATE TABLE IF NOT EXISTS `et_users` (
   KEY `group_id_2` (`group_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_users`
+--
+
 INSERT INTO `et_users` (`element_id`, `name`, `surname`, `email`, `password`, `group_id`, `regdate`) VALUES
 (22, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22'),
 (25, 'demo', '', 'demo@demo.dem', '0d08030d71f686ccbd53d46592566d4f', 19, '2013-08-08 13:31:22');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_usersgroups`
+--
 
 CREATE TABLE IF NOT EXISTS `et_usersgroups` (
   `element_id` int(11) NOT NULL,
@@ -245,9 +378,19 @@ CREATE TABLE IF NOT EXISTS `et_usersgroups` (
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_usersgroups`
+--
+
 INSERT INTO `et_usersgroups` (`element_id`, `name`) VALUES
 (18, 'register'),
 (19, 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `et_widgets`
+--
 
 CREATE TABLE IF NOT EXISTS `et_widgets` (
   `element_id` int(11) NOT NULL,
@@ -257,8 +400,18 @@ CREATE TABLE IF NOT EXISTS `et_widgets` (
   PRIMARY KEY (`element_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+--
+-- Дамп данных таблицы `et_widgets`
+--
+
 INSERT INTO `et_widgets` (`element_id`, `name`, `position`, `type`) VALUES
 (89, 'Товары', 1, 15);
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `lang`
+--
 
 CREATE TABLE IF NOT EXISTS `lang` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -268,6 +421,10 @@ CREATE TABLE IF NOT EXISTS `lang` (
   PRIMARY KEY (`id`),
   KEY `app` (`app`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=82 ;
+
+--
+-- Дамп данных таблицы `lang`
+--
 
 INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (1, NULL, 'sections', 'разделы'),
@@ -347,6 +504,12 @@ INSERT INTO `lang` (`id`, `app`, `en`, `ru`) VALUES
 (80, NULL, 'tip', 'подсказка'),
 (81, NULL, 'password', 'пароль');
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `types`
+--
+
 CREATE TABLE IF NOT EXISTS `types` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent` int(11) DEFAULT NULL,
@@ -356,6 +519,10 @@ CREATE TABLE IF NOT EXISTS `types` (
   KEY `parent` (`parent`),
   KEY `group` (`group`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=19 ;
+
+--
+-- Дамп данных таблицы `types`
+--
 
 INSERT INTO `types` (`id`, `parent`, `name`, `group`) VALUES
 (1, NULL, 'sections', 3),
@@ -371,6 +538,12 @@ INSERT INTO `types` (`id`, `parent`, `name`, `group`) VALUES
 (17, NULL, 'price-types', 1),
 (18, NULL, 'prices', 1);
 
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `types_settings`
+--
+
 CREATE TABLE IF NOT EXISTS `types_settings` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `type_id` int(11) NOT NULL,
@@ -379,9 +552,19 @@ CREATE TABLE IF NOT EXISTS `types_settings` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
+--
+-- Дамп данных таблицы `types_settings`
+--
+
 INSERT INTO `types_settings` (`id`, `type_id`, `name`, `value`) VALUES
 (1, 3, 'import', '{"file":"f56d2af56e09d54f78c2.xml"}'),
 (2, 7, 'view', '{"type":"except","fields":["sims","card_slot","wi-fi","bluetooth","gps"]}');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `type_groups`
+--
 
 CREATE TABLE IF NOT EXISTS `type_groups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -390,35 +573,66 @@ CREATE TABLE IF NOT EXISTS `type_groups` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=5 ;
 
+--
+-- Дамп данных таблицы `type_groups`
+--
+
 INSERT INTO `type_groups` (`id`, `name`, `previous`) VALUES
 (1, 'E-store', 3),
 (2, 'Users', 1),
 (3, 'Содержание', NULL),
 (4, 'Системные', 2);
 
+--
+-- Ограничения внешнего ключа сохраненных таблиц
+--
 
+--
+-- Ограничения внешнего ключа таблицы `apps`
+--
 ALTER TABLE `apps`
   ADD CONSTRAINT `apps_ibfk_1` FOREIGN KEY (`template_id`) REFERENCES `et_templates` (`element_id`);
 
+--
+-- Ограничения внешнего ключа таблицы `et_content`
+--
 ALTER TABLE `et_content`
   ADD CONSTRAINT `et_content_ibfk_2` FOREIGN KEY (`section_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+--
+-- Ограничения внешнего ключа таблицы `et_price-types`
+--
 ALTER TABLE `et_price-types`
   ADD CONSTRAINT `et_price@002dtypes_ibfk_1` FOREIGN KEY (`currency`) REFERENCES `et_currencies` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
+--
+-- Ограничения внешнего ключа таблицы `et_prices`
+--
 ALTER TABLE `et_prices`
   ADD CONSTRAINT `et_prices_ibfk_2` FOREIGN KEY (`product`) REFERENCES `et_content_products` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `et_prices_ibfk_3` FOREIGN KEY (`price_type`) REFERENCES `et_price-types` (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
+--
+-- Ограничения внешнего ключа таблицы `et_sections`
+--
 ALTER TABLE `et_sections`
   ADD CONSTRAINT `et_sections_ibfk_2` FOREIGN KEY (`parent_id`) REFERENCES `et_sections` (`element_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
+--
+-- Ограничения внешнего ключа таблицы `et_users`
+--
 ALTER TABLE `et_users`
   ADD CONSTRAINT `et_users_ibfk_1` FOREIGN KEY (`group_id`) REFERENCES `et_usersgroups` (`element_id`);
 
+--
+-- Ограничения внешнего ключа таблицы `lang`
+--
 ALTER TABLE `lang`
   ADD CONSTRAINT `lang_ibfk_1` FOREIGN KEY (`app`) REFERENCES `apps` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
+--
+-- Ограничения внешнего ключа таблицы `types`
+--
 ALTER TABLE `types`
   ADD CONSTRAINT `types_ibfk_1` FOREIGN KEY (`parent`) REFERENCES `types` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `types_ibfk_2` FOREIGN KEY (`group`) REFERENCES `type_groups` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
