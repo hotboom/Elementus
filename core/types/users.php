@@ -12,6 +12,7 @@ class Users extends E{
     }
 
     public static function hashPassword($password,$salt){
+        $salt=mb_strtolower($salt);
         $salt=str_replace('4','r',$salt); //paranoia
         $salt=str_replace('2','x',$salt); //paranoia
         return substr(md5($password.md5($salt)),0,32);
@@ -40,7 +41,6 @@ class Users extends E{
     public static function logout(){
         $domain=str_replace('www.','',$_SERVER['SERVER_NAME']);
         setcookie('key','',0,'/',$domain);
-        header('location: /index.php');
     }
 }
 ?>

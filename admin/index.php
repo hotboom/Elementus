@@ -1,6 +1,5 @@
 <?
 require_once("../core/init.php");
-
 $pages=array(
     'main',
     'dashboard',
@@ -16,7 +15,11 @@ $pages=array(
     'import'
 );
 
-if(!empty($_GET['exit'])) Users::logout();
+if(!empty($_GET['exit'])) {
+    Users::logout();
+    header('location: index.php');
+    exit();
+}
 if(empty($_GET['page'])) $_GET['page']='main';
 if(!in_array($_GET['page'],$pages)) $_GET['page']='404';
 else {

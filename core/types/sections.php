@@ -43,7 +43,8 @@ class S extends E{
         return $sections[0];
     }
 
-    public static function getList($parent_id='NULL'){
+    public static function getList($parent_id=''){
+        //E::debug();
         if(empty($parent_id)) $params['filter']="parent_id is NULL";
         else $params['filter']="parent_id='".$parent_id."'";
         return self::get($params);
@@ -67,4 +68,6 @@ class S extends E{
         return false;
     }
 }
+
+class_alias('S', 'Sections');
 ?>

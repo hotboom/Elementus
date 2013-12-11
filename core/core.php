@@ -206,6 +206,7 @@ class E{
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  self::error(7,'Type name may contain only latin letters and _ or - symbols');
         if(!empty($params['view'])&&!is_array($params['view'])) self::error(8,'Incorrect view format');
         if(!empty(self::$errors)) return false;
+        $params['name']=mb_strtolower($params['name']);
 
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
@@ -220,6 +221,7 @@ class E{
     }
 
     static function setField($type,$params){
+        print_r($params);
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
         $type=self::getType($type);
@@ -250,26 +252,23 @@ class E{
             }
         }
 
-        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
-        if($params['type']=='varchar'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
-        }
-        elseif($params['type']=='int'){
-            if(!self::$db->q($alter_prx.'INT(11) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
-        }
-        elseif($params['type']=='text'){
-            if(!self::$db->q($alter_prx."TEXT NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
-        }
-        elseif($params['type']=='html'){
-            if(!self::$db->q($alter_prx.'TEXT NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"html"}\'',self::$debug)) return false;
-        }
-        elseif($params['type']==='file'|$params['type']=='image'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"file"}\'',self::$debug)) return false;
-        }
+        $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
+        if($params['type']=='varchar')
+            $sql.='VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+        elseif($params['type']=='int')
+            $sql.='INT(11) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+        elseif($params['type']=='text')
+            $sql.="TEXT NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+        elseif($params['type']=='html')
+            $sql.='TEXT NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"html"}\'';
+        elseif($params['type']==='file'|$params['type']=='image')
+            $sql.='VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"file"}\'';
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
-            if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : ""),self::$debug)) return false;
+            $sql.="ENUM(".implode(',',$params['enum']['list']).") NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
         }
+        elseif($params['type']=='datetime')
+            $sql.='DATETIME NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
         elseif($params['type']=='elements'){
             if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
@@ -277,10 +276,15 @@ class E{
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug)) return false;
+            $sql=false;
         }
         else {
             self::error(5,'Unknown field type');
             return false;
+        }
+
+        if($sql){
+            if(!self::$db->q($sql)) return false;
         }
 
         if($params['lang']!=$params['name']&&!empty($params['lang'])){
@@ -292,9 +296,9 @@ class E{
     static function setTypeOpt($name,$value,$type_id){
         $opt=self::getTypeOpt($type_id,$name);
         if(is_array($value)) $value=json_encode($value);
-        $sql=(empty($opt) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='$name', `value`='".$value."' ";
+        $sql=(empty($opt) ? "INSERT INTO" : "UPDATE")." `types_settings` SET `name`='$name', `value`='".$value."' ";
         if(empty($opt)) $sql.=", `type_id`='$type_id'";
-        else $sql.="WHERE `type_id`='$type_id'";
+        else $sql.="WHERE `name`='$name' AND `type_id`='$type_id'";
         if(!self::$db->q($sql,self::$debug)) return false;
         return true;
     }
@@ -379,8 +383,8 @@ class E{
 
     public static function getTypeClass($type_name){
         $class['name']='E';
-        $class['path']=self::$root_path.'/core/core.php';
-        $path=self::$root_path."/core/classes/".$type_name.".php";
+        $class['path']=self::$root_path.'core/core.php';
+        $path=self::$root_path."core/types/".$type_name.".php";
         if(file_exists($path)) {
             $class['name']=ucfirst($type_name);
             $class['path']=$path;
