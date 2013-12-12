@@ -36,6 +36,9 @@ class E{
     /** @type mixed Temp variable for recursion functions results */
     private static $recursion_temp=false;
 
+    private static $buffer=array();
+    private static $buffer_functions=array();
+
     public static function init($db, $root_path, $debug=false){
         self::$db        = $db;
         self::$debug     = $debug;
@@ -50,6 +53,9 @@ class E{
             $templates=self::get(array('type'=>'templates','order'=>'id','limit'=>'1'));
             self::$template=$templates[0];
         }
+
+        //Memoizated functions
+        ob_start(array('E',"end_buffer"));
     }
 
     public static function debug($debug=true){
@@ -221,7 +227,6 @@ class E{
     }
 
     static function setField($type,$params){
-        print_r($params);
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
         $type=self::getType($type);
@@ -557,6 +562,39 @@ class E{
             else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
         }
         else return false;
+    }
+
+    /**
+     * Memorize callback to buffer
+     *
+     * @param array $callback Callback to memorize
+     *
+     */
+    static function add_to_buffer($callback){
+        $params = func_get_args();
+        unset($params[0]);
+
+        self::$buffer[]=ob_get_contents();
+        ob_clean();
+        self::$buffer_functions[]=array(
+            'function'=>$callback,
+            'params'=>$params
+        );
+    }
+
+    /**
+     * Execute memorizated functions to render final output
+     *
+     * @param string $content Callback to memorize
+     *
+     * @return string
+     */
+    static function end_buffer($content){
+        $return='';
+        foreach(self::$buffer_functions as $i=>$val){
+            $return.=self::$buffer[$i].forward_static_call_array(self::$buffer_functions[$i]['function'],self::$buffer_functions[$i]['params']);
+        }
+        return $return.$content;
     }
 }
 ?>

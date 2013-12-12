@@ -89,7 +89,7 @@
             <li class="active"><a href="#/dashboard"><i class="fa fa-th"></i> Dashboard</a></li>
             <li><a href="#/app_form/act/edit/id/<?=E::$app['id']?>"><i class="fa fa-cog"></i> <?=t('Settings')?></a></li>
             <li><a href="#/types"><i class="fa fa-code-fork"></i> <?=t('Types')?></a></li>
-            <li><a href="#/files"><i class="fa fa-columns"></i> Files</a></li>
+            <li><a href="/admin/plugins/kcfinder/browse.php?type=Files"><i class="fa fa-columns"></i> Files</a></li>
         </ul>
         <form class="navbar-form form-inline pull-right">
             <label><?=Users::$user['email']?></label> <a href="/admin/index.php?exit=1" class="btn btn-primary"><i class="fa fa-code-right"></i>  <?=t('Exit')?></a>
