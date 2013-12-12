@@ -12,8 +12,8 @@ else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    //E::debug();
     //print_r($_POST);
+    //E::debug();
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
@@ -116,6 +116,12 @@ else $field=array();
                     <label class="col-lg-2 control-label" for="input_default"><?=t('Default')?></label>
                     <div class="col-lg-10">
                         <input name="field[default]" type="text" class="form-control" id="input_default" value="<?=$field['default']?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('Show in list')?></label>
+                    <div class="col-lg-10">
+                        <input name="field[show]" type="text" class="form-control" id="input_default" value="<?=$field['show']?>">
                     </div>
                 </div>
             </div>

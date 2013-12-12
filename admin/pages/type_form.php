@@ -13,13 +13,17 @@ if($act=='edit'|$act=='copy') {
 
     if(empty($type['view'])) $type['view']=array('view'=>'','fields'=>array());
 }
-else $type=array();
+else {
+    $type=array();
+    if(!empty($_GET['parent'])) $type['parent']=(int)$_GET['parent'];
+}
+
 ?>
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
     //print_r($_POST);
-    if($act=='delete') $result=E::deleteType($_POST['types']);
+    if($act=='delete') $result=E::deleteType($_POST['types'][0]);
     else {
         $result=E::setType($_POST['type']);
         if(!empty($_POST['type']['order'])){
@@ -52,13 +56,13 @@ else $type=array();
     </script>
     <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=type_form&type=<?=$type['id']?>&act=<?=$act?>">
     <? if($act=='delete'):?>
-        <p><?=t('delete selected elements')?>?</p>
-        <? if(is_array($_GET['elements'])):?>
-            <? foreach($_GET['elements'] as $i=>$val):?>
-                <input type="hidden" name="elements[]" value="<?=$val?>">
+        <p><?=t('delete selected types')?>?</p>
+        <? if(is_array($_GET['types'])):?>
+            <? foreach($_GET['types'] as $i=>$val):?>
+                <input type="hidden" name="types[]" value="<?=$val?>">
             <? endforeach;?>
         <?endif?>
-        <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
+        <button type="submit" class="btn btn-danger"><?=t('Delete')?></button>
         <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
         <input type="hidden" name="submit" value="submit">
     <?else:?>
@@ -109,6 +113,10 @@ else $type=array();
                         <option value=""><?=t('not set')?></option>
                         <? foreach($type['fields'] as $field):?><option value="<?=$field['name']?>"<?=($field['name']==$type['order'] ? ' selected' : '')?>><?=$field['name']?></option><?endforeach;?>
                     </select>
+                </div>
+                <div class="form-group" id="group_view_fields">
+                    <label for="input_view_fields"><?=t('Delete type')?></label>
+                    <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target="#window" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
                 </div>
             </div>
             <script>

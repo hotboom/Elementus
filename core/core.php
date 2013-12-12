@@ -226,6 +226,15 @@ class E{
         else return true;
     }
 
+    static function deleteType($type_id){
+        //Deleting type elements
+        $elements=self::get(array('type'=>$type_id));
+        foreach($elements as $element) self::delete($element['id']);
+
+        //Deleting type
+        return self::$db->q("DELETE FROM `types` WHERE `id`='".$type_id."'",self::$debug);
+    }
+
     static function setField($type,$params){
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
@@ -257,25 +266,34 @@ class E{
             }
         }
 
+        if(isset($params['show'])&&$params['show']!='') $extra['show']=$params['show'];
+
         $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='varchar')
-            $sql.='VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            $sql.='VARCHAR(255) NOT NULL';
         elseif($params['type']=='int')
-            $sql.='INT(11) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            $sql.='INT(11) NOT NULL';
         elseif($params['type']=='text')
-            $sql.="TEXT NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
-        elseif($params['type']=='html')
-            $sql.='TEXT NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"html"}\'';
-        elseif($params['type']==='file'|$params['type']=='image')
-            $sql.='VARCHAR(255) NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "").' COMMENT \'{"type":"file"}\'';
+            $sql.="TEXT NOT NULL";
+        elseif($params['type']=='html'){
+            $sql.='TEXT NOT NULL';
+            $extra['type']='html';
+        }
+        elseif($params['type']==='file'|$params['type']=='image'){
+            $sql.='VARCHAR(255) NOT NULL';
+            $extra['type']='file';
+        }
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
-            $sql.="ENUM(".implode(',',$params['enum']['list']).") NOT NULL".(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            $sql.="ENUM(".implode(',',$params['enum']['list']).") NOT NULL";
         }
         elseif($params['type']=='datetime')
-            $sql.='DATETIME NOT NULL'.(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            $sql.='DATETIME NOT NULL';
         elseif($params['type']=='elements'){
-            if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
+            $sql.='INT(11) NULL';
+            $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
             $params['elements_type']=self::getTypeTableName($params['elements_type']);
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
@@ -289,7 +307,10 @@ class E{
         }
 
         if($sql){
-            if(!self::$db->q($sql)) return false;
+            //print_r($extra);
+            $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
         }
 
         if($params['lang']!=$params['name']&&!empty($params['lang'])){
@@ -437,6 +458,7 @@ class E{
         if(!empty($column['COLUMN_COMMENT'])) {
             $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
             if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
+            if($field['comment']['show']!='') $field['show']=$field['comment']['show'];
         }
         if($field['key']=='MUL') {
             $sql="

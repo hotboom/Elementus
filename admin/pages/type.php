@@ -43,7 +43,7 @@ $elements=$type['class']['name']::get($params);
     <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-cog"></i> <?=t('Settings')?></a>
     <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="fa fa-cog"></i> <?=t('Fields')?></a>
     <a href="import/type/<?=$type['id']?>" data-target="#window" class="btn btn-primary"><i class="fa fa-reply-all"></i> <?=t('Import')?></a>
-    <a href="/admin/index.php?page=type_form" class="btn btn-primary" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add subtype')?></a>
+    <a href="/admin/index.php?page=type_form&parent=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add subtype')?></a>
 </p>
 
 <table class="table table-hover table-condensed selectable">
