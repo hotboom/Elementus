@@ -25,7 +25,8 @@ a:link{color:#003357;}
 a:visited{color:#003357;}
 a:hover{color:#014d78;}
 
-h2{font-size:30px; font-family: 'Open Sans', sans-serif; font-style: normal; font-weight: 300; color:#393939;}
+h1{font-size:30px; font-family: 'Open Sans', sans-serif; font-style: normal; font-weight: 300; color:#393939;}
+h2{font-size:24px; font-family: 'Open Sans', sans-serif; font-style: normal; font-weight: 300; color:#393939;}
 
 h1,h2,h3,h4{font-weight:normal; margin:0.5em 0 0.6em 0;}
 
@@ -40,11 +41,18 @@ a.logo:hover{background-position:bottom;}
 ul.mmenu{float:right; margin:0 0 0 51px; font-size:18px; font-family: 'Open Sans Condensed', sans-serif; text-transform:uppercase;}
 ul.mmenu li{float:left;}
 ul.mmenu li a{color:#FFFFFF; text-decoration:none; height:56px; display: block; padding:36px 17px 0 17px;}
-ul.mmenu li a:hover{background: red;}
+ul.mmenu li a:hover{background: #e56f07;}
 ul.mmenu li ul{display: none; text-transform: none; position: absolute; font-family: 'Open Sans', sans-serif; font-size: 14px; background:#00416f; top:92px;}
 ul.mmenu li ul li{float:none;}
 ul.mmenu li ul li a{float:none; height: auto; padding: 10px 17px;}
 ul.mmenu li:hover ul{display: block;}
+
+ul.leftmenu{font-size:18px;}
+ul.leftmenu li{padding:5px 0;}
+ul.leftmenu ul{font-size:12px; padding:0 0 0 22px;}
+ul.leftmenu ul li{padding:3px 0;}
+
+ul.leftmenu a.selected{text-decoration:none; color:#393939;}
 
 a.city{background:url(../images/icon_location.png) no-repeat; display:block; height:20px; padding:3px 0 0 28px; color:white; float:right; margin:35px 30px 0 50px; font-size:14px; text-decoration:none;}
 a.city span{display:block; border-bottom:1px dashed white;}
@@ -54,6 +62,7 @@ a.city span{display:block; border-bottom:1px dashed white;}
 .categories h3 a{text-decoration:none;}
 
 .leftbar{float:left; width:550px;}
+.leftbar h2{margin-top:25px;}
 .rightbar{float:right; width:550px;}
 
 ul.arrows li {padding:0 0 0 28px;}
@@ -61,16 +70,13 @@ ul.arrows li{background:url(../images/arrow-right.png) no-repeat 9px 6px; height
 
 strong{color:#bf4432;}
 
-.footer{
-    height:239px;
-    padding:30px 50px 50px 50px; color:white;
-}
+.footer{height:239px; padding:30px 50px 50px 50px; color:white;}
 
 .partners{background:#999999; padding:17px 50px;}
 
-.footer .copyright{width:300px; color:#6f6f6f; font-size:11px; float:left;}
-.footer .cotacts{width:300px; float:left; margin:0 230px 0 0;}
-.footer .info{float:left; width:300px; float:left;}
+.footer .copyright{width:200px; color:#6f6f6f; font-size:11px; float:left;}
+.footer .cotacts{width:220px; float:left; padding:0 42px 0 0; float:left;}
+.footer .info{float:left; float:left;}
 .footer h3{font-family: 'Open Sans Condensed', sans-serif; text-transform:uppercase; color:white; font-size:18px; border-bottom:1px solid #585757; padding-bottom:10px;}
 .footer a{color:#3d98c2;}
 

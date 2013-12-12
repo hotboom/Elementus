@@ -266,7 +266,7 @@ class E{
             }
         }
 
-        if(isset($params['show'])&&$params['show']!='') $extra['show']=$params['show'];
+        if(isset($params['hide'])&&$params['hide']!='') $extra['hide']=$params['hide'];
 
         $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='varchar')
@@ -458,7 +458,7 @@ class E{
         if(!empty($column['COLUMN_COMMENT'])) {
             $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
             if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
-            if($field['comment']['show']!='') $field['show']=$field['comment']['show'];
+            if($field['comment']['hide']) $field['hide']=$field['comment']['hide'];
         }
         if($field['key']=='MUL') {
             $sql="

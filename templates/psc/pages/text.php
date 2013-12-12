@@ -1,33 +1,44 @@
 <? include("header.php"); ?>
-<ul class="categories">
-    <li><h3><a href="#">Кровля и гидроизоляция</a></h3>
-        Кровельные и гидроизоляционные материалы
-    </li>
-    <li><h3><a href="#">Теплоизоляция</a></h3>
-        Современные теплоизоляционые
-        материалы</li>
-    <li><h3><a href="#">Фасады</a></h3>
-        Сайдинги и штукатурные
-        фасады</li>
-    <li><h3><a href="#">Огнезацита</a></h3>
-        Конструктивная огнезащита
-    </li>
-    <li><h3><a href="#">Отделка</a></h3>
-        Сухие строительные  и
-        гипсокартон</li>
-</ul>
-<br class="clear">
-<div class="leftbar">
-    <h2>Услуги</h2>
-    <ul class="arrows">
-        <li>Комплексная поставка строительных материалов</li>
-        <li>Консультации и расчет материалов</li>
-        <li>Доставка материалов на объекты</li>
-    </ul>
+<? include("category.php"); ?>
+<div class="leftbar" style="width:300px;">
+    <?
+    //Функция для рекурсивного вывода меню раздела
+    function tree2($parent_id=0){
+        $sections=S::getList($parent_id);
+        if(empty($sections)) return false;
+        foreach($sections as $section){
+            if(empty($section['link'])) $section['link']='/'.$section['path'];
+            echo '<li><a href="'.$section['link'].'" '.(strpos($section['link'],'http://')!==false ? 'target="_blank"' : '').'>'.$section['name'].'</a>';
+            echo '<ul>';
+            tree2($section['id']);
+            echo '</ul>';
+            echo '</li>';
+        }
+        return true;
+    }
+    $parents=S::getParents(S::$section['id']);
+    if(!empty($parents)):
+        echo '<h2>Разделы</h2>';
+        echo '<ul class="leftmenu">';
+        tree2($parents[count($parents)-1]); //Отображение древовидного меню первого предка текущего раздела
+        echo '</ul>';
+    elseif(S::getList($_E['section']['id'])!=array()):
+        echo '<h2>Разделы</h2>';
+        echo '<ul class="leftmenu">';
+        tree2(S::$section['id']);
+        echo '</ul>';
+    endif; ?>
 </div>
-<div class="rightbar">
-    <h2>О компании</h2>
-    <strong>Первый Строй Центр</strong> - поставщик комплексных решений в сфере строительных и отделочных материалов. Приоритетное направление в сфере поставок - кровельные и изоляционные материалы. Мы сотрудничаем с потребителями всех уровней. Нашими постоянными клиентами являются как крупные промышленные предприятия и компании- застройщики, государственные учреждения, так и небольшие строительные бригады и частные застройщики.
+<div class="rightbar" style="width:750px;">
+    <h1><?=S::$section['name']?></h1>
+    <? if($content=E::get(array(
+        'type'=>'content',
+        'filter'=>'section_id='.S::$section['id']
+    ))): ?>
+        <? foreach($content as $text):?>
+            <?=$text['content']?>
+        <? endforeach;?>
+    <? endif;?>
 </div>
 <br class="clear">
 <? include("footer.php"); ?>

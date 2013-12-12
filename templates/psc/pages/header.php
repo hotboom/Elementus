@@ -12,23 +12,15 @@
     <div class="header">
         <a href="/" class="logo"></a>
         <a class="city" href="#"><span>Пермь</span></a>
+        <ul class="mmenu">
         <?
-        function tree($parent_id=0){
-            $sections=Sections::getList($parent_id);
-            if(empty($sections)) return false;
-
-            if($parent_id==0) echo '<ul class="mmenu">';
-            else echo '<ul>';
-            foreach($sections as $section){
-                if(empty($section['link'])) $section['link']='/'.$section['path'].'/';
-                echo '<li><a href="'.$section['link'].'" '.(strpos($section['link'],'http://')!==false ? 'target="_blank"' : '').'>'.$section['name'].'</a>';
-                tree($section['id']);
-                echo '</li>';
-            }
-            echo '</ul>';
-            return true;
-        }
-        tree();
+        $sections=S::getList(0);
+        foreach($sections as $section):
+            if($section['show']&&$section['public']):?>
+            <li><a href="/<?=$section['path']?>"><?=$section['name']?></a></li>
+            <? endif;?>
+        <? endforeach;?>
+        </ul>
         ?>
     </div>
     <div class="page">

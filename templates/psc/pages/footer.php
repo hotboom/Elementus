@@ -9,12 +9,13 @@
         <br>
         © «Первый Строй Центр»
     </div>
+    <? $cities=E::get('city');
+    foreach($cities as $city):?>
     <div class="fblock cotacts">
-        <h3>Контакты</h3>
-        Пермь, Деревообделочная ул,	6  (<a href="#">карта проезда</a>)<br>
-        тел/факс: (342) 238-86-67, (342) 238-86-68<br>
-        e-mail: <a href="mailto:1sc@saturn-r.ru">1sc@saturn-r.ru</a><br>
+            <h3><?=$city['name']?></h3>
+            <?=$city['contacts']?>
     </div>
+    <? endforeach; ?>
     <div class="fblock info">
         <h3>Информация</h3>
         <ul>

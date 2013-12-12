@@ -119,9 +119,9 @@ else $field=array();
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label" for="input_default"><?=t('Show in list')?></label>
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('Hide in list')?></label>
                     <div class="col-lg-10">
-                        <input name="field[show]" type="text" class="form-control" id="input_default" value="<?=$field['show']?>">
+                        <input name="field[hide]" type="text" class="form-control" id="input_default" value="<?=$field['hide']?>">
                     </div>
                 </div>
             </div>
