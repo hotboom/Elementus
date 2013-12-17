@@ -69,7 +69,7 @@ class E{
 
     public static function getApps($params=array()){
         if(empty($params)) return self::$app;
-        $sql="SELECT id,name,domain,template_id FROM apps";
+        $sql="SELECT id,name,domain,alias,template_id FROM apps";
         if(!empty($params['filter'])) $sql.=' WHERE '.$params['filter'];
         if(!empty($params['order']))  $sql.=' ORDER BY '.$params['order'];
         if(empty($params['page'])) $params['page']=0;
@@ -84,6 +84,7 @@ class E{
         $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." apps SET
         name='".$params['name']."',
         domain='".$params['domain']."',
+        alias='".$params['alias']."',
         template_id=".(empty($params['template_id']) ? "NULL" : "'".$params['template_id']."'")."
         WHERE id='".$params['id']."'";
 

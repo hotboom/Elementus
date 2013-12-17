@@ -105,14 +105,6 @@ else {
                     <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target="#window" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
                 </div>
             </div>
-            <script>
-                $('#input_view').change(function(){
-                    var group_view_fields=$('#group_view_fields');
-                    if($(this).val()) group_view_fields.show();
-                    else group_view_fields.hide();
-
-                });
-            </script>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
             <a href="#" class="btn btn-default pull-right" onClick="$('#advanced').toggle(); $(this).find('i').toggleClass('fa-angle-down').toggleClass('fa-angle-up'); return false;"><i class="fa fa-angle-down"></i> <?=t('Advanced settings')?></a>
