@@ -74,7 +74,7 @@ class S extends E{
     }
 
     static function getTitle(){
-        if(empty(self::$section)) return self::$section['name'];
+        if(empty(self::$section['title'])) return self::$section['name'];
         else return self::$section['title'];
     }
 
