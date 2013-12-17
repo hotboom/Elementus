@@ -8,11 +8,12 @@ if($act=='edit'|$act=='copy') {
     $field=E::getField($type,$_GET['fields'][0]);
 }
 else $field=array();
+//print_r($field);
 ?>
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
-
+    //print_r($_POST);
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
@@ -62,13 +63,14 @@ else $field=array();
                 <?
                 $ftypes=array(
                     'int'=>'Integer',
-                    'string'=>'String',
+                    'varchar'=>'String',
                     'text'=>'Text',
                     'elements'=>'Elements select',
                     'enum'=>'Values select',
                     'html'=>'HTML',
                     'file'=>'File',
-                    'image'=>'Image'
+                    'image'=>'Image',
+                    'datetime'=>'Date and time'
                 );
                 ?>
                 <div class="col-lg-10">
