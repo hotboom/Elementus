@@ -13,7 +13,7 @@ $element=$data['element'];
 </a>
 <div class="clearfix"></div>
 <? if(!empty($data['value'])):?>
-    <img src="/upload/files/<?=$data['value']?>" style="width:100px; height: auto;">
+<div class="row"><div class="col-sm-6 col-md-3"><a href="#" class="thumbnail"><img src="/upload/files/<?=$data['value']?>" class="img-responsive"></a></div></div>
 <? endif;?>
 <script language="Javascript">
     $(function(){
@@ -51,7 +51,7 @@ $element=$data['element'];
                 target.val(file_name);
                 <? if($field['type']=='image'):?>
                 button.parent().find('img').remove();
-                button.parent().append('<img src="/upload/files/'+file_name+'" style="width:100px; height: auto;">');
+                button.parent().append('<div class="row"><div class="col-sm-6 col-md-3"><a href="#" class="thumbnail"><img src="/upload/files/'+file_name+'" class="img-responsive"></a></div></div>');
                 <? endif;?>
             });
             fileinput.click();
