@@ -5,19 +5,14 @@ if(empty($_GET['mode'])) $_GET['mode']='normal';
 
 $type['fields']=array();
 $type['fields']=E::getFullTypeFields($type);
-if($type['view']=E::getTypeOpt($type['id'],'view')){
-    if(!empty($type['view']['fields'])){
-        foreach($type['fields'] as $i=>$field){
-            if(in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='except') unset($type['fields'][$i]);
-            if(!in_array($field['name'],$type['view']['fields'])&&$type['view']['type']==='only') unset($type['fields'][$i]);
-        }
-    }
+
+foreach($type['fields'] as $i=>$field){
+    if($type['fields'][$i]['hide']) unset($type['fields'][$i]);
 }
 
 $type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array();
-if(!empty($_GET['p'])) $params['page']=(int)$_GET['p'];
 $params['type']=$type;
 if(!empty($_GET['order'])) $params['order']=array($_GET['order'],$_GET['desc']);
 if(!empty($_GET['filter'])) {
