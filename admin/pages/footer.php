@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="window" tabindex="-1" role="dialog" data-backdrop="false">
+<div class="modal fade" id="window" role="dialog" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-inner">
             <div class="modal-content">

@@ -10,6 +10,7 @@
     }
     ?>
     <?=t('Wrong username or password')?>
+    <? exit(); ?>
 <? else: ?>
 <!DOCTYPE html>
 <html lang="ru">
