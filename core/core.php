@@ -473,8 +473,7 @@ class E{
         $field['key']=$column['COLUMN_KEY'];
         if(!empty($column['COLUMN_COMMENT'])) {
             $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
-            if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
-            if($field['comment']['hide']) $field['hide']=$field['comment']['hide'];
+            $field=array_merge($field, $field['comment']);
         }
         if($field['key']=='MUL') {
             $sql="
