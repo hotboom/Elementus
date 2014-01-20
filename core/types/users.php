@@ -1,15 +1,10 @@
 <?
-class Users extends E{
+class U extends E{
     public static $user;
 
     public static function init(){
-        if(!empty($_COOKIE['key'])){
-            $params=array('type'=>'users','filter'=>"password='".$_COOKIE['key']."'");
-            if($users=parent::get($params)){
-                self::$user=$users[0];
-                self::$user['group']=self::getById(self::$user['group_id']);
-            }
-        }
+        if(session_id()=='') session_start();
+        self::$user=self::autorization();
     }
     public static function set($params){
         $params['type']='users';
@@ -23,6 +18,18 @@ class Users extends E{
         $salt=str_replace('2','x',$salt); //paranoia
         return substr(md5($password.md5($salt)),0,32);
     }
+    public static function autorization(){
+        if(!empty($_COOKIE['key'])){
+            $params=array('type'=>'users','filter'=>"password='".$_COOKIE['key']."'");
+            if($users=parent::get($params)) {
+                $users[0]['hash']=$users[0]['password'];
+                return $users[0];
+            }
+            return false;
+        }
+        return false;
+    }
+
     public static function login($email, $password, $remember=false){
         $hash=self::hashPassword($password,$email);
         $params=array('type'=>'users','filter'=>"password='".$hash."'");
@@ -41,4 +48,6 @@ class Users extends E{
         setcookie('key','',0,'/',$domain);
     }
 }
+
+class_alias('U', 'Users');
 ?>

@@ -3,5 +3,8 @@
 <?elseif($data['field']['type']==='enum'): ?>
     <? Template::render('pages/field_types/enum.php',$data); ?>
 <?else:?>
+    <? if($data['field']['name']=='id'):?>
+        <input type="checkbox" id="selectAll" class="pull-left">
+    <? endif;?>
     <? Template::render('pages/field_types/default.php',$data); ?>
 <?endif;?>

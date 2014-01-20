@@ -27,6 +27,7 @@ class S extends E{
 
     static function set($params){
         $params['type']=1;
+        if(empty($params['path'])) $params['path']=translit($params['name']);
         return parent::set($params);
     }
 

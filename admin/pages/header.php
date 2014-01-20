@@ -37,8 +37,8 @@
     <script type="text/javascript" src="/admin/static/js/bootstrap-select.js"></script>
     <link rel="stylesheet" type="text/css" href="/admin/static/css/bootstrap-select.css">
 
-    <link href="/admin/plugins/datepicker/css/datepicker.css" rel="stylesheet">
-    <script src="/admin/plugins/datepicker/js/bootstrap-datepicker.js"></script>
+    <script src="/admin/plugins/ckeditor/ckeditor.js"></script>
+    <script src="/admin/plugins/ckeditor/adapters/jquery.js"></script>
 
     <script type="text/javascript">
 
