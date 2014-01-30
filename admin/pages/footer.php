@@ -1,5 +1,5 @@
 <!-- Modal -->
-<div class="modal fade" id="window" tabindex="-1" role="dialog" data-backdrop="false">
+<div class="modal fade" id="window" role="dialog" data-backdrop="false">
     <div class="modal-dialog">
         <div class="modal-inner">
             <div class="modal-content">
@@ -62,13 +62,15 @@
             event.preventDefault();
         });
 
-        $('table.selectable tbody').unbind().on('click','tr', function(event){
+        var table=$('table.selectable tbody');
+
+        table.unbind().on('click','tr', function(event){
             var checkbox=$(this).find('input[type=checkbox]');
             checkbox.click();
             event.preventDefault();
         });
 
-        $('table.selectable tbody').on('click','tr input[type=checkbox]',function(event){
+        table.on('click','tr input[type=checkbox]',function(event){
             //console.log($(this));
             var tr=$(this).parents('tr');
             tr.toggleClass('active');
@@ -85,6 +87,15 @@
             event.stopPropagation();
         });
 
+        table.on('dblclick', 'tr', function(event){
+            $('table.selectable input[type=checkbox]').attr('checked',false).parents('tr.active').toggleClass('active');
+            var checkbox=$(this).find('input[type=checkbox]');
+            checkbox.click();
+            $('#btn-edit').click();
+            event.preventDefault();
+            event.stopPropagation();
+        });
+
         $("table tr.filter th input[type='text']").keypress(function(e){
             if(e.which==13) {
                 console.log(location.hash);
@@ -92,6 +103,10 @@
                 e.preventDefault();
             }
 
+        });
+
+        $('#selectAll').click(function(e){
+            table.find('input[type=checkbox]').click();
         });
 
         $('.selectpicker').selectpicker({

@@ -21,9 +21,9 @@ else $app=array();
     <? if($result):?>
         <div class="alert alert-success"><i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?></div>
     <? else:?>
-        <div class="alert alert-warning"><i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?></div>
+        <div class="alert alert-warning"><i class="fa fa-warning-sign"></i> <?=t('Error occurred:')?><? foreach(E::$errors['desc'] as $error): echo $error['descr']; endforeach;?></div>
     <? endif;?>
-    <a href="#/app_form/act/edit/id/<?=(int)$_POST['app']['id']?>/form" class="btn btn-default"><i class="fa fa-arrow-left"></i> <?=t('Back to form')?></a>
+    <a href="#/app_form/act/edit/id/<?=(int)$_POST['app']['id']?>" class="btn btn-default"><i class="fa fa-arrow-left"></i> <?=t('Back to form')?></a>
 <? else:?>
     <script>
         $(function() {
@@ -50,11 +50,15 @@ else $app=array();
                     <input name="app[name]" type="text" class="form-control" id="input_name" value="<?=$app['name']?>">
                 </div>
                 <div class="form-group">
-                    <label for="input_name"><?=t('Domain')?></label>
-                    <input name="app[domain]" type="text" class="form-control" id="input_name" value="<?=$app['domain']?>">
+                    <label for="input_domain"><?=t('Domain')?></label>
+                    <input name="app[domain]" type="text" class="form-control" id="input_domain" value="<?=$app['domain']?>">
+                </div>
+                <div class="form-group" id="group_view_fields">
+                    <label for="input_alias"><?=t('Alias')?></label>
+                    <textarea class="form-control" rows="3" name="app[alias]" id="input_alias"><?=$app['alias']?></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="input_type"><?=t('Type')?></label>
+                    <label for="input_type"><?=t('Template')?></label>
                     <select name="app[template_id]" id="input_type" class="form-control">
                         <option value="INT(11)"><?=t('Not set')?></option>
                         <? $templates=E::get(array('type'=>'templates'));

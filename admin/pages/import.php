@@ -8,7 +8,6 @@ $import=E::getTypeOpt($type['id'],'import');
     $uploaddir = $root_path.'/upload/';
     $uploadfile = $uploaddir . basename($_FILES['file']['name']);
 
-
     if (move_uploaded_file($_FILES['file']['tmp_name'], $uploadfile)) echo $_FILES['file']['name'];
 ?>
 <? elseif(!empty($_POST['step1'])):
@@ -18,11 +17,49 @@ $import=E::getTypeOpt($type['id'],'import');
     //else $result=E::setApp($_POST['app']);
     if($result):
     $file=array('name'=>$_POST['import']['file']);
-    if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'){
-        require($root_path.'/modules/import/xmlparser.php');
-        $xml_parser = new xml();
 
-        $xmlfile=$root_path.'upload/f56d2af56e09d54f78c2.xml';
+    if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'|substr($file['name'], strrpos($file['name'], '.') + 1)==='yml'){
+        require($root_path.'/modules/import/xmlparser.php');
+        set_time_limit(360);
+        $xml_parser = new xml();
+        $xml_parser->processor='process';
+        //E::debug();
+        E::clearType(20);
+        E::clearType(21);
+        $offer=array();
+        function process($tag){
+            global $offer;
+            if($tag['name']=='CATEGORY'){
+                E::set(array(
+                    'type'=>21,
+                    'id1c'=>(int)$tag['attr']['ID'],
+                    'parentId'=>(int)$tag['attr']['PARENTID'],
+                    'name'=>$tag['value']
+                ));
+            }
+            if($tag['name']=='OFFER')  {
+                if(!empty($offer)){
+                    E::set(array(
+                        'type'=>20,
+                        'id1c'=>$offer['id'],
+                        'categoryId'=>$offer['category'],
+                        'model'=>$offer['model'],
+                        'price'=>$offer['price'],
+                        'store'=>$offer['store']
+                    ));
+                    $offer=array();
+                }
+                $offer['id']=(int)$tag['attr']['ID'];
+            }
+            if($tag['name']=='CATEGORYID') $offer['category']=$tag['value'];
+            if($tag['name']=='MODEL') $offer['model']=$tag['value'];
+            if($tag['name']=='PRICE') $offer['price']=$tag['value'];
+            if($tag['name']=='STORE') $offer['store']=$tag['value'];
+        }
+
+
+        $xmlfile=$root_path.'upload/'.$file['name'];
+
         if (!($fp = fopen($xmlfile, "r"))) die("could not open XML input");
 
         while ($data = fgets($fp))
@@ -31,13 +68,13 @@ $import=E::getTypeOpt($type['id'],'import');
         }
 
         $depth=0;
-        foreach($xml_parser->tags as $tag){
+        /*foreach($xml_parser->tags as $tag){
             if($tag['depth']>$depth) echo '<ul>';
             if($tag['depth']<$depth) echo '</ul>';
             $depth=$tag['depth'];
 
             echo '<li>'.$tag['name'].'</li>';
-        }
+        }*/
     }
     ?>
     <? else:?>
@@ -114,6 +151,16 @@ $import=E::getTypeOpt($type['id'],'import');
                                 });
                             });
                         </script>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_encoding"><?=t('Encoding')?></label>
+                    <div class="col-lg-10">
+                        <select name="import[encoding]" id="input_encoding" class="form-control selectpicker">
+                            <option value="utf-8">UTF-8</option>
+                            <option value="ansi">ANSI</option>
+                            <option value="cp1251">WINDOWS-1251</option>
+                        </select>
                     </div>
                 </div>
             </div>

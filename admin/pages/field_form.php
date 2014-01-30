@@ -12,8 +12,8 @@ else $field=array();
 ?>
 
 <? if(!empty($_POST['submit'])):
-    //print_r($_POST);
     //E::debug();
+    //print_r($_POST);
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
@@ -21,7 +21,9 @@ else $field=array();
     <? if($result):?>
     <i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?>
     <? else:?>
+    <? foreach(E::$errors as $error):?>
     <i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?>
+    <? endforeach;?>
     <? endif;?>
     <script>
         $(window).hashchange();
@@ -119,9 +121,18 @@ else $field=array();
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="col-lg-2 control-label" for="input_default"><?=t('Hide in list')?></label>
+                    <label class="col-lg-2 control-label" for="input_hide"><?=t('Hide in list')?></label>
                     <div class="col-lg-10">
-                        <input name="field[hide]" type="text" class="form-control" id="input_default" value="<?=$field['hide']?>">
+                        <select name="field[hide]" id="input_hide" class="form-control">
+                            <option value="0"><?=t('no')?></option>
+                            <option value="1"<?=($field['hide'] ? ' selected="selected"' : '')?>><?=t('yes')?></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('Placeholder')?></label>
+                    <div class="col-lg-10">
+                        <input name="field[placeholder]" type="text" class="form-control" id="input_default" value="<?=$field['placeholder']?>">
                     </div>
                 </div>
             </div>

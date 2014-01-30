@@ -69,7 +69,7 @@ class E{
 
     public static function getApps($params=array()){
         if(empty($params)) return self::$app;
-        $sql="SELECT id,name,domain,template_id FROM apps";
+        $sql="SELECT id,name,domain,alias,template_id FROM apps";
         if(!empty($params['filter'])) $sql.=' WHERE '.$params['filter'];
         if(!empty($params['order']))  $sql.=' ORDER BY '.$params['order'];
         if(empty($params['page'])) $params['page']=0;
@@ -84,6 +84,7 @@ class E{
         $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." apps SET
         name='".$params['name']."',
         domain='".$params['domain']."',
+        alias='".$params['alias']."',
         template_id=".(empty($params['template_id']) ? "NULL" : "'".$params['template_id']."'")."
         WHERE id='".$params['id']."'";
 
@@ -92,7 +93,6 @@ class E{
 
     public static function get($params=array()){
         if(!is_array($params)) $params=array('type'=>$params);
-        if(empty($params['limit'])) $params['limit']=30;
         if(empty($params['page'])) $params['page']=0;
 
         if(!$type=self::getType($params['type'])) return false;
@@ -119,6 +119,16 @@ class E{
         }
         else $sql.="AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
+            if(is_array($params['filter'])){
+                $filter='';
+                $j=0;
+                foreach($params['filter'] as $i=>$v) {
+                    if($j>0) $filter.=' AND ';
+                    $filter.="`".$i."`='".$v."'";
+                    $j++;
+                }
+                $params['filter']=$filter;
+            }
             $sql.="AND (";
             $sql.=$params['filter'];
             $sql.=") ";
@@ -127,7 +137,10 @@ class E{
             if(is_array($params['order'])) $sql.="ORDER BY `".$params['order'][0]."` ".($params['order'][1] ? 'DESC' : 'ASC')." ";
             else $sql.="ORDER BY `".$params['order']."` ";
         }
-        $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
+        if(isset($params['limit'])){
+            if($params['limit']) $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
+        }
+        else $sql.="LIMIT ".($params['page']*30).",".($params['page']*30+30)." ";
         $elements=self::$db->q($sql,self::$debug,false);
         return $elements;
     }
@@ -228,11 +241,15 @@ class E{
 
     static function deleteType($type_id){
         //Deleting type elements
-        $elements=self::get(array('type'=>$type_id));
-        foreach($elements as $element) self::delete($element['id']);
+        self::clearType($type_id);
 
         //Deleting type
         return self::$db->q("DELETE FROM `types` WHERE `id`='".$type_id."'",self::$debug);
+    }
+
+    static function clearType($type_id){
+        $elements=self::get(array('type'=>$type_id,'limit'=>false));
+        foreach($elements as $element) self::delete($element['id']);
     }
 
     static function setField($type,$params){
@@ -267,6 +284,7 @@ class E{
         }
 
         if(isset($params['hide'])&&$params['hide']!='') $extra['hide']=$params['hide'];
+        if(!empty($params['placeholder'])) $extra['placeholder']=$params['placeholder'];
 
         $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='varchar')
@@ -457,8 +475,7 @@ class E{
         $field['key']=$column['COLUMN_KEY'];
         if(!empty($column['COLUMN_COMMENT'])) {
             $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
-            if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
-            if($field['comment']['hide']) $field['hide']=$field['comment']['hide'];
+            $field=array_merge($field, $field['comment']);
         }
         if($field['key']=='MUL') {
             $sql="
@@ -617,6 +634,15 @@ class E{
             $return.=self::$buffer[$i].forward_static_call_array(self::$buffer_functions[$i]['function'],self::$buffer_functions[$i]['params']);
         }
         return $return.$content;
+    }
+
+    static function component($component,$template='default',$params=array()){
+        if(file_exists(include(COMPONENTS_DIR.$component."/component.php"))){
+            include(COMPONENTS_DIR.$component."/component.php");
+            return true;
+        }
+        self::$errors[]="Component $component not found";
+        return false;
     }
 }
 ?>

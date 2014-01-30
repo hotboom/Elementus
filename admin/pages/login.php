@@ -20,7 +20,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Elemental</title>
+    <title>Elementus</title>
     <!-- Bootstrap -->
     <link href="/admin/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link href="/admin/static/css/bootstrap-glyphicons.css" rel="stylesheet" media="screen">

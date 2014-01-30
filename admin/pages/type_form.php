@@ -93,20 +93,6 @@ else {
                 <input name="type[name]" type="text" class="form-control" id="input_name" value="<?=$type['name']?>">
             </div>
             <div id="advanced" style="display:none;">
-                <div class="form-group">
-                    <label for="input_view"><?=t('Show fields in list')?></label>
-                    <select name="type[view][type]" id="input_view" class="form-control selectpicker">
-                        <option value=""><?=t('All')?></option>
-                        <option value="except" <?=($type['view']['type']=='except' ? 'selected' : '')?>><?=t('Except defined')?></option>
-                        <option value="only" <?=($type['view']['type']=='only' ? 'selected' : '')?>><?=t('Only defined')?></option>
-                    </select>
-                </div>
-                <div class="form-group" id="group_view_fields" <?=(empty($type['view']['type']) ? 'style="display:none;"' : '')?>>
-                    <label for="input_view_fields"><?=t('Fields')?></label>
-                    <select name="type[view][fields][]" class="selectpicker form-control" multiple title="<?=t('Choose fields...')?>">
-                        <? foreach($type['fields'] as $field):?><option value="<?=$field['name']?>"<?=(in_array($field['name'],$type['view']['fields']) ? ' selected' : '')?>><?=$field['name']?></option><?endforeach;?>
-                    </select>
-                </div>
                 <div class="form-group" id="group_view_fields">
                     <label for="input_view_fields"><?=t('Sort by')?></label>
                     <select name="type[order]" class="form-control" title="<?=t('Choose fields...')?>">
@@ -119,14 +105,6 @@ else {
                     <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target="#window" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
                 </div>
             </div>
-            <script>
-                $('#input_view').change(function(){
-                    var group_view_fields=$('#group_view_fields');
-                    if($(this).val()) group_view_fields.show();
-                    else group_view_fields.hide();
-
-                });
-            </script>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
             <a href="#" class="btn btn-default pull-right" onClick="$('#advanced').toggle(); $(this).find('i').toggleClass('fa-angle-down').toggleClass('fa-angle-up'); return false;"><i class="fa fa-angle-down"></i> <?=t('Advanced settings')?></a>

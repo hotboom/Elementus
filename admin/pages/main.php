@@ -3,6 +3,12 @@
                 <div class="panel-group" id="accordion">
                     <? //E::debug();
                     $groups=E::getTypeGroups();
+                    $groups[]=Array(
+                        'id' => false,
+                        'name' => t('Other'),
+                        'previous' =>false,
+                        'sort' =>false
+                    );
                     foreach($groups as $i=>$group):?>
                     <div class="panel panel-default">
                         <div class="panel-heading">
@@ -32,7 +38,11 @@
                 <?
                 function treeTypes($params=array('parent'=>false,'group'=>false,'class'=>'types')){
                     $filter='';
-                    if(!empty($params['group'])) $filter.="`group`='".$params['group']."' AND ";
+                    if(isset($params['group'])) {
+                        if(!empty($params['group'])) $filter.="`group`='".$params['group']."' AND ";
+                        else $filter.="`group` IS NULL AND ";
+                    }
+
                     if($params['parent']) $filter.="`parent`='".$params['parent']."'";
                     else $filter.="parent is NULL";
                     $types=E::getTypes($filter);

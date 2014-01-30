@@ -106,6 +106,13 @@ CKEDITOR.stylesSet.add( 'default', [
 	},
 
 	{ name: 'Borderless Table',		element: 'table',	styles: { 'border-style': 'hidden', 'background-color': '#E6E6FA' } },
-	{ name: 'Square Bulleted List',	element: 'ul',		styles: { 'list-style-type': 'square' } }
+	{ name: 'Square Bulleted List',	element: 'ul',		styles: { 'list-style-type': 'square' } },
+    { name: 'Стрелки',	element: 'ul', attributes: { 'class': 'arrows' } },
+    { name: 'Стиль таблицы', element: 'table', attributes: {
+        'class': 'compact',
+        cellpadding: '0',
+        cellspacing: '0',
+        border: '0'
+    }}
 ]);
 

@@ -26,4 +26,7 @@ Users::init();
 
 //Helper functions
 require_once($root_path."/core/helper.php");
+
+//Image_functions
+require_once($root_path."/core/image_functions.php");
 ?>

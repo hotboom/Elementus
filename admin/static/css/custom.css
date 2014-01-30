@@ -59,3 +59,6 @@ a.order{white-space: nowrap;}
     margin-bottom: 0px;
     margin-left: 0;
 }
+
+table.selectable #input_id{width:80px;}
+table.selectable #selectAll{margin-right:8px;}
