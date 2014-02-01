@@ -18,6 +18,7 @@ Template::init();
 
 //Sections
 require_once($root_path."/core/types/sections.php");
+S::init();
 
 //Users
 require_once($root_path."/core/types/users.php");
@@ -25,4 +26,10 @@ Users::init();
 
 //Helper functions
 require_once($root_path."/core/helper.php");
+
+//Image functions
+require_once($root_path."/core/image.func.php");
+
+//Mail functions
+require_once($root_path."/core/mail.func.php");
 ?>

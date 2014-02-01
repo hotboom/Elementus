@@ -19,6 +19,9 @@ class xml  {
     var $temp;
     var $depth;
 
+    var $cdata;
+    var $processor=false;
+
     function xml()
     {
         $this->parser = xml_parser_create();
@@ -41,22 +44,20 @@ class xml  {
     {
 
         //if(!in_array($tag,$this->tags)) $this->tags[]=$tag;
-        $this->temp[count($this->temp)]=array('name'=>$tag,'depth'=>$this->depth);
-        if(!empty($attributes)) $this->temp[count($this->temp)-1]['attr']=$attributes;
+        $this->tags[$tag]=array('name'=>$tag,'attr'=>$attributes,'depth'=>$this->depth);
         $this->depth++;
     }
 
     function cdata($parser, $cdata)
     {
-        $cdata=trim($cdata);
-        if(!empty($cdata)) $this->temp[count($this->temp)-1]['value']=$cdata;
+        $this->cdata=trim($cdata);
     }
 
     function tag_close($parser, $tag)
     {
-        $this->tags=array_merge($this->tags,$this->temp);
-        $this->temp=array();
+        $this->tags[$tag]['value']=$this->cdata;
         $this->depth=$this->depth-1;
+        if($this->processor) call_user_func($this->processor, $this->tags[$tag]);
     }
 
 } // окончание определения класса xml

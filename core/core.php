@@ -11,7 +11,7 @@
  * The section after the long description contains the tags; which provide
  * structured meta-data concerning the given element.
  *
- * @author  Mike van Riel <huntedbox@gmail.com>
+ * @author  Andrey Nedorostkov <huntedbox@gmail.com>
  *
  * @since 1.0
  */
@@ -19,7 +19,7 @@ class E{
     /** @type object Database object */
     public static $db;
     /** @type array Current error */
-    public static $error=array();
+    public static $errors=array();
     /** @type bool Debug mode on/off */
     public static $debug;
     /** @type array Current app params array */
@@ -36,6 +36,9 @@ class E{
     /** @type mixed Temp variable for recursion functions results */
     private static $recursion_temp=false;
 
+    private static $buffer=array();
+    private static $buffer_functions=array();
+
     public static function init($db, $root_path, $debug=false){
         self::$db        = $db;
         self::$debug     = $debug;
@@ -50,20 +53,23 @@ class E{
             $templates=self::get(array('type'=>'templates','order'=>'id','limit'=>'1'));
             self::$template=$templates[0];
         }
+
+        //Memoizated functions
+        ob_start(array('E',"end_buffer"));
     }
 
     public static function debug($debug=true){
         self::$debug=$debug;
     }
 
-    private static function error($error){
-        self::$error=$error;
+    private static function error($code,$desr){
+        self::$errors[]=array('code'=>$code,'desc'=>$desr);
         return false;
     }
 
     public static function getApps($params=array()){
         if(empty($params)) return self::$app;
-        $sql="SELECT id,name,domain,template_id FROM apps";
+        $sql="SELECT id,name,domain,alias,template_id FROM apps";
         if(!empty($params['filter'])) $sql.=' WHERE '.$params['filter'];
         if(!empty($params['order']))  $sql.=' ORDER BY '.$params['order'];
         if(empty($params['page'])) $params['page']=0;
@@ -78,6 +84,7 @@ class E{
         $sql=($insert ? 'INSERT '.'INTO' : 'UPDATE')." apps SET
         name='".$params['name']."',
         domain='".$params['domain']."',
+        alias='".$params['alias']."',
         template_id=".(empty($params['template_id']) ? "NULL" : "'".$params['template_id']."'")."
         WHERE id='".$params['id']."'";
 
@@ -85,7 +92,7 @@ class E{
     }
 
     public static function get($params=array()){
-        if(empty($params['limit'])) $params['limit']=30;
+        if(!is_array($params)) $params=array('type'=>$params);
         if(empty($params['page'])) $params['page']=0;
 
         if(!$type=self::getType($params['type'])) return false;
@@ -112,6 +119,16 @@ class E{
         }
         else $sql.="AND e.type_id='".$type['id']."' ";
         if(!empty($params['filter'])){
+            if(is_array($params['filter'])){
+                $filter='';
+                $j=0;
+                foreach($params['filter'] as $i=>$v) {
+                    if($j>0) $filter.=' AND ';
+                    $filter.="`".$i."`='".$v."'";
+                    $j++;
+                }
+                $params['filter']=$filter;
+            }
             $sql.="AND (";
             $sql.=$params['filter'];
             $sql.=") ";
@@ -120,7 +137,10 @@ class E{
             if(is_array($params['order'])) $sql.="ORDER BY `".$params['order'][0]."` ".($params['order'][1] ? 'DESC' : 'ASC')." ";
             else $sql.="ORDER BY `".$params['order']."` ";
         }
-        $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
+        if(isset($params['limit'])){
+            if($params['limit']) $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
+        }
+        else $sql.="LIMIT ".($params['page']*30).",".($params['page']*30+30)." ";
         $elements=self::$db->q($sql,self::$debug,false);
         return $elements;
     }
@@ -147,9 +167,8 @@ class E{
         else{
             $prx="INSERT ";
             if(empty($params['type'])){
-                self::$error['code']=2;
-                self::$error['desc']='Missing element type name or id';
-                if(self::$debug) print_r(self::$error);
+                self::error(2,'Missing element type name or id');
+                if(self::$debug) print_r(self::$errors);
                 return false;
             }
             self::$db->q("INSERT INTO `elements` SET `type_id`='".$type['id']."', `app_id`='".self::$app['id']."'",self::$debug);
@@ -202,9 +221,11 @@ class E{
 
     static function setType($params){
         $type=$params;
-        if(empty($params['name'])) return self::error(array('code'=>6,'Type name is empty'));
-        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Type name may contain only latin letters and _ or - symbols'));
-        if(!empty($params['view'])&&!is_array($params['view'])) return self::error(array('code'=>'8','Incorrect view format'));
+        if(empty($params['name'])) self::error(6,'Type name is empty');
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  self::error(7,'Type name may contain only latin letters and _ or - symbols');
+        if(!empty($params['view'])&&!is_array($params['view'])) self::error(8,'Incorrect view format');
+        if(!empty(self::$errors)) return false;
+        $params['name']=mb_strtolower($params['name']);
 
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
@@ -218,8 +239,21 @@ class E{
         else return true;
     }
 
+    static function deleteType($type_id){
+        //Deleting type elements
+        self::clearType($type_id);
+
+        //Deleting type
+        return self::$db->q("DELETE FROM `types` WHERE `id`='".$type_id."'",self::$debug);
+    }
+
+    static function clearType($type_id){
+        $elements=self::get(array('type'=>$type_id,'limit'=>false));
+        foreach($elements as $element) self::delete($element['id']);
+    }
+
     static function setField($type,$params){
-        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(array('code'=>7,'Field name may contain only latin letters and _ or - symbols'));
+        if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
         $type=self::getType($type);
         $table=self::getTypeTableName($type);
@@ -249,39 +283,52 @@ class E{
             }
         }
 
-        $alter_prx="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
-        if($params['type']=='string'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL',self::$debug)) return false;
-        }
-        elseif($params['type']=='int'){
-            if(!self::$db->q($alter_prx.'INT(11) NOT NULL',self::$debug)) return false;
-        }
-        elseif($params['type']=='text'){
-            if(!self::$db->q($alter_prx."TEXT NOT NULL",self::$debug)) return false;
-        }
+        if(isset($params['hide'])&&$params['hide']!='') $extra['hide']=$params['hide'];
+        if(!empty($params['placeholder'])) $extra['placeholder']=$params['placeholder'];
+
+        $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
+        if($params['type']=='varchar')
+            $sql.='VARCHAR(255) NOT NULL';
+        elseif($params['type']=='int')
+            $sql.='INT(11) NOT NULL';
+        elseif($params['type']=='text')
+            $sql.="TEXT NOT NULL";
         elseif($params['type']=='html'){
-            if(!self::$db->q($alter_prx.'TEXT NOT NULL COMMENT \'{"type":"html"}\'',self::$debug)) return false;
+            $sql.='TEXT NOT NULL';
+            $extra['type']='html';
         }
         elseif($params['type']==='file'|$params['type']=='image'){
-            if(!self::$db->q($alter_prx.'VARCHAR(255) NOT NULL COMMENT \'{"type":"file"}\'',self::$debug)) return false;
+            $sql.='VARCHAR(255) NOT NULL';
+            $extra['type']='file';
         }
         elseif($params['type']=='enum'){
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
-            if(!self::$db->q($alter_prx."ENUM(".implode(',',$params['enum']['list']).") NOT NULL",self::$debug)) return false;
+            $sql.="ENUM(".implode(',',$params['enum']['list']).") NOT NULL";
         }
+        elseif($params['type']=='datetime')
+            $sql.='DATETIME NOT NULL';
         elseif($params['type']=='elements'){
-            if(!self::$db->q($alter_prx.'INT(11) NULL',self::$debug)) return false;
+            $sql.='INT(11) NULL';
+            $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
             $params['elements_type']=self::getTypeTableName($params['elements_type']);
-            echo $params['elements_type'];
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
             //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug)) return false;
+            $sql=false;
         }
         else {
-            self::$error['code']=5;
-            self::$error['desc']='Unknown field type';
+            self::error(5,'Unknown field type');
             return false;
+        }
+
+        if($sql){
+            //print_r($extra);
+            $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
         }
 
         if($params['lang']!=$params['name']&&!empty($params['lang'])){
@@ -293,9 +340,9 @@ class E{
     static function setTypeOpt($name,$value,$type_id){
         $opt=self::getTypeOpt($type_id,$name);
         if(is_array($value)) $value=json_encode($value);
-        $sql=(empty($opt) ? "INSERT " : "UPDATE ")."`types_settings` SET `name`='$name', `value`='".$value."' ";
+        $sql=(empty($opt) ? "INSERT INTO" : "UPDATE")." `types_settings` SET `name`='$name', `value`='".$value."' ";
         if(empty($opt)) $sql.=", `type_id`='$type_id'";
-        else $sql.="WHERE `type_id`='$type_id'";
+        else $sql.="WHERE `name`='$name' AND `type_id`='$type_id'";
         if(!self::$db->q($sql,self::$debug)) return false;
         return true;
     }
@@ -317,9 +364,8 @@ class E{
         $types=self::getTypes("id='".$type_id."'");
         if(!empty($types)) return $types[0];
         else {
-            self::$error['code']=3;
-            self::$error['desc']='Type id:'.$type_id.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(3,'Type id:'.$type_id.' not found');
+            if(self::$debug) print_r(self::$errors);
             return false;
         }
     }
@@ -365,9 +411,7 @@ class E{
     private static function getElementById($element_id){
         if($element=self::$db->q("SELECT * FROM `elements` WHERE `id`='$element_id' AND `app_id`='".self::$app['id']."'",self::$debug)) return $element;
         else{
-            self::$error['code']='1';
-            self::$error['desc']='Element id:'.$element_id.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(1,'Element id:'.$element_id.' not found');
             return false;
         }
     }
@@ -376,17 +420,15 @@ class E{
         $types=self::getTypes("name='".$type_name."'");
         if(!empty($types)) return $types[0];
         else {
-            self::$error['code']=4;
-            self::$error['desc']='Type name:'.$type_name.' not found';
-            if(self::$debug) print_r(self::$error);
+            self::error(4,'Type name:'.$type_name.' not found');
             return false;
         }
     }
 
     public static function getTypeClass($type_name){
         $class['name']='E';
-        $class['path']=self::$root_path.'/core/core.php';
-        $path=self::$root_path."/core/classes/".$type_name.".php";
+        $class['path']=self::$root_path.'core/core.php';
+        $path=self::$root_path."core/types/".$type_name.".php";
         if(file_exists($path)) {
             $class['name']=ucfirst($type_name);
             $class['path']=$path;
@@ -433,7 +475,7 @@ class E{
         $field['key']=$column['COLUMN_KEY'];
         if(!empty($column['COLUMN_COMMENT'])) {
             $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
-            if(!empty($field['comment']['type'])) $field['type']=$field['comment']['type'];
+            $field=array_merge($field, $field['comment']);
         }
         if($field['key']=='MUL') {
             $sql="
@@ -559,6 +601,48 @@ class E{
             else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
         }
         else return false;
+    }
+
+    /**
+     * Memorize callback to buffer
+     *
+     * @param array $callback Callback to memorize
+     *
+     */
+    static function add_to_buffer($callback){
+        $params = func_get_args();
+        unset($params[0]);
+
+        self::$buffer[]=ob_get_contents();
+        ob_clean();
+        self::$buffer_functions[]=array(
+            'function'=>$callback,
+            'params'=>$params
+        );
+    }
+
+    /**
+     * Execute memorizated functions to render final output
+     *
+     * @param string $content Callback to memorize
+     *
+     * @return string
+     */
+    static function end_buffer($content){
+        $return='';
+        foreach(self::$buffer_functions as $i=>$val){
+            $return.=self::$buffer[$i].forward_static_call_array(self::$buffer_functions[$i]['function'],self::$buffer_functions[$i]['params']);
+        }
+        return $return.$content;
+    }
+
+    static function component($component,$template='default',$params=array()){
+        if(file_exists(include(COMPONENTS_DIR.$component."/component.php"))){
+            include(COMPONENTS_DIR.$component."/component.php");
+            return true;
+        }
+        self::$errors[]="Component $component not found";
+        return false;
     }
 }
 ?>

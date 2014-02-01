@@ -11,18 +11,9 @@ class Template extends E{
         self::$path=parent::$template['path'];
     }
 
-    static function header($params){
-       self::render(self::$templates_dir.'/'.self::$path.'/header.php');
-    }
-
     static function page($params){
         $params['type']=1;
         return parent::set($params);
-    }
-
-    static function footer($section_id){
-        $params['filter']="element_id='".$section_id."'";
-        return self::get($params);
     }
 
     static function render($template,$data=array()){

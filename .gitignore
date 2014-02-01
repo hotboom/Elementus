@@ -1,4 +1,6 @@
 # Untracked files:
+.idea/
 upload/
 temp/
 config.php
+templates/psc/

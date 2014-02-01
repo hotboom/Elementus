@@ -9,12 +9,14 @@ $type['class']=E::getTypeClass($type['name']);
 if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes/".$type['name'].".php");
 
 $act=htmlspecialchars($_GET['act']);
-$element=array();
+$elements=array('id'=>false);
 $connects=E::getConnectedTypes($type['id']);
 
-if($act=='edit'|$act=='copy') {
-    $element_id=(int)$_GET['elements'][0];
-    $element=E::getById($element_id);
+if(($act=='edit'|$act=='copy')&&empty($_POST['submit'])) {
+    $elements=$_GET['elements'];
+    foreach($elements as $i=>$element) $elements[$i]=E::getById((int)$element);
+    if(count($elements)==1) $element=$elements[0];
+    else $element=array();
 }
 ?>
 <? if(!empty($_FILES)):
@@ -30,7 +32,20 @@ if($act=='edit'|$act=='copy') {
     //E::debug();
     if($act=='delete') $result=$type['class']['name']::delete($_POST['elements']);
     else {
-        $result=$type['class']['name']::set($_POST['fields']);
+        $fields=$_POST['fields'];
+        if(!empty($_POST['elements'])) $elements=$_POST['elements'];
+        else $elements=array('id'=>false);
+
+        if(count($elements)>1){
+            foreach($fields as $i=>$field) {
+                if(empty($field)) unset($fields[$i]);
+            }
+        }
+        foreach($elements as $element){
+            $fields['id']=$element;
+            $result=$type['class']['name']::set($fields);
+        }
+
         if(!empty($_POST['connected'])) {
             foreach($_POST['connected'] as $connected) {
                 if(!empty($connected['delete'])&&!empty($connected['id'])) $type['class']['name']::delete($connected['id']);
@@ -42,7 +57,9 @@ if($act=='edit'|$act=='copy') {
     <? if($result):?>
         <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
     <? else:?>
+        <? foreach(E::$errors as $error):?>
         <div class="alert alert-warning"><?=t('Error occurred:'.E::$error['desc'])?></div>
+        <? endforeach;?>
     <? endif;?>
     <script>
         $(window).hashchange();
@@ -84,7 +101,12 @@ if($act=='edit'|$act=='copy') {
                     <input type="hidden" name="submit" value="submit">
                 <?else:?>
                     <fieldset>
-                        <input name="fields[id]" type="hidden" value="<?=($act!='copy' ? $element['id']:'')?>">
+                        <? foreach($elements as $e): ?>
+                        <input name="elements[]" type="hidden" value="<?=($act!='copy' ? $e['id']:'')?>">
+                        <? endforeach;?>
+                        <? if(count($elements)>1):?>
+                            <div class="alert alert-info"><strong><?=t('Batch')?></strong>: <?=t('changes will be applied to '.count($elements).'  elements, blank fields has no effect')?></div>
+                        <? endif;?>
                         <? foreach($type['fields'] as $i=>$field):
                             Template::render('pages/field_types/field_group_hor.php',array(
                                 'field'=>$field,
@@ -95,7 +117,7 @@ if($act=='edit'|$act=='copy') {
                         <div class="form-group">
                             <label class="col-lg-2 control-label"></label>
                             <div class="col-lg-10">
-                                <button type="submit" class="btn btn-success"><?=t($act)?></button>
+                                <button type="submit" class="btn btn-success"><?=t($act)?><? if(count($elements)>1) echo ' '.t('all ('.count($elements).')'); ?></button>
                                 <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
                             </div>
                         </div>
@@ -105,98 +127,28 @@ if($act=='edit'|$act=='copy') {
                 <?endif;?>
             </div>
             <? if($act!='delete'):?>
-            <? foreach($connects as $connect):?>
-                <div class="tab-pane fade" id="<?=$connect['type']['name']?>">
-                    <?
-                    //E::debug();
-                    $cType=E::getType($connect['type']);
-                    $cType['fields']=E::getTypeFields($cType);
-                    $cElements=E::get(array('filter'=>"`".$connect['field']."`='".$element['element_id']."'",'type'=>$connect['type']));
-                    if(empty($cElements)) $cElements['example']=array();
-                    ?>
-                    <p class="pull-left">
-                        <a href="#add" class="btn btn-success" tabindex="1"><i class="fa fa-plus"></i> <?=t('Add')?></a>
-                        <a href="#copy" class="btn btn-primary disabled" tabindex="3"><i class="fa fa-copy"></i> <?=t('Copy')?></a>
-                        <a href="#delete" class="btn btn-danger" tabindex="4"><i class="fa fa-times"></i> <?=t('Delete')?></a>
-                    </p>
-                    <table id="connected" class="table table-hover table-condensed selectable">
-                        <thead>
-                        <tr>
-                        <th class="col-lg-1"><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>">#</a></th>
-                        <? foreach($cType['fields'] as $i=>$field):?>
-                            <? if($field['name']==$connect['field']) continue; ?>
-                            <th><a href="#/type/id/id/<?=$type['id']?>/sort/<?=$field['name']?>"><?=t($field['name'])?></a></th>
-                        <? endforeach; ?>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <? foreach($cElements as $i=>$cElement): ?>
-                            <tr<?=($i==='example' ? ' style="display:none;"' : ' data-element="1"')?>>
-                                <td>
-                                    <input type="checkbox" name="connected_elements[]" value="<?=$cElement['id']?>"> <span class="id"><?=$cElement['id']?></span>
-                                    <input name="id" type="hidden" value="<?=$cElement['id']?>" data-field="id">
-                                    <input name="<?=$connect['field']?>" class="common" type="hidden" value="<?=$element['id']?>" data-field="<?=$connect['field']?>">
-                                    <input name="type" class="common" type="hidden" value="<?=$cType['name']?>" data-field="type">
-                                </td>
-                                <? foreach($cType['fields'] as $j=>$field):?>
-                                    <? if($field['name']===$connect['field']) continue; ?>
-                                    <td>
-                                    <? if($field['type']==='elements'):?>
-                                        <? Template::render('pages/field_types/elements.php',array('field'=>$field,'value'=>$cElement[$field['name']], 'name'=>$field['name'])); ?></td>
-                                    <? elseif($field['type']==='varchar'|$field['type']==='int'):?>
-                                        <input name="<?=$field['name']?>" class="form-control" type="text" value="<?=$cElement[$field['name']]?>" data-field="<?=$field['name']?>">
-                                    <? endif; ?>
-                                    </td>
-                                <? endforeach; ?>
-                            </tr>
-                        <? endforeach; ?>
-                        </tbody>
-                    </table>
-                    <script>
-                        $(function(){
-                            function changeConnectedFieldsNames(){
-                                $("#connected tr[data-element='1']").find('input, select, textarea').attr('name',function( i, val ) {
-                                    if(!$(this).attr('data-field')) return val;
-                                    return 'connected['+$(this).parents('tr').index()+']['+$(this).attr('data-field')+']';
-                                });
-                            }
-                            changeConnectedFieldsNames();
-
-                            $("a[href='#add']").click(function(e){
-                                var clone=$('#connected tr:eq(1)').clone();
-                                $('#connected').append(clone);
-                                clone.find("input[class!='common']").val('');
-                                clone.find('.id').remove();
-                                clone.attr('data-element',1);
-                                changeConnectedFieldsNames();
-                                clone.show();
-                                e.preventDefault();
-                            });
-                            $("a[href='#copy']").click(function(e){
-                                var clone=$('#connected tr:eq(1)').clone();
-                                clone.find('.id').remove();
-                                $('#connected').append(clone);
-                                e.preventDefault();
-                            });
-                            $("a[href='#delete']").click(function(e){
-                                $('#connected tr.active td:eq(0)').append('<input type="hidden" value="1" name="delete" data-field="delete">');
-                                changeConnectedFieldsNames();
-                                $('#connected tr.active').hide();
-                                e.preventDefault();
-                            });
-                        });
-                    </script>
-                    <fieldset>
-                    <p>
-                        <button type="submit" class="btn btn-success"><?=t($act)?></button>
-                        <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
-                    </p>
-                    </fieldset>
-                </div>
-            <? endforeach;?>
+                <? foreach($connects as $connect):?>
+                    <div class="tab-pane fade" id="<?=$connect['type']['name']?>" data-ajax="/admin/index.php?page=type&mode=compact&id=<?=$connect['type']['id']?>&filter[<?=$connect['field']?>]=<?=$element['id']?>">
+                        <?=t('Loading').'...'?>
+                    </div>
+                <? endforeach;?>
             <? endif; ?>
-
         </div>
     </form>
     <div class="clearfix"></div>
+    <script>
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            var url=$('.tab-content .tab-pane.active').attr('data-ajax');
+            if(url){
+                $.ajax({
+                    url: url,
+                    cache:false,
+                    success: function(data){
+                        $('.tab-content .tab-pane.active').html(data);
+                    }
+                });
+            }
+
+        });
+    </script>
 <? endif;?>

@@ -8,11 +8,12 @@ if($act=='edit'|$act=='copy') {
     $field=E::getField($type,$_GET['fields'][0]);
 }
 else $field=array();
+//print_r($field);
 ?>
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
-
+    //print_r($_POST);
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
@@ -20,7 +21,9 @@ else $field=array();
     <? if($result):?>
     <i class="fa fa-ok"></i> <?=t('Field succesfuly '.$act)?>
     <? else:?>
+    <? foreach(E::$errors as $error):?>
     <i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?>
+    <? endforeach;?>
     <? endif;?>
     <script>
         $(window).hashchange();
@@ -62,13 +65,14 @@ else $field=array();
                 <?
                 $ftypes=array(
                     'int'=>'Integer',
-                    'string'=>'String',
+                    'varchar'=>'String',
                     'text'=>'Text',
                     'elements'=>'Elements select',
                     'enum'=>'Values select',
                     'html'=>'HTML',
                     'file'=>'File',
-                    'image'=>'Image'
+                    'image'=>'Image',
+                    'datetime'=>'Date and time'
                 );
                 ?>
                 <div class="col-lg-10">
@@ -114,6 +118,21 @@ else $field=array();
                     <label class="col-lg-2 control-label" for="input_default"><?=t('Default')?></label>
                     <div class="col-lg-10">
                         <input name="field[default]" type="text" class="form-control" id="input_default" value="<?=$field['default']?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_hide"><?=t('Hide in list')?></label>
+                    <div class="col-lg-10">
+                        <select name="field[hide]" id="input_hide" class="form-control">
+                            <option value="0"><?=t('no')?></option>
+                            <option value="1"<?=($field['hide'] ? ' selected="selected"' : '')?>><?=t('yes')?></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('Placeholder')?></label>
+                    <div class="col-lg-10">
+                        <input name="field[placeholder]" type="text" class="form-control" id="input_default" value="<?=$field['placeholder']?>">
                     </div>
                 </div>
             </div>

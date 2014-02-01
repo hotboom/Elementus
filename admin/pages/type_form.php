@@ -7,23 +7,37 @@ else $act='add';
 if($act=='edit'|$act=='copy') {
     $type_id=(int)$_GET['type'];
     $type=E::getType($type_id);
-    $type['view']=E::getTypeOpt($type['id'],'view');
     $type['fields']=E::getTypeFields($type);
+    $type['view']=E::getTypeOpt($type['id'],'view');
+    $type['order']=E::getTypeOpt($type['id'],'order');
+
     if(empty($type['view'])) $type['view']=array('view'=>'','fields'=>array());
 }
-else $type=array();
+else {
+    $type=array();
+    if(!empty($_GET['parent'])) $type['parent']=(int)$_GET['parent'];
+}
+
 ?>
 
 <? if(!empty($_POST['submit'])):
     //E::debug();
     //print_r($_POST);
-    if($act=='delete') $result=E::deleteType($_POST['types']);
-    else $result=E::setType($_POST['type']);
+    if($act=='delete') $result=E::deleteType($_POST['types'][0]);
+    else {
+        $result=E::setType($_POST['type']);
+        if(!empty($_POST['type']['order'])){
+            E::debug();
+            E::setTypeOpt('order',$_POST['type']['order'],$type['id']);
+        }
+    }
 
     if($result):?>
         <div class="alert alert-success"><?=t($type['name'].' succesfuly '.$act)?></div>
     <? else:?>
-        <div class="alert alert-warning"><?=t('Error occurred:'.E::$error['desc'])?></div>
+        <? foreach(E::$errors as $error):?>
+        <div class="alert alert-warning"><?=t('Error '.$error['code'].':'.$error['desc'])?></div>
+        <? endforeach;?>
     <? endif;?>
     <script>
         $(window).hashchange();
@@ -42,13 +56,13 @@ else $type=array();
     </script>
     <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=type_form&type=<?=$type['id']?>&act=<?=$act?>">
     <? if($act=='delete'):?>
-        <p><?=t('delete selected elements')?>?</p>
-        <? if(is_array($_GET['elements'])):?>
-            <? foreach($_GET['elements'] as $i=>$val):?>
-                <input type="hidden" name="elements[]" value="<?=$val?>">
+        <p><?=t('delete selected types')?>?</p>
+        <? if(is_array($_GET['types'])):?>
+            <? foreach($_GET['types'] as $i=>$val):?>
+                <input type="hidden" name="types[]" value="<?=$val?>">
             <? endforeach;?>
         <?endif?>
-        <button type="submit" class="btn btn-success"><?=t('Delete')?></button>
+        <button type="submit" class="btn btn-danger"><?=t('Delete')?></button>
         <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
         <input type="hidden" name="submit" value="submit">
     <?else:?>
@@ -79,29 +93,18 @@ else $type=array();
                 <input name="type[name]" type="text" class="form-control" id="input_name" value="<?=$type['name']?>">
             </div>
             <div id="advanced" style="display:none;">
-                <div class="form-group">
-                    <label for="input_view"><?=t('Show fields in list')?></label>
-                    <select name="type[view][type]" id="input_view" class="form-control selectpicker">
-                        <option value=""><?=t('All')?></option>
-                        <option value="except" <?=($type['view']['type']=='except' ? 'selected' : '')?>><?=t('Except defined')?></option>
-                        <option value="only" <?=($type['view']['type']=='only' ? 'selected' : '')?>><?=t('Only defined')?></option>
+                <div class="form-group" id="group_view_fields">
+                    <label for="input_view_fields"><?=t('Sort by')?></label>
+                    <select name="type[order]" class="form-control" title="<?=t('Choose fields...')?>">
+                        <option value=""><?=t('not set')?></option>
+                        <? foreach($type['fields'] as $field):?><option value="<?=$field['name']?>"<?=($field['name']==$type['order'] ? ' selected' : '')?>><?=$field['name']?></option><?endforeach;?>
                     </select>
                 </div>
-                <div class="form-group" id="group_view_fields" <?=(empty($type['view']['type']) ? 'style="display:none;"' : '')?>>
-                    <label for="input_view_fields"><?=t('Fields')?></label>
-                    <select name="type[view][fields][]" class="selectpicker form-control" multiple title="<?=t('Choose fields...')?>">
-                        <? foreach($type['fields'] as $field):?><option value="<?=$field['name']?>"<?=(in_array($field['name'],$type['view']['fields']) ? ' selected' : '')?>><?=$field['name']?></option><?endforeach;?>
-                    </select>
+                <div class="form-group" id="group_view_fields">
+                    <label for="input_view_fields"><?=t('Delete type')?></label>
+                    <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target="#window" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
                 </div>
             </div>
-            <script>
-                $('#input_view').change(function(){
-                    var group_view_fields=$('#group_view_fields');
-                    if($(this).val()) group_view_fields.show();
-                    else group_view_fields.hide();
-
-                });
-            </script>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>
             <a href="#" class="btn btn-default" data-dismiss="modal"><?=t('Cancel')?></a>
             <a href="#" class="btn btn-default pull-right" onClick="$('#advanced').toggle(); $(this).find('i').toggleClass('fa-angle-down').toggleClass('fa-angle-up'); return false;"><i class="fa fa-angle-down"></i> <?=t('Advanced settings')?></a>
