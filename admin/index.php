@@ -23,7 +23,7 @@ if(!empty($_GET['exit'])) {
 if(empty($_GET['page'])) $_GET['page']='main';
 if(!in_array($_GET['page'],$pages)) $_GET['page']='404';
 else {
-    if(Users::$user['group_id']!='19'&&$_GET['page']!='login') {
+    if(Users::$user['group']['name']!='admin'&&$_GET['page']!='login') {
         header("HTTP/1.1 301 Moved Permanently");
         header("Location: login");
         exit();
