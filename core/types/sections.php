@@ -18,6 +18,9 @@ class S extends E{
             else header('HTTP/1.0 404 Not Found');
         }
         else self::$section=self::getByPath('main');
+        self::$section['parents']=self::getParents(S::$section['id']);
+        foreach(self::$section['parents'] as $i=>$parent) self::$section['parents'][$i]=S::getById($parent);
+        self::$section['parents']=array_reverse(self::$section['parents']);
     }
 
     static function get($params=array()){
