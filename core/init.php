@@ -22,7 +22,7 @@ S::init();
 
 //Users
 require_once($root_path."/core/types/users.php");
-Users::init();
+U::init();
 
 //Helper functions
 require_once($root_path."/core/helper.php");
