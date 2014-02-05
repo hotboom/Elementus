@@ -107,25 +107,35 @@ $elements=$type['class']['name']::get($params);
     <li><a href="#">&raquo;</a></li>
 </ul>
 <script>
-    //Filter
-    $('table tr.filter').keypress(function(e){
-        if(e.which==13) {
+    filter = {
+        submit: function() {
             var q='';
-            $(this).find('input, select').each(function(i){
+            $('table tr.filter').find('input, select').each(function(i){
                 //console.log($(this));
                 if($(this).val()) q+='/'+$(this).attr('name')+'/'+$(this).val();
             });
-            //console.log('/type/id/<?=(int)$_GET['id']?>'+q);
             location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
         }
+    };
+
+    if(window.f) {
+        var input=$('#'+window.f);
+        input[0].selectionStart = input[0].selectionEnd = input.val().length;
+    }
+
+    $('table tr.filter').find('input, select').keyup(function(e){
+        window.f=$(this).attr('id');
     });
+
+    $('table tr.filter').keyup(function(e){
+        clearTimeout(window.timer);
+        window.timer = setTimeout(function() { filter.submit() },1000);
+        if(e.which==13) {
+            filter.submit();
+        }
+    });
+
     $('.selectpicker').change(function(){
-        var q='';
-        console.log($(this).parents('tr.filter'));
-        $(this).parents('tr.filter').find('input, select').each(function(i){
-          //console.log($(this));
-          if($(this).val()) q+='/'+$(this).attr('name')+'/'+$(this).val();
-        });
-        location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
+        filter.submit();
     });
 </script>
