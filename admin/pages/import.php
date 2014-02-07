@@ -16,67 +16,77 @@ $import=E::getTypeOpt($type['id'],'import');
     $result=E::setTypeOpt('import',$_POST['import'],$type['id']);
     //else $result=E::setApp($_POST['app']);
     if($result):
-    $file=array('name'=>$_POST['import']['file']);
+        $file=array('name'=>$_POST['import']['file']);
+        $file['path']=$root_path.'upload/'.$file['name'];
 
-    if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'|substr($file['name'], strrpos($file['name'], '.') + 1)==='yml'){
-        require($root_path.'/modules/import/xmlparser.php');
-        set_time_limit(360);
-        $xml_parser = new xml();
-        $xml_parser->processor='process';
-        //E::debug();
-        E::clearType(20);
-        E::clearType(21);
-        $offer=array();
-        function process($tag){
-            global $offer;
-            if($tag['name']=='CATEGORY'){
-                E::set(array(
-                    'type'=>21,
-                    'id1c'=>(int)$tag['attr']['ID'],
-                    'parentId'=>(int)$tag['attr']['PARENTID'],
-                    'name'=>$tag['value']
-                ));
-            }
-            if($tag['name']=='OFFER')  {
-                if(!empty($offer)){
-                    E::set(array(
-                        'type'=>20,
-                        'id1c'=>$offer['id'],
-                        'categoryId'=>$offer['category'],
-                        'model'=>$offer['model'],
-                        'price'=>$offer['price'],
-                        'store'=>$offer['store']
-                    ));
-                    $offer=array();
+        if($_POST['import']['format']=='yml'){
+            if(substr($file['name'], strrpos($file['name'], '.') + 1)==='xml'|substr($file['name'], strrpos($file['name'], '.') + 1)==='yml'){
+                require($root_path.'/modules/import/xmlparser.php');
+                set_time_limit(360);
+                $xml_parser = new xml();
+                $xml_parser->processor='process';
+                //E::debug();
+                E::clearType(20);
+                E::clearType(21);
+                $offer=array();
+                function process($tag){
+                    global $offer;
+                    if($tag['name']=='CATEGORY'){
+                        E::set(array(
+                            'type'=>21,
+                            'id1c'=>(int)$tag['attr']['ID'],
+                            'parentId'=>(int)$tag['attr']['PARENTID'],
+                            'name'=>$tag['value']
+                        ));
+                    }
+                    if($tag['name']=='OFFER')  {
+                        if(!empty($offer)){
+                            E::set(array(
+                                'type'=>20,
+                                'id1c'=>$offer['id'],
+                                'categoryId'=>$offer['category'],
+                                'model'=>$offer['model'],
+                                'price'=>$offer['price'],
+                                'store'=>$offer['store']
+                            ));
+                            $offer=array();
+                        }
+                        $offer['id']=(int)$tag['attr']['ID'];
+                    }
+                    if($tag['name']=='CATEGORYID') $offer['category']=$tag['value'];
+                    if($tag['name']=='MODEL') $offer['model']=$tag['value'];
+                    if($tag['name']=='PRICE') $offer['price']=$tag['value'];
+                    if($tag['name']=='STORE') $offer['store']=$tag['value'];
                 }
-                $offer['id']=(int)$tag['attr']['ID'];
+
+
+                $xmlfile=$file['path'];
+
+                if (!($fp = fopen($xmlfile, "r"))) die("could not open XML input");
+
+                while ($data = fgets($fp))
+                {
+                    if (!$xml_parser->parse($data,feof($fp))) break;
+                }
+
+                $depth=0;
+                /*foreach($xml_parser->tags as $tag){
+                    if($tag['depth']>$depth) echo '<ul>';
+                    if($tag['depth']<$depth) echo '</ul>';
+                    $depth=$tag['depth'];
+
+                    echo '<li>'.$tag['name'].'</li>';
+                }*/
             }
-            if($tag['name']=='CATEGORYID') $offer['category']=$tag['value'];
-            if($tag['name']=='MODEL') $offer['model']=$tag['value'];
-            if($tag['name']=='PRICE') $offer['price']=$tag['value'];
-            if($tag['name']=='STORE') $offer['store']=$tag['value'];
         }
-
-
-        $xmlfile=$root_path.'upload/'.$file['name'];
-
-        if (!($fp = fopen($xmlfile, "r"))) die("could not open XML input");
-
-        while ($data = fgets($fp))
-        {
-            if (!$xml_parser->parse($data,feof($fp))) break;
+        elseif($_POST['import']['format']=='excelxml'){
+            require($root_path.'/modules/import/excel_xml_parser.php');
+            E::clearType($type_id);
+            $xml_parser = new xml();
+            if (!($fp = fopen($file['path'], "r"))) die("could not open XML input");
+            while ($data = fgets($fp)) if (!$xml_parser->parse($data,feof($fp))) break;
         }
-
-        $depth=0;
-        /*foreach($xml_parser->tags as $tag){
-            if($tag['depth']>$depth) echo '<ul>';
-            if($tag['depth']<$depth) echo '</ul>';
-            $depth=$tag['depth'];
-
-            echo '<li>'.$tag['name'].'</li>';
-        }*/
-    }
-    ?>
+        ?>
     <? else:?>
     <div class="alert alert-warning"><i class="fa fa-warning-sign"></i> <?=t('Error occurred:'.E::$error['desc'])?></div>
     <? endif;?>
@@ -111,46 +121,6 @@ $import=E::getTypeOpt($type['id'],'import');
                             <i class="fa fa-plus"></i>
                             <span><?=t('Select from server...')?></span>
                         </a>
-                        <script language="Javascript">
-                            $(function(){
-                                //Form
-                                var form=$('#fileupload-form');
-                                if(!form.size()){
-                                    form=$('<form id="fileupload-form" target="fileupload-iframe" method="post" enctype="multipart/form-data" encoding="multipart/form-data" style="display:none;"><input type="file" name="file"></form>');
-                                    $('body').append(form);
-                                }
-
-                                //Fileinput
-                                var fileinput=form.find('input[name="file"]');
-                                fileinput.change(function(event){
-                                    form.submit();
-                                });
-
-                                //Iframe
-                                var iframe=$('#fileupload-iframe');
-                                if(!iframe.size()){
-                                    iframe=$('<iframe id="fileupload-iframe" name="fileupload-iframe" style="display:none;" />');
-                                    $('body').append(iframe);
-                                }
-                                iframe.off('load');
-                                iframe.off('onload');
-
-
-                                $('.fileupload-button').click(function(event){
-                                    var button=$(this);
-                                    form.attr('action',$(this).attr('data-fileupload-action'));
-                                    var target=$($(this).attr('data-fileupload-target'));
-                                    var file_name='';
-                                    iframe.unbind('load');
-                                    iframe.bind('load',function(event){
-                                        file_name=$(this).contents().find("body").html();
-                                        target.val(file_name);
-                                    });
-                                    fileinput.click();
-                                    event.preventDefault();
-                                });
-                            });
-                        </script>
                     </div>
                 </div>
                 <div class="form-group">
@@ -160,6 +130,15 @@ $import=E::getTypeOpt($type['id'],'import');
                             <option value="utf-8">UTF-8</option>
                             <option value="ansi">ANSI</option>
                             <option value="cp1251">WINDOWS-1251</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_format"><?=t('Encoding')?></label>
+                    <div class="col-lg-10">
+                        <select name="import[format]" id="input_format" class="form-control selectpicker">
+                            <option value="yml">YML</option>
+                            <option value="excelxml">Excel 2003 XML</option>
                         </select>
                     </div>
                 </div>
@@ -174,4 +153,44 @@ $import=E::getTypeOpt($type['id'],'import');
             <input type="hidden" name="step1" value="submit">
         </fieldset>
     </form>
+    <script language="Javascript">
+        $(function(){
+            //Form
+            var form=$('#fileupload-form');
+            if(!form.size()){
+                form=$('<form id="fileupload-form" target="fileupload-iframe" method="post" enctype="multipart/form-data" encoding="multipart/form-data" style="display:none;"><input type="file" name="file"></form>');
+                $('body').append(form);
+            }
+
+            //Fileinput
+            var fileinput=form.find('input[name="file"]');
+            fileinput.change(function(event){
+                form.submit();
+            });
+
+            //Iframe
+            var iframe=$('#fileupload-iframe');
+            if(!iframe.size()){
+                iframe=$('<iframe id="fileupload-iframe" name="fileupload-iframe" style="display:none;" />');
+                $('body').append(iframe);
+            }
+            iframe.off('load');
+            iframe.off('onload');
+
+
+            $('.fileupload-button').click(function(event){
+                var button=$(this);
+                form.attr('action',$(this).attr('data-fileupload-action'));
+                var target=$($(this).attr('data-fileupload-target'));
+                var file_name='';
+                iframe.unbind('load');
+                iframe.bind('load',function(event){
+                    file_name=$(this).contents().find("body").html();
+                    target.val(file_name);
+                });
+                fileinput.click();
+                event.preventDefault();
+            });
+        });
+    </script>
 <? endif;?>
