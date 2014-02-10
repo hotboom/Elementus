@@ -81,7 +81,7 @@ $import=E::getTypeOpt($type['id'],'import');
         }
         elseif($_POST['import']['format']=='excelxml'){
             require($root_path.'/modules/import/excel_xml_parser.php');
-            E::clearType($type_id);
+            //E::clearType($type_id);
             $xml_parser = new xml();
             if (!($fp = fopen($file['path'], "r"))) die("could not open XML input");
             while ($data = fgets($fp)) if (!$xml_parser->parse($data,feof($fp))) break;

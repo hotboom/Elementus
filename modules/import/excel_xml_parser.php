@@ -90,6 +90,13 @@ class xml  {
                             $element[$col]=$this->cells[$i];
                         }
                     }
+
+                    $offers=E::get(array(
+                        'type'=>$element['type'],
+                        'filter'=>array('articul'=>$element['articul'])
+                    ));
+                    if(!empty($offers)) $element['id']=$offers[0]['id'];
+                    $element['price']=round($element['price'],2);
                     E::set($element);
                 }
             }

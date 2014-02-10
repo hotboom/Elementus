@@ -23,7 +23,7 @@ function img($source, $target, $folder, $newsize){
 //$sourcefile - исходная картинка
 //$namefile - измененная картинка
 //$blank - шаблон
-function imageResizeToRect ($sourcefile, $namefile, $blank)
+function imageResizeToRect ($sourcefile, $namefile, $newsize)
 {
 	$picsize=getimagesize($sourcefile);
     $source_x  = $picsize[0];
@@ -37,28 +37,27 @@ function imageResizeToRect ($sourcefile, $namefile, $blank)
 	else if($picsize[2]==3){
 		$source_id = imagecreatefrompng($sourcefile);
 	}
-	
-	$picsize_blank=getimagesize("$blank");
-    $x_blank  = $picsize_blank[0];
-    $y_blank  = $picsize_blank[1];
-	if(($source_x/$source_y)>($x_blank/$y_blank)){
-		$prop=$source_x/$x_blank;
+
+	if(($source_x/$source_y)>($newsize[0]/$newsize[1])){
+		$prop=$source_x/$newsize[0];
 	}
 	else{
-		$prop=$source_y/$y_blank;
+		$prop=$source_y/$newsize[1];
 	}
-	$dest_x=$source_x/$prop;
-	$dest_y=$source_y/$prop;
-	if(($x_blank-$dest_x)<=2) $dest_x=$x_blank;
-	if(($y_blank-$dest_y)<=2) $dest_y=$y_blank;
+    $dest_x=round($source_x/$prop);
+    $dest_y=round($source_y/$prop);
+
+	if(($newsize[0]-$dest_x)<=2) $dest_x=$newsize[0];
+	if(($newsize[1]-$dest_y)<=2) $dest_y=$newsize[1];
+
+    $target_id=imagecreatetruecolor($newsize[0],$newsize[1]);
+    $white = imagecolorallocate($target_id, 255, 255, 255);
+    imagefill($target_id, 0, 0, $white);
+
+	//if($picsize[2]==3) setTransparency($target_id, $source_id);
 	
-	$target_id=ImageCreateFromPNG("$blank");
-	if($picsize[2]==3) setTransparency($target_id, $source_id);	
-	
-	$poz_x=($x_blank-$dest_x)/2;
-	$poz_y=($y_blank-$dest_y)/2;
-	$poz_x=$poz_x;
-	$poz_y=$poz_y;
+	$poz_x=round(($newsize[0]-$dest_x)/2);
+	$poz_y=round(($newsize[1]-$dest_y)/2);
 	
     $target_pic=imagecopyresampled($target_id,$source_id, $poz_x,$poz_y, 0,0, $dest_x,$dest_y,$source_x,$source_y);
 	if($picsize[2]==1){
@@ -70,6 +69,8 @@ function imageResizeToRect ($sourcefile, $namefile, $blank)
 	elseif($picsize[2]==3) {
 		imagepng($target_id,$namefile);
 	}
+    imagedestroy($target_id);
+    imagedestroy($source_id);
 	return true;
 }
 
@@ -92,10 +93,7 @@ function imageCropToRect ($sourcefile, $namefile, $newsize)
 	else if($picsize[2]==3){
 		$source_id = imagecreatefrompng($sourcefile);
 	}
-	
-    $x_blank  = $newsize[0];
-    $y_blank  = $newsize[1];
-	//echo "$x_blank $y_blank<br>";
+
 	if(($source_x/$source_y)>($newsize[0]/$newsize[1])){
 		$prop=$source_y/$newsize[1];
 	}
@@ -242,27 +240,27 @@ function setTransparency($new_image, $image_source)
 * @param int $lifeTime время жизни превьюшки в секундах (по дефолту месяц)
 * @return string
 */
-function MakeImage ($src, $size=array(100,100), $lifeTime = 2592000, $params = "") {
-   $sourcefile=$_SERVER['DOCUMENT_ROOT'].$src;
-   $sourcefile=str_replace('//','/',$sourcefile);
-   if (file_exists($sourcefile)) {
-   		$ext = end(explode(".", $src)); // Расширение файла картинки 
-        $base_name = basename($src, ".".$ext); // Основное имя файла
-        $target_file = $_SERVER['DOCUMENT_ROOT'].dirname($src)."/".$base_name."_thumb_".$size[0].".".$ext;
-        if (file_exists($target_file) AND filesize($target_file)>0){
-            if (filemtime($target_file)+$lifeTime < time()) { // Файл есть, но старый
-                $success=imageCropToRect ($sourcefile, $target_file, $size);
-            } else { // Файл есть, новый, не генерируем
-                $success = true;
-            }
-        } else { // Файла нет, генерируем
-           if (file_exists($target_file) AND filesize($target_file)==0) @unlink($target_file); // удаление файла нулевой длины
-           $success=imageCropToRect ($sourcefile, $target_file, $size);
+function MakeImage($src, $size = array(100, 100), $method = 'crop', $lifeTime = 2592000)
+{
+    $sourcefile = $_SERVER['DOCUMENT_ROOT'] . $src;
+    $sourcefile = str_replace('//', '/', $sourcefile);
+    if (file_exists($sourcefile)) {
+        $ext = end(explode(".", $src)); // Расширение файла картинки
+        $base_name = basename($src, "." . $ext); // Основное имя файла
+        $target_file['name'] = dirname($src)."/".$base_name."_thumb_". $size[0].".".$ext;
+        $target_file['path'] = $_SERVER['DOCUMENT_ROOT'].$target_file['name'];
+        if (file_exists($target_file['path']) AND filesize($target_file['path']) > 0) {
+            if (filemtime($target_file['path']) + $lifeTime > time()) return $target_file['name']; // Файл есть, новый
         }
-        if ($success) return substr($target_file, strlen($_SERVER['DOCUMENT_ROOT'])); 
-		else return false;
-    } else {
-        return false;
+        // Файла нет или старый - генерируем
+        if (file_exists($target_file['path']) AND filesize($target_file['path']) == 0) @unlink($target_file['path']); // удаление файла нулевой длины
+        if($method=='crop'){
+            if (imageCropToRect($sourcefile, $target_file['path'], $size)) return $target_file['name'];
+        }
+        elseif($method='scale'){
+            if (imageResizeToRect($sourcefile, $target_file['path'], $size)) return $target_file['name'];
+        }
     }
+    return false;
 }
 ?>

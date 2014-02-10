@@ -68,6 +68,8 @@ if(!empty(U::$user['id'])) {
     ));
 }
 
+$result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['order']['id'])));
+
 //Обновление заказа
 if($_REQUEST['step']==2){
     //Сохранение заказа
@@ -83,9 +85,9 @@ if($_REQUEST['step']==2){
     else $password=false;
     U::set(array(
         'id'=>U::$user['id'],
-        'name'=>$_POST['user']['name'],
+        'name'=>htmlspecialchars($_POST['user']['name']),
         'email'=>$_POST['user']['email'],
-        'phone'=>$_POST['user']['phone'],
+        'phone'=>htmlspecialchars($_POST['user']['phone']),
         'new_password'=>$password
     ));
     if(empty(U::$user['id'])){
@@ -109,7 +111,6 @@ if($_REQUEST['step']==2){
     ));
 
     //Уведомление покупателю
-    $body='Ваш заказ принят в обработку. Наш менеджер свяжется с вами в ближайшее время';
     send_mime_mail(
         $_SERVER['HTTP_HOST'], // имя отправителя
         'no-reply@'.$_SERVER['HTTP_HOST'], // email отправителя
@@ -121,10 +122,43 @@ if($_REQUEST['step']==2){
         $body // текст письма
     );
 
+    //Уведомление админам
+    $users=E::get(array(
+        'type'=>'users',
+        'filter'=>array('group_id'=>19)
+    ));
+    foreach($result['offers'] as $i=>$offer) {
+        $product=E::getById($offer['offer']);
+        if(is_array($product)) $result['offers'][$i]=array_merge($product,$offer);
+    }
+
+    $body='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/4/filter[id]/'.U::$user['id'].'">Заказчик</a></h2>';
+    $body.='имя: '.htmlspecialchars($_POST['user']['name']).'<br>';
+    $body.='e-mail: '.htmlspecialchars($_POST['user']['email']).'<br>';
+    $body.='телефон: '.htmlspecialchars($_POST['user']['phone']).'<br>';
+    $body.='доставка: '.htmlspecialchars($_POST['delivery']).'<br>';
+    $body.='оплата: '.htmlspecialchars($_POST['paymethod']).'<br>';
+    $body.='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/22/filter[id]/'.$result['order']['id'].'">Заказ</a></h2>';
+    $body.='<table><tr><th>Наименование</th><th>Кол-во</th><th>Цена</th></tr>';
+    foreach($result['offers'] as $offer) $body.='<tr><td>'.$offer['name'].'</td><td>'.$offer['num'].'</td><td>'.$offer['price'].'</td></tr>';
+    $body.='</table>';
+
+    foreach($users as $user){
+        send_mime_mail(
+            $_SERVER['HTTP_HOST'], // имя отправителя
+            'no-reply@'.$_SERVER['HTTP_HOST'], // email отправителя
+            $user['name'], // имя получателя
+            $user['email'], // email получателя
+            'utf-8', // кодировка переданных данных
+            'utf-8', // кодировка письма
+            'Заказ на '.$_SERVER['HTTP_HOST'], // тема письма
+            $body, // текст письма
+            'text/html'
+        );
+    }
+
     $result['step']=2;
 };
-
-$result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['order']['id'])));
 
 if($_REQUEST['step']>0){
     $result['step']=$result['step']+1;
