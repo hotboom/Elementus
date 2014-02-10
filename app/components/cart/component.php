@@ -72,14 +72,6 @@ $result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['orde
 
 //Обновление заказа
 if($_REQUEST['step']==2){
-    //Сохранение заказа
-    E::set(array(
-        'id'=>$result['order']['id'],
-        'paymethod'=>$_POST['paymethod'],
-        'delivery'=>$_POST['delivery'],
-        'status'=>'sended'
-    ));
-
     //Сохранение пользователя
     if(empty(U::$user['id'])) $password=substr(md5(mktime()),0,8);
     else $password=false;
@@ -93,6 +85,15 @@ if($_REQUEST['step']==2){
     if(empty(U::$user['id'])){
         U::login($_POST['user']['email'],$password,true);
     }
+
+    //Сохранение заказа
+    E::set(array(
+        'id'=>$result['order']['id'],
+        'user_id'=>U::$user['id'],
+        'paymethod'=>$_POST['paymethod'],
+        'delivery'=>$_POST['delivery'],
+        'status'=>'sended'
+    ));
 
     //Сохранение адреса
     $addresses=E::get(array(

@@ -60,5 +60,5 @@ a.order{white-space: nowrap;}
     margin-left: 0;
 }
 
-table.selectable #input_id{width:80px;}
+table.selectable #filter_id{width:80px;}
 table.selectable #selectAll{margin-right:8px;}

@@ -65,8 +65,10 @@ $elements=$type['class']['name']::get($params);
         <th>
             <? Template::render('pages/field_types/field_filter.php',array(
                 'field'=>array('name'=>'id'),
+                'value'=>htmlspecialchars($_GET['filter']['id']),
                 'element'=>false,
-                'name'=>'id'
+                'name'=>'filter[id]',
+                'id'=>'filter_id'
             )); ?>
         </th>
         <? foreach($type['fields'] as $i=>$field):?>
@@ -111,8 +113,8 @@ $elements=$type['class']['name']::get($params);
         submit: function() {
             var q='';
             $('table tr.filter').find('input, select').each(function(i){
-                //console.log($(this));
-                if($(this).val()) q+='/'+$(this).attr('name')+'/'+$(this).val();
+                console.log($(this));
+                if($(this).val()&&$(this).attr('name')) q+='/'+$(this).attr('name')+'/'+$(this).val();
             });
             location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
         }
