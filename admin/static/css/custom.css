@@ -62,3 +62,7 @@ a.order{white-space: nowrap;}
 
 table.selectable #filter_id{width:80px;}
 table.selectable #selectAll{margin-right:8px;}
+
+.loading{background: url(../images/ajax-loader.gif) no-repeat center center;}
+
+.modal-body.loading, #page.loading{min-height: 150px;}

@@ -48,11 +48,12 @@
                 var url = hash.replace( /^#\//, '' );
                 $("a.selected").removeClass('selected');
                 $("a[href~='"+hash+"']").addClass('selected');
-
+                $("#page").addClass('loading');
                 $.ajax({
                     url: url,
                     success:function(html){
                         $("#page > *").remove();
+                        $("#page").removeClass('loading');
                         $("#page").html(html);
                     }
                 });

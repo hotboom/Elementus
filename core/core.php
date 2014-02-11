@@ -58,11 +58,11 @@ class E{
         ob_start(array('E',"end_buffer"));
     }
 
-    public static function debug($debug=true){
+    static function debug($debug=true){
         self::$debug=$debug;
     }
 
-    private static function error($code,$desr){
+    static function error($code,$desr){
         self::$errors[]=array('code'=>$code,'desc'=>$desr);
         return false;
     }
@@ -97,13 +97,22 @@ class E{
 
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
+
         foreach($types as $i=>$t){
             $types[$i]['table']=self::getTypeTableName($t);
             if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) unset($types[$i]);
         }
-        $sql="SELECT e.*";
-        foreach($types as $i=>$t) {
-            $sql.=", t$i.* ";
+
+        if(!empty($params['count']))
+        {
+            $params['limit']=false;
+            $sql="SELECT count(*)";
+        }
+        else{
+            $sql="SELECT e.*";
+            foreach($types as $i=>$t) {
+                $sql.=", t$i.* ";
+            }
         }
         $sql.="FROM `elements` AS e ";
         foreach($types as $i=>$t) {

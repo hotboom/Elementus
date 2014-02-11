@@ -30,14 +30,26 @@ if(!empty($_GET['filter'])) {
 //E::debug();
 $elements=$type['class']['name']::get($params);
 
+foreach($elements as $i=>$element){
+    foreach($type['fields'] as $field){
+        if($field['type']=='elements') {
+            $el=E::getById($elements[$i][$field['name']]);
+            if(!empty($el['name'])) $elements[$i][$field['name']]=$el['name'];
+            if(!empty($el['header'])) $elements[$i][$field['name']]=$el['header'];
+        }
+    }
+}
+
 ?>
 <div class="row">
-<p class="pull-left">
-    <a href="element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window" tabindex="1"><i class="fa fa-plus"></i> <?=t('Add')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit" tabindex="2"><i class="fa fa-edit"></i> <?=t('Edit')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=copy" class="btn btn-primary disabled" data-target="#window" id="btn-copy" tabindex="3"><i class="fa fa-copy"></i> <?=t('Copy')?></a>
-    <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete" tabindex="4"><i class="fa fa-times"></i> <?=t('Delete')?></a>
-</p>
+<? if($_GET['mode']!='compact'): ?>
+    <p class="pull-left">
+        <a href="element/act/add/type/<?=$type['id']?>" class="btn btn-success" data-target="#window" tabindex="1"><i class="fa fa-plus"></i> <?=t('Add')?></a>
+        <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" class="btn btn-primary disabled" data-target="#window" id="btn-edit" tabindex="2"><i class="fa fa-edit"></i> <?=t('Edit')?></a>
+        <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=copy" class="btn btn-primary disabled" data-target="#window" id="btn-copy" tabindex="3"><i class="fa fa-copy"></i> <?=t('Copy')?></a>
+        <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=delete" class="btn btn-danger disabled" data-target="#window" id="btn-delete" tabindex="4"><i class="fa fa-times"></i> <?=t('Delete')?></a>
+    </p>
+<? endif;?>
 <? if($_GET['mode']=='normal'): ?>
 <p class="pull-right">
     <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-cog"></i> <?=t('Settings')?></a>

@@ -50,13 +50,15 @@
             $('table.selectable input:checked').each(function(){
                 url=url+'&'+$(this).attr('name')+'='+$(this).val();
             });
+            $(target+' .modal-body > *').remove();
+            $(target+' .modal-body').addClass('loading');
+            $(target).modal('show');
             $.ajax({
                 url: url,
                 cache:false,
                 success: function(data){
-                    $(target+' .modal-body > *').remove();
+                    $(target+' .modal-body').removeClass('loading');
                     $(target+' .modal-body').html(data);
-                    $(target).modal('show');
                 }
             });
             event.preventDefault();
@@ -112,6 +114,13 @@
         $('.selectpicker').selectpicker({
             'selectedText': 'cat'
         });
+
+        $.fn.preload = function() {
+            this.each(function(){
+                $('<img/>')[0].src = this;
+            });
+        }
+        $(['/admin/static/images/ajax-loader.gif','/admin/static/images/ajax-loader_small.gif']).preload();
     });
 </script>
 </body>
