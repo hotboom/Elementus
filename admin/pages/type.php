@@ -113,12 +113,17 @@ foreach($elements as $i=>$element){
     </tbody>
     </tr>
 </table>
+<?
+$link="#/type/id/".$type['id'];
+foreach($_GET['filter'] as $i=>$val) $link.="/filter[".htmlspecialchars($i)."]/".htmlspecialchars($val);
+
+?>
 <ul class="pagination">
-    <li><a href="#">&laquo;</a></li>
+    <li><a href="<?=(int)$_GET['p']-1?>">&laquo;</a></li>
     <? for($i=0; $i<10; $i++):?>
-    <li<?=($i==$_GET['p'] ? ' class="active"' : '')?>><a href="#/type/id/<?=$type['id']?>/p/<?=$i?>"><?=($i+1)?></a></li>
+    <li<?=($i==$_GET['p'] ? ' class="active"' : '')?>><a href="<?=$link?>/p/<?=$i?>"><?=($i+1)?></a></li>
     <? endfor;?>
-    <li><a href="#">&raquo;</a></li>
+    <li><a href="<?=(int)$_GET['p']+1?>">&raquo;</a></li>
 </ul>
 <script>
     filter = {
