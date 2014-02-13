@@ -36,6 +36,7 @@ class U extends E{
             $params=array('type'=>'users','filter'=>"password='".$_COOKIE['key']."'");
             if($users=parent::get($params)) {
                 $users[0]['hash']=$users[0]['password'];
+                $users[0]['group']=parent::getById($users[0]['group_id']);
                 return $users[0];
             }
             return false;
