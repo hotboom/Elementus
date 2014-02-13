@@ -115,8 +115,9 @@ foreach($elements as $i=>$element){
 </table>
 <?
 $link="#/type/id/".$type['id'];
-foreach($_GET['filter'] as $i=>$val) $link.="/filter[".htmlspecialchars($i)."]/".htmlspecialchars($val);
-
+if(is_array($_GET['filter'])){
+    foreach($_GET['filter'] as $i=>$val) $link.="/filter[".htmlspecialchars($i)."]/".htmlspecialchars($val);
+}
 ?>
 <ul class="pagination">
     <li><a href="<?=(int)$_GET['p']-1?>">&laquo;</a></li>
