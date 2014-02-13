@@ -118,6 +118,7 @@ $link="#/type/id/".$type['id'];
 if(is_array($_GET['filter'])){
     foreach($_GET['filter'] as $i=>$val) $link.="/filter[".htmlspecialchars($i)."]/".htmlspecialchars($val);
 }
+if(!empty($_GET['order'])) $link.="/order/".htmlspecialchars($_GET['order']);
 ?>
 <ul class="pagination">
     <li><a href="<?=(int)$_GET['p']-1?>">&laquo;</a></li>
@@ -131,7 +132,6 @@ if(is_array($_GET['filter'])){
         submit: function() {
             var q='';
             $('table tr.filter').find('input, select').each(function(i){
-                console.log($(this));
                 if($(this).val()&&$(this).attr('name')) q+='/'+$(this).attr('name')+'/'+$(this).val();
             });
             location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
