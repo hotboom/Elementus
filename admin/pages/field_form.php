@@ -64,8 +64,9 @@ else $field=array();
                 <label class="col-lg-2 control-label" for="input_type"><?=t('Type')?></label>
                 <?
                 $ftypes=array(
-                    'int'=>'Integer',
                     'varchar'=>'String',
+                    'int'=>'Integer',
+                    'decimal'=>'Decimal',
                     'text'=>'Text',
                     'elements'=>'Elements select',
                     'enum'=>'Values select',

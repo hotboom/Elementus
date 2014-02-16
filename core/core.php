@@ -133,7 +133,8 @@ class E{
                 $j=0;
                 foreach($params['filter'] as $i=>$v) {
                     if($j>0) $filter.=' AND ';
-                    $filter.="`".$i."`='".$v."'";
+                    if($v===false) $filter.="`".$i."` is NULL";
+                    else $filter.="`".$i."`='".$v."'";
                     $j++;
                 }
                 $params['filter']=$filter;
