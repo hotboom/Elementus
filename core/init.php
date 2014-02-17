@@ -24,6 +24,8 @@ S::init();
 require_once($root_path."/core/types/users.php");
 U::init();
 
+require_once($root_path."/core/types/products.php");
+
 //Helper functions
 require_once($root_path."/core/helper.php");
 

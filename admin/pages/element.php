@@ -5,8 +5,8 @@ $type=E::getType($type_id);
 $types=E::getFullType($type_id);
 $type['fields']=E::getFullTypeFields($type);
 
-$type['class']=E::getTypeClass($type['name']);
-if(!class_exists($type['class']['name'])) require_once($root_path."/core/classes/".$type['name'].".php");
+$type['class']=E::getTypeClass($type);
+if(!class_exists($type['class']['name'])) require_once($root_path."/core/types/".$type['name'].".php");
 
 $act=htmlspecialchars($_GET['act']);
 $elements=array('id'=>false);

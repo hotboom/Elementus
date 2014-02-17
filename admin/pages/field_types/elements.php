@@ -5,14 +5,15 @@ $type=E::getType($field['elements_type']);
 $type['class']=E::getTypeClass($type['name']);
 $fields=E::getTypeFields($type['id']);
 $type['tree']=false;
-foreach($fields as $field){
+/*oreach($fields as $field){
     if($field['elements_type']==$type['name']) {
         $type['tree']=$field;
     }
-}
+}*/
 //print_r($fields);
 //print_r($type);
-$elements=E::get(array('type'=>$type['id'],'subtypes'=>true,'limit'=>999));
+$type['class']=E::getTypeClass($type);
+$elements=$type['class']['name']::get(array('type'=>$type['id'],'subtypes'=>true,'limit'=>999));
 
 ?>
 <? if(!$type['tree']):?>

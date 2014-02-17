@@ -33,9 +33,10 @@ $elements=$type['class']['name']::get($params);
 foreach($elements as $i=>$element){
     foreach($type['fields'] as $field){
         if($field['type']=='elements') {
-            $el=E::getById($elements[$i][$field['name']]);
+            $subtype['class']=E::getTypeClass($field['elements_type']);
+            $el=$subtype['class']['name']::getById($elements[$i][$field['name']]);
             if(!empty($el['name'])) $elements[$i][$field['name']]=$el['name'];
-            if(!empty($el['header'])) $elements[$i][$field['name']]=$el['header'];
+            //elseif(!empty($el['header'])) $elements[$i][$field['name']]=$el['header'];
         }
     }
 }
@@ -128,22 +129,26 @@ if(!empty($_GET['order'])) $link.="/order/".htmlspecialchars($_GET['order']);
     <li><a href="<?=(int)$_GET['p']+1?>">&raquo;</a></li>
 </ul>
 <script>
+    window.type=<?=(int)$_GET['id']?>;
+
     filter = {
         submit: function() {
+            console.log('test');
             var q='';
             $('table tr.filter').find('input, select').each(function(i){
                 if($(this).val()&&$(this).attr('name')) q+='/'+$(this).attr('name')+'/'+$(this).val();
             });
-            location.hash='/type/id/<?=(int)$_GET['id']?>'+q;
+            location.hash='/type/id/'+window.type+q;
         }
     };
 
     if(window.f) {
         var input=$('#'+window.f);
-        input[0].selectionStart = input[0].selectionEnd = input.val().length;
+        if(input.val()) input[0].selectionStart = input[0].selectionEnd = input.val().length;
     }
 
     $('table tr.filter').find('input, select').keyup(function(e){
+        console.log('test2');
         window.f=$(this).attr('id');
     });
 

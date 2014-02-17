@@ -92,8 +92,16 @@ class E{
     }
 
     public static function get($params=array()){
-        if(!is_array($params)) $params=array('type'=>$params);
+        if(!is_array($params)) {
+            if(is_numeric($params)) {
+                $params=array('filter'=>array('id'=>$params));
+                $params['type']=self::getElementType($params['filter']['id']);
+            }
+            else $params=array('type'=>$params);
+        }
         if(empty($params['page'])) $params['page']=0;
+
+        //if(empty($params['type'])&&!empty($params['filter']['id'])) $params['type']=self::getElementType($params['filter']['id']);
 
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
@@ -156,10 +164,7 @@ class E{
     }
 
     public static function getById($element_id){
-        if(!$type=self::getElementType($element_id)) return false;
-        $params['type']=$type['name'];
-        $params['filter']='id='.$element_id;
-        $elements=self::get($params);
+        $elements=self::get($element_id);
         return $elements[0];
     }
 
@@ -435,12 +440,13 @@ class E{
         }
     }
 
-    public static function getTypeClass($type_name){
+    public static function getTypeClass($type){
+        if(!$type=self::getType($type)) return false;
         $class['name']='E';
         $class['path']=self::$root_path.'core/core.php';
-        $path=self::$root_path."core/types/".$type_name.".php";
+        $path=self::$root_path."core/types/".$type['name'].".php";
         if(file_exists($path)) {
-            $class['name']=ucfirst($type_name);
+            $class['name']=ucfirst($type['name']);
             $class['path']=$path;
         }
         return $class;
@@ -651,7 +657,7 @@ class E{
             include(COMPONENTS_DIR.$component."/component.php");
             return true;
         }
-        self::$errors[]="Component $component not found";
+        //self::$errors[]="Component $component not found";
         return false;
     }
 }
