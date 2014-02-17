@@ -101,8 +101,6 @@ class E{
         }
         if(empty($params['page'])) $params['page']=0;
 
-        //if(empty($params['type'])&&!empty($params['filter']['id'])) $params['type']=self::getElementType($params['filter']['id']);
-
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
 

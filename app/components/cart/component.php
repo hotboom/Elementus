@@ -73,6 +73,7 @@ if(!empty(U::$user['id'])) {
 }
 
 $result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['order']['id'])));
+
 foreach($result['offers'] as $i=>$offer) {
     if($product=E::getById($offer['offer'])){
         $result['offers'][$i]=array_merge($product,$offer);
@@ -181,13 +182,13 @@ if($_REQUEST['step']==2){
 
 if($_REQUEST['step']>0){
     $result['step']=$result['step']+1;
-    foreach($result['offers'] as $offer){
+    foreach($result['offers'] as $i=>$offer){
+        $result['offers'][$i]['num']=(int)$_POST['num'][$offer['id']];
         E::set(array(
-           'id'=>$offer['id'],
-           'num'=>(int)$_POST['num'][$offer['id']]
+            'id'=>$offer['id'],
+            'num'=>(int)$_POST['num'][$offer['id']]
         ));
     }
-    $result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['order']['id'])));
 }
 
 $result['summ']=0;
