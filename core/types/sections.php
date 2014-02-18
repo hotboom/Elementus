@@ -15,7 +15,10 @@ class S extends E{
                 header("HTTP/1.0 200 OK");
                 self::$section=$section;
             }
-            else header('HTTP/1.0 404 Not Found');
+            else {
+                header('HTTP/1.0 404 Not Found');
+                S::$section['template']='404';
+            }
         }
         else self::$section=self::getByPath('main');
         self::$section['parents']=self::getParents(S::$section['id']);
@@ -42,7 +45,7 @@ class S extends E{
 
     static function getByPath($section_path){
         $params['filter']="path='".$section_path."'";
-        $sections=self::get($params);
+        if(!$sections=self::get($params)) return false;
         if(empty($sections[0]['template'])) $sections[0]['template']=self::getTemplate($sections[0]['id']);
         return $sections[0];
     }
