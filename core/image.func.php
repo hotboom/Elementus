@@ -58,7 +58,9 @@ function imageResizeToRect ($sourcefile, $namefile, $newsize)
 	
 	$poz_x=round(($newsize[0]-$dest_x)/2);
 	$poz_y=round(($newsize[1]-$dest_y)/2);
-	
+
+    //echo 'prop:'.$prop.', pos_x:'.$poz_x.', pos_y:'.$poz_y.', dest_x:'.$dest_x.', dest_y:'.$dest_y;
+
     $target_pic=imagecopyresampled($target_id,$source_id, $poz_x,$poz_y, 0,0, $dest_x,$dest_y,$source_x,$source_y);
 	if($picsize[2]==1){
 		imagegif($target_id,$namefile);
