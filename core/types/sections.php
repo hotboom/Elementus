@@ -8,6 +8,7 @@
  */
 class S extends E{
     public static $section;
+    public static $children=array();
 
     static function init(){
         if(!empty($_GET['section'])){
@@ -65,6 +66,16 @@ class S extends E{
             if($section=parent::getById($section['parent_id'])) $parents[]=$section['id'];
         }
         return $parents;
+    }
+
+    static function children($parent_id=0){
+        $sections=self::getList($parent_id);
+        if(empty($sections)) return false;
+        foreach($sections as $section){
+            self::$children[]=$section;
+            self::children($section['id']);
+        }
+        return self::$children;
     }
 
     static function getTemplate($section){
