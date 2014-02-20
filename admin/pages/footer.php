@@ -25,7 +25,6 @@
 </div><!-- /.modal -->
 <script>
     $(document).bind("ajaxComplete", function(){
-
         //Ajax form submit
         $('form[data-async]').unbind().submit(function(event) {
             var form = $(this);

@@ -149,6 +149,7 @@ class E{
             $sql.=$params['filter'];
             $sql.=") ";
         }
+        if(!empty($params['group'])) $sql.="GROUP BY `".$params['group']."`";
         if(!empty($params['order'])) {
             if(is_array($params['order'])) $sql.="ORDER BY `".$params['order'][0]."` ".($params['order'][1] ? 'DESC' : 'ASC')." ";
             else $sql.="ORDER BY `".$params['order']."` ";
