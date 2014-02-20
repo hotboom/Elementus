@@ -30,13 +30,17 @@
         $('form[data-async]').unbind().submit(function(event) {
             var form = $(this);
             var target = $(form.attr('data-target'));
-            //console.log(form.serialize());
+
             $.ajax({
                 type: form.attr('method'),
                 url: form.attr('action'),
                 data: form.serialize(),
-
+                beforeSend: function(xhr) {
+                    target.find('*').hide();
+                    target.addClass('loading');
+                },
                 success: function(data, status) {
+                    target.removeClass('loading');
                     target.html(data);
                 }
             });

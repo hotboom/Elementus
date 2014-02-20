@@ -85,6 +85,7 @@ $import=E::getTypeOpt($type['id'],'import');
             $xml_parser = new xml();
             if (!($fp = fopen($file['path'], "r"))) die("could not open XML input");
             while ($data = fgets($fp)) if (!$xml_parser->parse($data,feof($fp))) break;
+            echo 'Импорт успешно завершен';
         }
         ?>
     <? else:?>
