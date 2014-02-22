@@ -1,13 +1,14 @@
 <?
 $field=$data['field'];
 $element=$data['element'];
+$id=(empty($data['id']) ? 'input_'.$field['name'] : $data['id']);
 ?>
-<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>" value="<?=$data['value']?>" style="width:auto;" data-field="<?=$field['name']?>">
+<input name="<?=$data['name']?>" type="text" class="form-control pull-left clearfix" id="<?=$id?>" value="<?=$data['value']?>" style="width:auto;" data-field="<?=$field['name']?>">
 <a class="btn btn-success fileupload-button" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
     <i class="fa fa-plus"></i>
     <span><?=t('Upload files...')?></span>
 </a>
-<a class="btn btn-default" data-fileupload-action="/admin/index.php?page=element&type=<?=$type['id']?>&act=<?=$act?>" data-fileupload-target="#<?=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])?>">
+<a class="btn btn-default" onclick="openKCFinder('#<?=$id?>');">
     <i class="fa fa-plus"></i>
     <span><?=t('Select from server...')?></span>
 </a>
@@ -58,4 +59,17 @@ $element=$data['element'];
             event.preventDefault();
         });
     });
+    function openKCFinder(field) {
+        window.KCFinder = {
+            callBack: function(url) {
+                var filename=url.substring(url.lastIndexOf('/')+1);
+                $(field).val(filename);
+                window.KCFinder = null;
+            }
+        };
+        window.open('/admin/plugins/kcfinder/browse.php?type=Files', 'kcfinder_textbox',
+            'status=0, toolbar=0, location=0, menubar=0, directories=0, ' +
+                'resizable=1, scrollbars=0, width=800, height=600'
+        );
+    }
 </script>

@@ -25,7 +25,8 @@ function img($source, $target, $folder, $newsize){
 //$blank - шаблон
 function imageResizeToRect ($sourcefile, $namefile, $newsize)
 {
-	$picsize=getimagesize($sourcefile);
+	if(!file_exists($sourcefile)) return false;
+    $picsize=getimagesize($sourcefile);
     $source_x  = $picsize[0];
     $source_y  = $picsize[1];
 	if($picsize[2]==1){
