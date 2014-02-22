@@ -250,12 +250,17 @@ function MakeImage($src, $size = array(100, 100), $method = 'crop', $lifeTime = 
     if (file_exists($sourcefile)) {
         $ext = end(explode(".", $src)); // Расширение файла картинки
         $base_name = basename($src, "." . $ext); // Основное имя файла
-        $target_file['name'] = dirname($src)."/".$base_name."_thumb_". $size[0].'x'.$size[1].".".$ext;
-        $target_file['path'] = $_SERVER['DOCUMENT_ROOT'].$target_file['name'];
+        $thumbs_path=dirname($src)."/.thumbs";
+        $target_file['name'] = $thumbs_path.'/'.$base_name."_thumb_". $size[0].'x'.$size[1].".".$ext;
+        $target_file['path'] = $_SERVER['DOCUMENT_ROOT'].'/'.$target_file['name'];
         if (file_exists($target_file['path']) AND filesize($target_file['path']) > 0) {
             if (filemtime($target_file['path']) + $lifeTime > time()) return $target_file['name']; // Файл есть, новый
         }
-        if (file_exists($target_file['path']) AND filesize($target_file['path']) == 0) @unlink($target_file['path']); // удаление файла нулевой длины
+        if(!is_dir($_SERVER['DOCUMENT_ROOT'].$thumbs_path)){
+            if(!mkdir($_SERVER['DOCUMENT_ROOT'].$thumbs_path, 0777)) return false;
+            chmod($_SERVER['DOCUMENT_ROOT'].$thumbs_path, 0777);
+        }
+        if (file_exists($target_file['path']) AND filesize($target_file['path']) == 0) @unlink($target_file['name']); // удаление файла нулевой длины
         if($method=='crop'){
             if (imageCropToRect($sourcefile, $target_file['path'], $size)) return $target_file['name'];
         }
