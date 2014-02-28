@@ -431,6 +431,7 @@ class E{
     }
 
     public static function getTypeByName($type_name){
+        if(empty($type_name)) return self::error('3','Empty type name');
         $types=self::getTypes("name='".$type_name."'");
         if(!empty($types)) return $types[0];
         else {

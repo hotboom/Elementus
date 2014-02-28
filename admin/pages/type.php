@@ -27,19 +27,19 @@ if(!empty($_GET['filter'])) {
 
     }
 }
-//E::debug();
+
 $elements=$type['class']['name']::get($params);
 
-foreach($elements as $i=>$element){
-    foreach($type['fields'] as $field){
-        if($field['type']=='elements') {
-            $subtype['class']=E::getTypeClass($field['elements_type']);
-            $el=$subtype['class']['name']::getById($elements[$i][$field['name']]);
+foreach($type['fields'] as $field){
+    if($field['type']=='elements') {
+        $subtype['class']=E::getTypeClass($field['elements_type']);
+        foreach($elements as $i=>$element) {
+            $el=E::getById($elements[$i][$field['name']]);
             if(!empty($el['name'])) $elements[$i][$field['name']]=$el['name'];
-            //elseif(!empty($el['header'])) $elements[$i][$field['name']]=$el['header'];
         }
     }
 }
+
 
 ?>
 <div class="row">
@@ -148,7 +148,6 @@ if(!empty($_GET['order'])) $link.="/order/".htmlspecialchars($_GET['order']);
     }
 
     $('table tr.filter').find('input, select').keyup(function(e){
-        console.log('test2');
         window.f=$(this).attr('id');
     });
 
