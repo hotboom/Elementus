@@ -129,12 +129,20 @@ if(is_array($_GET['filter'])){
 }
 if(!empty($_GET['order'])) $link.="/order/".htmlspecialchars($_GET['order']);
 ?>
+<?
+$next=(int)$_GET['p']+1;
+$prev=(int)$_GET['p']-1;
+?>
 <ul class="pagination">
-    <li><a href="<?=$link?>/p/<?=(int)$_GET['p']-1?>">&laquo;</a></li>
+    <?if($prev>=0):?>
+    <li><a href="<?=$link?>/p/<?=$prev?>">&laquo;</a></li>
+    <?endif;?>
     <? for($i=0; $i<ceil($count/30); $i++):?>
     <li<?=($i==$_GET['p'] ? ' class="active"' : '')?>><a href="<?=$link?>/p/<?=$i?>"><?=($i+1)?></a></li>
     <? endfor;?>
-    <li><a href="<?=$link?>/p/<?=(int)$_GET['p']+1?>">&raquo;</a></li>
+    <?if($next<$count/30):?>
+    <li><a href="<?=$link?>/p/<?=$next?>">&raquo;</a></li>
+    <?endif;?>
 </ul>
 <script>
     window.type=<?=(int)$_GET['id']?>;
