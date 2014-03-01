@@ -233,6 +233,30 @@ class E{
         return true;
     }
 
+    static function replace($type, $field, $find, $replace){
+        //update ИМЯ_ТАБЛИЦЫ set ИМЯ_ПОЛЯ = replace(ИМЯ_ПОЛЯ, 'что ищем', 'на что заменяем') where ИМЯ_ПОЛЯ like 'что ищем%';
+        if(!$type=self::getType($type)) return false;
+        if(!$types=self::getFullType($type['id'])) return false;
+
+        foreach($types as $i=>$t){
+            $types[$i]['table']=self::getTypeTableName($t);
+            if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) continue;
+            $fields=self::getTypeFields($t);
+            foreach($fields as $f){
+                if($f['name']==$field){
+                    if(!self::$db->q("UPDATE ".$types[$i]['table']." set ".$f['name']." = replace(".$f['name'].", '".$find."', '".$replace."')",self::$debug)) return false;
+                }
+            }
+        }
+    }
+
+    static function count($params){
+        $params['count']=true;
+        if(!$arr=self::get($params)) return false;
+        $i='count(*)';
+        return $arr[0][$i];
+    }
+
     static function setType($params){
         $type=$params;
         if(empty($params['name'])) self::error(6,'Type name is empty');

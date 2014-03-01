@@ -28,6 +28,7 @@ if(!empty($_GET['filter'])) {
     }
 }
 
+$count=$type['class']['name']::count($params);
 $elements=$type['class']['name']::get($params);
 
 foreach($type['fields'] as $field){
@@ -52,10 +53,17 @@ foreach($type['fields'] as $field){
     </p>
 <? endif;?>
 <? if($_GET['mode']=='normal'): ?>
+<div class="dropdown pull-right" style="margin:0 3px;">
+    <a data-toggle="dropdown" href="#" class="btn btn-primary">Edit&nbsp;<div class="caret"></div></a>
+    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+        <li role="presentation"><a role="menuitem" href="replace/type/<?=$type['id']?>" data-target="#window"><i class="fa fa-search"></i> <?=t('Find and replace')?></a></li>
+        <li role="presentation"><a role="menuitem" href="import/type/<?=$type['id']?>" data-target="#window"><i class="fa fa-reply-all"></i> <?=t('Import')?></a></li>
+    </ul>
+</div>
 <p class="pull-right">
     <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-cog"></i> <?=t('Settings')?></a>
     <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="fa fa-cog"></i> <?=t('Fields')?></a>
-    <a href="import/type/<?=$type['id']?>" data-target="#window" class="btn btn-primary"><i class="fa fa-reply-all"></i> <?=t('Import')?></a>
+
     <a href="/admin/index.php?page=type_form&parent=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add subtype')?></a>
 </p>
 <? endif; ?>
@@ -122,11 +130,11 @@ if(is_array($_GET['filter'])){
 if(!empty($_GET['order'])) $link.="/order/".htmlspecialchars($_GET['order']);
 ?>
 <ul class="pagination">
-    <li><a href="<?=(int)$_GET['p']-1?>">&laquo;</a></li>
-    <? for($i=0; $i<10; $i++):?>
+    <li><a href="<?=$link?>/p/<?=(int)$_GET['p']-1?>">&laquo;</a></li>
+    <? for($i=0; $i<ceil($count/30); $i++):?>
     <li<?=($i==$_GET['p'] ? ' class="active"' : '')?>><a href="<?=$link?>/p/<?=$i?>"><?=($i+1)?></a></li>
     <? endfor;?>
-    <li><a href="<?=(int)$_GET['p']+1?>">&raquo;</a></li>
+    <li><a href="<?=$link?>/p/<?=(int)$_GET['p']+1?>">&raquo;</a></li>
 </ul>
 <script>
     window.type=<?=(int)$_GET['id']?>;
