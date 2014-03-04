@@ -19,7 +19,11 @@ if(!empty($_GET['add'])){
     }
 
     //Создаем заказ (если уже не создан)
-    $orders=E::get(array('type'=>22,'filter'=>array('hash'=>U::$user['hash'],'status'=>'not send')));
+    if(!empty(U::$user['hash'])) $orders=E::get(array('type'=>22,'filter'=>array('hash'=>U::$user['hash'],'status'=>'not send')));
+    else{
+        header('HTTP/1.0 403 Forbidden');
+        exit;
+    }
 
     if(empty($orders)){
         $order_id=E::set(array(

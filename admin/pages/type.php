@@ -58,12 +58,12 @@ foreach($type['fields'] as $field){
     <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
         <li role="presentation"><a role="menuitem" href="replace/type/<?=$type['id']?>" data-target="#window"><i class="fa fa-search"></i> <?=t('Find and replace')?></a></li>
         <li role="presentation"><a role="menuitem" href="import/type/<?=$type['id']?>" data-target="#window"><i class="fa fa-reply-all"></i> <?=t('Import')?></a></li>
+        <li role="presentation"><a role="menuitem" href="type_clear/type/<?=$type['id']?>" data-target="#window"><i class="fa fa-times"></i> <?=t('Clear')?></a></li>
     </ul>
 </div>
 <p class="pull-right">
     <a href="/admin/index.php?page=type_form&act=edit&type=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-cog"></i> <?=t('Settings')?></a>
     <a href="#/type_fields/id/<?=$type['id']?>" class="btn btn-primary"><i class="fa fa-cog"></i> <?=t('Fields')?></a>
-
     <a href="/admin/index.php?page=type_form&parent=<?=$type['id']?>" class="btn btn-primary" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add subtype')?></a>
 </p>
 <? endif; ?>

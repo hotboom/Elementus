@@ -288,6 +288,7 @@ class E{
     static function clearType($type_id){
         $elements=self::get(array('type'=>$type_id,'limit'=>false));
         foreach($elements as $element) self::delete($element['id']);
+        return true;
     }
 
     static function setField($type,$params){
