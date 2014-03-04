@@ -5,7 +5,7 @@
                     $groups=E::getTypeGroups();
                     $groups[]=Array(
                         'id' => false,
-                        'name' => t('Other'),
+                        'name' => 'Other',
                         'previous' =>false,
                         'sort' =>false
                     );

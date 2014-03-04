@@ -41,7 +41,6 @@ foreach($type['fields'] as $field){
     }
 }
 
-
 ?>
 <div class="row">
 <? if($_GET['mode']!='compact'): ?>

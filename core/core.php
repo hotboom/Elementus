@@ -622,14 +622,19 @@ class E{
         if($translate=self::$db->q($sql)) {
             $text=($ucfirst ? mb_ucfirst($translate) : mb_strtolower($translate));
         }
-        else{ //Try translate by word
-            if(strpos($text,' ')) {
+        else{
+            $translate=self::translate_yandex($text);
+            if(!empty($translate)) {
+                self::$db->q("INSERT INTO `lang` SET `".$lang."`='".$text."', `".self::$lang."`='".$translate."'",self::$debug);
+                return $translate;
+            }
+            /*//Try translate by word
                 $words=explode(' ',$text);
                 $text='';
                 $text=self::translate($words[0],$ucfirst).' '; //Use $ucfirst to first word
                 unset($words[0]);
                 foreach($words as $word) $text.=self::translate($word).' ';
-            }
+            }*/
         }
         return trim($text);
     }
@@ -642,6 +647,16 @@ class E{
             else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
         }
         else return false;
+    }
+
+    static function translate_yandex($text){
+        $key='trnsl.1.1.20140304T063512Z.016dd2d94d77fdec.a75eaf9d47041ea6d7d086977a7249b71d910dd5';
+        $url='https://translate.yandex.net/api/v1.5/tr.json/translate?key='.$key.'&text='.$text.'&lang=en-ru';
+
+        if(!class_exists('REST')) include(CMS_DIR.'core/rest.class.php');
+        $R= new REST;
+        $resp=$R->get($url);
+        return $resp['text'][0];
     }
 
     /**

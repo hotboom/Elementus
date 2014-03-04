@@ -9,8 +9,8 @@ if(!empty($_POST['submit'])){
 else{
     ?>
     <form method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=type_clear&type=<?=$type['id']?>" class="form-horizontal">
-        <?=t('Delete all elements in type?')?>
         <fieldset>
+            <div class="alert alert-info"><strong><?=t('This action delete all elements in type')?></strong>: <?=t('are you sure?')?></div>
             <div class="form-group">
                 <label class="col-lg-2 control-label"></label>
                 <div class="col-lg-10">
