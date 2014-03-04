@@ -625,6 +625,7 @@ class E{
         else{
             $translate=self::translate_yandex($text);
             if(!empty($translate)) {
+                //if($translate==$text) return $translate;
                 self::$db->q("INSERT INTO `lang` SET `".$lang."`='".$text."', `".self::$lang."`='".$translate."'",self::$debug);
                 return $translate;
             }
