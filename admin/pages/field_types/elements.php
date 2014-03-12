@@ -16,11 +16,15 @@ $type['class']=E::getTypeClass($type);
 $params=array('type'=>$type['id'],'subtypes'=>true,'limit'=>999);
 $count=E::count($params);
 
-$elements=$type['class']['name']::get($params);
+if($count<=100) $elements=$type['class']['name']::get($params);
+else {
+    if(!empty($data['value'])) $elements=$type['class']['name']::get($data['value']);
+    else $elements=array();
+}
 
 ?>
 <? if(!$type['tree']):?>
-<select name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$data['field']['name'] : $data['id'])?>" class="form-control selectpicker" data-field="<?=$data['field']['name']?>" <?=($count>100 ? 'data-ajax-search="/api.php?method=get&params[type]=1"' : '')?> data-live-search="true">
+<select name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$data['field']['name'] : $data['id'])?>" class="form-control selectpicker" data-field="<?=$data['field']['name']?>" <?=($count>100 ? 'data-ajax-search="/admin/index.php?page=api&method=get&params[type]='.$type['name'].'"' : '')?> data-live-search="true">
     <? if($field['nullable']):?><option value=""><?=t('not set')?></option><? endif;?>
     <? foreach($elements as $element):?>
         <option value="<?=$element['id']?>" <?=($element['id']==$data['value'] ? 'selected':'')?>><?=(empty($element['name']) ? $element['header'] : $element['name'])?></option>
