@@ -1,8 +1,14 @@
 <?
 $result['step']=1;
 
-//Добавление товара в корзину
+//Adding product to cart
 if(!empty($_GET['add'])){
+    if(empty($_COOKIE)){
+        header('HTTP/1.0 403 Forbidden');
+        echo 'Ошибка: Включите подержку файлов Cookie.';
+        exit;
+    }
+
     if(empty($_GET['num'])) $num=1;
     else $num=(int)$_GET['num'];
 
@@ -11,26 +17,48 @@ if(!empty($_GET['add'])){
     //Проверка существования товара
     if(!$offer=E::getById($offer_id)) {
         header('HTTP/1.0 403 Forbidden');
+        echo 'Ошибка: Товар не найден';
         exit;
     }
     if($offer['type_id']!=20) {
         header('HTTP/1.0 403 Forbidden');
+        echo 'Ошибка: Неверный код товара';
         exit;
     }
 
-    //Создаем заказ (если уже не создан)
+    //Проверяем существование у пользователя неотправленного заказа и создаем новый если такого нет
     if(!empty(U::$user['hash'])) $orders=E::get(array('type'=>22,'filter'=>array('hash'=>U::$user['hash'],'status'=>'not send')));
     else{
         header('HTTP/1.0 403 Forbidden');
+        echo 'Ошибка авторизации, обратитесь к администратору';
         exit;
     }
 
     if(empty($orders)){
         $order_id=E::set(array(
             'type'=>22,
+            'user'=>U::$user['id'],
             'date'=>date('Y-m-d H:i'),
-            'hash'=>U::$user['hash']
+            'hash'=>U::$user['hash'],
+            'ip'=>$_SERVER['REMOTE_ADDR']
         ));
+
+        //Чистим неотправленные заказы старше 30-ти дней
+        //E::debug();
+        $orders_trash=E::get(array(
+            'type'=>22,
+            'filter'=>'`status`="not send" AND `date`<"'.date('Y-m-d',time()-(3600*24*30)).'"',
+            'limit'=>false
+        ));
+        foreach($orders_trash as $order_tr){
+            $offers_tr=E::get(array('type'=>23,'filter'=>array(
+                'order'=>$order_tr['id']
+            )));
+            foreach($offers_tr as $offer_tr) {
+                E::delete($offer_tr['id']);
+            }
+            E::delete($order_tr['id']);
+        }
     }
     else $order_id=$orders[0]['id'];
 
@@ -103,7 +131,7 @@ if($_REQUEST['step']==2){
     //Save order
     E::set(array(
         'id'=>$result['order']['id'],
-        'user_id'=>U::$user['id'],
+        'user'=>U::$user['id'],
         'paymethod'=>$_POST['paymethod'],
         'delivery'=>$_POST['delivery'],
         'status'=>'sended'
@@ -138,6 +166,10 @@ if($_REQUEST['step']==2){
     );
 
     //Notice to administrators
+    /*$body=E::get(array('type'=>28,'filter'=>array(
+        'name'=>'order_admin'
+    )));
+    $body=$body[0]['content'];*/
     $body='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/4/filter[id]/'.U::$user['id'].'">Заказчик</a></h2>';
     $body.='имя: '.htmlspecialchars($_POST['user']['name']).'<br>';
     $body.='e-mail: '.htmlspecialchars($_POST['user']['email']).'<br>';
