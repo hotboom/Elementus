@@ -288,6 +288,7 @@ class E{
     static function clearType($type_id){
         $elements=self::get(array('type'=>$type_id,'limit'=>false));
         foreach($elements as $element) self::delete($element['id']);
+        return true;
     }
 
     static function setField($type,$params){
@@ -621,14 +622,20 @@ class E{
         if($translate=self::$db->q($sql)) {
             $text=($ucfirst ? mb_ucfirst($translate) : mb_strtolower($translate));
         }
-        else{ //Try translate by word
-            if(strpos($text,' ')) {
+        else{
+            $translate=self::translate_yandex($text);
+            if(!empty($translate)) {
+                //if($translate==$text) return $translate;
+                self::$db->q("INSERT INTO `lang` SET `".$lang."`='".$text."', `".self::$lang."`='".$translate."'",self::$debug);
+                return $translate;
+            }
+            /*//Try translate by word
                 $words=explode(' ',$text);
                 $text='';
                 $text=self::translate($words[0],$ucfirst).' '; //Use $ucfirst to first word
                 unset($words[0]);
                 foreach($words as $word) $text.=self::translate($word).' ';
-            }
+            }*/
         }
         return trim($text);
     }
@@ -636,11 +643,21 @@ class E{
     static function setTranslate($en,$translate,$lang=''){
         if(empty($lang)) $lang=self::$lang;
         if(!empty($translate)){
-            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en' AND `$lang`='$translate' AND `app`='".self::$app['id']."'";
-            if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en' AND `app`='".self::$app."'",self::$debug);
-            else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
+            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en'";
+            if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en'",self::$debug);
+            else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en'",self::$debug);
         }
         else return false;
+    }
+
+    static function translate_yandex($text){
+        $key='trnsl.1.1.20140304T063512Z.016dd2d94d77fdec.a75eaf9d47041ea6d7d086977a7249b71d910dd5';
+        $url='https://translate.yandex.net/api/v1.5/tr.json/translate?key='.$key.'&text='.$text.'&lang=en-ru';
+
+        if(!class_exists('REST')) include(CMS_DIR.'core/rest.class.php');
+        $R= new REST;
+        $resp=$R->get($url);
+        return $resp['text'][0];
     }
 
     /**

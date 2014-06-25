@@ -21,11 +21,8 @@
     <script src="/admin/static/js/jquery-migrate-1.2.1.js"></script>
 
     <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/admin/static/js/moment-2.4.0.js"></script>
     <script src="/admin/static/js/bootstrap.min.js"></script>
-
-    <!-- wysihtml5 editor -->
-    <script src="/admin/static/js/advanced.js"></script>
-    <script src="/admin/static/js/wysihtml5-0.3.0.js"></script>
 
     <!--jQuery UI-->
     <script src="/admin/static/js/jquery-ui-1.10.3.custom.js"></script>
@@ -39,6 +36,10 @@
 
     <script src="/admin/plugins/ckeditor/ckeditor.js"></script>
     <script src="/admin/plugins/ckeditor/adapters/jquery.js"></script>
+
+    <!--Bootstrap datepicker -->
+    <script type="text/javascript" src="/admin/plugins/datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/admin/plugins/datetimepicker/build/css/bootstrap-datetimepicker.min.css">
 
     <script type="text/javascript">
 
