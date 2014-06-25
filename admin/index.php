@@ -13,7 +13,9 @@ $pages=array(
     'type_form',
     'types',
     'import',
-    'replace'
+    'replace',
+    'type_clear',
+    'api'
 );
 
 if(!empty($_GET['exit'])) {

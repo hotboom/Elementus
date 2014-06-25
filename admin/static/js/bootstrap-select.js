@@ -83,7 +83,7 @@
             //If we are multiple, then add the show-tick class by default
             var multiple = this.multiple ? ' show-tick' : '';
             var header = this.options.header ? '<div class="popover-title"><button type="button" class="close" aria-hidden="true">&times;</button>' + this.options.header + '</div>' : '';
-            var searchbox = this.options.liveSearch ? '<div class="bootstrap-select-searchbox"><input type="text" class="input-block-level form-control" /></div>' : '';
+            var searchbox = this.options.liveSearch|this.options.ajaxSearch ? '<div class="bootstrap-select-searchbox"><input type="text" class="input-block-level form-control" /></div>' : '';
             var drop =
                 "<div class='btn-group bootstrap-select" + multiple + "'>" +
                     "<button type='button' class='btn dropdown-toggle' data-toggle='dropdown'>" +
@@ -532,7 +532,26 @@
 
             this.$searchbox.on('input', function() {
                 if (that.$searchbox.val()) {
-                    that.$menu.find('li').show().not(':icontains(' + that.$searchbox.val() + ')').hide();
+                    console.log(that.options.ajaxSearch);
+                    if(that.options.ajaxSearch){
+                        console.log('ajax');
+                        $.ajax({
+                            url: that.options.ajaxSearch+'&search='+that.$searchbox.val(),
+                            dataType:'json',
+                            beforeSend: function(xhr) {
+                                that.$element.find('option').remove();
+                                that.$menu.addClass('loading');
+                            },
+                            success: function(data, status) {
+                                that.$menu.removeClass('loading');
+                                $.each(data,function(index,value){
+                                    that.$element.append('<option value="'+value.id+'">'+value.header+'</option>');
+                                    that.refresh();
+                                });
+                            }
+                        });
+                    }
+                    else that.$menu.find('li').show().not(':icontains(' + that.$searchbox.val() + ')').hide();
                 } else {
                     that.$menu.find('li').show();
                 }
@@ -716,7 +735,8 @@
         showContent: true,
         dropupAuto: true,
         header: false,
-        liveSearch: false
+        liveSearch: false,
+        ajaxSearch: false
     };
 
     $(document)
