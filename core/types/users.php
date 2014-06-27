@@ -60,6 +60,7 @@ class U extends E{
             self::$user=$users[0];
             return true;
         }
+        self::error('1','Wrong username or password');
         return false;
     }
 

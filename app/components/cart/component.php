@@ -105,11 +105,14 @@ if(!empty(U::$user['id'])) {
 }
 
 $result['offers']=E::get(array('type'=>23,'filter'=>array('order'=>$result['order']['id'])));
+$result['summ']=0;
 
 foreach($result['offers'] as $i=>$offer) {
     if($product=E::getById($offer['offer'])){
         $result['offers'][$i]=array_merge($product,$offer);
     };
+    $result['offers'][$i]['cost']=$result['offers'][$i]['num']*$result['offers'][$i]['price'];
+    $result['summ']+=$result['offers'][$i]['cost'];
 }
 
 //Обновление заказа
@@ -153,52 +156,46 @@ if($_REQUEST['step']==2){
         'address'=>$_POST['address']['address']
     ));
 
-    //Notice to buyer
-    send_mime_mail(
-        $_SERVER['HTTP_HOST'], // имя отправителя
-        'no-reply@'.$_SERVER['HTTP_HOST'], // email отправителя
-        $_POST['user']['name'], // имя получателя
-        $_POST['user']['email'], // email получателя
-        'utf-8', // кодировка переданных данных
-        'utf-8', // кодировка письма
-        'Заказ на '.$_SERVER['HTTP_HOST'], // тема письма
-        $body // текст письма
-    );
-
-    //Notice to administrators
-    /*$body=E::get(array('type'=>28,'filter'=>array(
+    $body=E::get(array('type'=>28,'filter'=>array(
         'name'=>'order_admin'
     )));
-    $body=$body[0]['content'];*/
-    $body='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/4/filter[id]/'.U::$user['id'].'">Заказчик</a></h2>';
+    $body=$body[0]['content'];
+    $body=str_replace('#summ#',$result['summ'],$body);
+    $body=str_replace('#order#',$result['order']['id'],$body);
+    $body=str_replace('#date#',date('d.m.y H:i'),$body);
+    $body=str_replace('#user#',htmlspecialchars($_POST['user']['name']).', '.htmlspecialchars($_POST['user']['email']).', '.htmlspecialchars($_POST['user']['phone']),$body);
+    $body=str_replace('#delivery#',htmlspecialchars($_POST['delivery']),$body);
+    $body=str_replace('#paymethod#',htmlspecialchars($_POST['paymethod']),$body);
+    $body=str_replace('#comment#',htmlspecialchars($_POST['comment']),$body);
+    /*$body='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/4/filter[id]/'.U::$user['id'].'">Заказчик</a></h2>';
     $body.='имя: '.htmlspecialchars($_POST['user']['name']).'<br>';
     $body.='e-mail: '.htmlspecialchars($_POST['user']['email']).'<br>';
     $body.='телефон: '.htmlspecialchars($_POST['user']['phone']).'<br>';
     $body.='доставка: '.htmlspecialchars($_POST['delivery']).'<br>';
     $body.='оплата: '.htmlspecialchars($_POST['paymethod']).'<br>';
     $body.='<h2><a href="http://'.$_SERVER['HTTP_HOST'].'/admin/#/type/id/22/filter[id]/'.$result['order']['id'].'">Заказ</a></h2>';
-    $body.='<table><tr>';
-    $fields=E::getTypeFields('products');
-    $fields2=E::getTypeFields('catalog');
-    $fields=array_merge($fields,$fields2);
-    foreach($fields as $field) $body.='<th>'.t($field['name']).'</th>';
-    $body.='</tr>';
-    $ignore=array('product','order','section','image','categoryId','store','brand');
+    $body.='<table><tr>';*/
+    $offers='<table width="100%" border="0" cellspacing="0" cellpadding="0"><tr>';
+    $fields=array('articul','name','num','unit','price','cost');
+    foreach($fields as $field) $offers.='<th style="padding: 0px 12px 25px 0px; font-size: 11px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: #999999;;">'.t($field).'</th>';
+    $offers.='</tr>';
+
     foreach($result['offers'] as $offer){
-        $body.='<tr>';
+        $offers.='<tr>';
         foreach($fields as $i=>$field) {
-            if(in_array($field['name'],$ignore)) continue;
-            $body.='<td>'.$offer[$field['name']].'</td>';
+            $offers.='<td style="padding: 0px 12px 25px 0px; font-size: 14px; line-height: 22px; font-family: Helvetica, Arial, sans-serif; color: #ffffff;">'.$offer[$field].'</td>';
         }
-        $body.='</tr>';
+        $offers.='</tr>';
     }
-    $body.='</table>';
+    $offers.='</table>';
+    $body=str_replace('#offers#',$offers,$body);
 
     $users=E::get(array(
         'type'=>'users',
         'filter'=>array('group_id'=>19)
     ));
 
+    //Notice to administrators
     foreach($users as $user){
         send_mime_mail(
             $_SERVER['HTTP_HOST'], // имя отправителя
@@ -213,6 +210,20 @@ if($_REQUEST['step']==2){
         );
     }
 
+    //Notice to buyer
+    send_mime_mail(
+        $_SERVER['HTTP_HOST'], // имя отправителя
+        'no-reply@'.$_SERVER['HTTP_HOST'], // email отправителя
+        $_POST['user']['name'], // имя получателя
+        $_POST['user']['email'], // email получателя
+        'utf-8', // кодировка переданных данных
+        'utf-8', // кодировка письма
+        'Заказ #'.$result['order']['id'].' на '.$_SERVER['HTTP_HOST'], // тема письма
+        $body, // текст письма
+        'text/html'
+    );
+
+
     $result['step']=2;
 };
 
@@ -226,8 +237,6 @@ if($_REQUEST['step']>0){
         ));
     }
 }
-
-$result['summ']=0;
 
 include_once(TEMPLATES_DIR.E::$template['path'].'/pages/'.$component.'/'.$template.'.php');
 ?>

@@ -1,6 +1,10 @@
 <?
 //E::debug();
-$type=E::getTypeById((int)$_GET['id']);
+if(!$type=E::getTypeById((int)$_GET['id'])) {
+    foreach(E::$errors as $error) echo $error['desc'].'<br>';
+    exit;
+}
+
 if(empty($_GET['mode'])) $_GET['mode']='normal';
 
 $type['fields']=array();
@@ -11,6 +15,7 @@ foreach($type['fields'] as $i=>$field){
 }
 
 $type['class']=E::getTypeClass($type['name']);
+
 if(!class_exists($type['class']['name'])) require_once($type['class']['path']);
 $params=array();
 if(!empty($_GET['p'])) $params['page']=(int)$_GET['p'];

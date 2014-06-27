@@ -7,11 +7,10 @@ if(!empty($_GET['act'])){
         break;
 
         case 'login':
-            //E::debug();
             if(!U::login($_POST['email'],$_POST['password'],$_POST['remember'])) {
                 header('HTTP/1.0 403 Forbidden');
-                //exit();
             }
+            else header ('Location: '.$_SERVER['HTTP_REFERER']);
         break;
 
         case 'signup':
