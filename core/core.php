@@ -643,9 +643,9 @@ class E{
     static function setTranslate($en,$translate,$lang=''){
         if(empty($lang)) $lang=self::$lang;
         if(!empty($translate)){
-            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en' AND `$lang`='$translate' AND `app`='".self::$app['id']."'";
-            if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en' AND `app`='".self::$app."'",self::$debug);
-            else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en', `app`='".self::$app['id']."'",self::$debug);
+            $sql="SELECT count(*) FROM `lang` WHERE `en`='$en'";
+            if($exist=self::$db->q($sql,self::$debug)) return self::$db->q("UPDATE `lang` SET `".self::$lang."`='$translate' WHERE `en`='$en'",self::$debug);
+            else return self::$db->q("INSERT INTO `lang` SET `".self::$lang."`='$translate', `en`='$en'",self::$debug);
         }
         else return false;
     }

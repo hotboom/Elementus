@@ -27,6 +27,7 @@ if(!empty($_GET['filter'])) {
 
     }
 }
+if(!empty($_GET['limit'])) $params['limit']=(int)$_GET['limit'];
 
 $count=$type['class']['name']::count($params);
 $elements=$type['class']['name']::get($params);

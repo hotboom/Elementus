@@ -68,14 +68,14 @@
 <body>
     <div class="container">
         <form class="form-signin" method="POST" data-async data-target="#window .modal-body" action="/admin/index.php?page=login">
-            <h2 class="form-signin-heading"><?=t('Sign in')?></h2>
+            <h2 class="form-signin-heading"><?=t('Log in')?></h2>
             <input type="text" name="email" class="input-block-level" placeholder="Email address">
             <input type="password" name="password" class="input-block-level" placeholder="Password">
             <label class="checkbox">
                 <input type="checkbox" name="remember" value="1" checked="checked"> <?=t('Remember me')?>
             </label>
             <input type="hidden" name="submit" value="submit">
-            <button class="btn btn-large btn-primary" type="submit"><?=t('Sign in')?></button>
+            <button class="btn btn-large btn-primary" type="submit"><?=t('Log in')?></button>
         </form>
         <script>
             $(function() {

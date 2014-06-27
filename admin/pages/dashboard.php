@@ -9,7 +9,7 @@ foreach($widgets as $widget):
     $c='count(*)';
     ?>
     <div class="panel panel-default">
-        <div class="panel-heading"><?=t($widget['name'])?></div>
+        <div class="panel-heading"><?=t(mb_ucfirst($widget['name']))?></div>
         <div class="panel-body">
             <div class="btn-group">
                 <a href="#/type/id/<?=$widget['type']['id']?>" type="button" class="btn btn-default">Обзор <span class="badge"><?=$widget['count'][0][$c]?></span></a>
@@ -19,7 +19,7 @@ foreach($widgets as $widget):
             <div class="elements"></div>
             <script>
                 $.ajax({
-                    url: '/admin/index.php?page=type&id=<?=$widget['type']['id']?>&mode=compact',
+                    url: '/admin/index.php?page=type&id=<?=$widget['type']['id']?>&order=<?=$widget['order']?><?=($widget['sort']=='DESC' ? '&desc=1' : '')?><?=($widget['limit'] ? '&limit='.$widget['limit'] : '')?>&mode=compact',
                     success:function(data){
                         $('.elements').html(data);
                     }
