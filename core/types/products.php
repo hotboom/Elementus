@@ -2,7 +2,7 @@
 class Products extends E{
     static function get($params){
         $elements=parent::get($params);
-        if(!empty($elements)){
+        if(!empty($elements)&&is_array($elements)){
             foreach($elements as $i=>$element) {
                 if(!empty($elements[$i]['brand'])) {
                     $brand=parent::getById($elements[$i]['brand']);

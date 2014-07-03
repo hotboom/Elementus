@@ -157,8 +157,9 @@ class E{
         if(isset($params['limit'])){
             if($params['limit']) $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
         }
-        else $sql.="LIMIT ".($params['page']*30).",".($params['page']*30+30)." ";
+        //else $sql.="LIMIT ".($params['page']*30).",".($params['page']*30+30)." ";
         $elements=self::$db->q($sql,self::$debug,false);
+        if(!empty($params['count'])) return $elements[0]['count(*)'];
         return $elements;
     }
 
@@ -252,9 +253,8 @@ class E{
 
     static function count($params){
         $params['count']=true;
-        if(!$arr=self::get($params)) return false;
-        $i='count(*)';
-        return $arr[0][$i];
+        if(!$count=self::get($params)) return false;
+        return $count;
     }
 
     static function setType($params){
