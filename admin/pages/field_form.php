@@ -4,16 +4,14 @@ else $act='add';
 
 $type=E::getType((int)$_GET['type']);
 $type['table']=E::getTypeTableName($type);
+$type['fields']=E::getTypeFields($type);
 if($act=='edit'|$act=='copy') {
     $field=E::getField($type,$_GET['fields'][0]);
 }
 else $field=array();
-//print_r($field);
 ?>
 
 <? if(!empty($_POST['submit'])):
-    //E::debug();
-    //print_r($_POST);
     if($act=='delete') $result=E::deleteTypeField((int)$_GET['type'],$_POST['fields']);
     else $result=E::setField((int)$_GET['type'],$_POST['field']);
 
@@ -73,6 +71,7 @@ else $field=array();
                     'html'=>'HTML',
                     'file'=>'File',
                     'image'=>'Image',
+                    'date'=>'Date',
                     'datetime'=>'Date and time'
                 );
                 ?>
@@ -82,6 +81,13 @@ else $field=array();
                             <option value="<?=$i?>"<?=($field['type']==$i ? ' selected="selected"' : '')?>><?=t($ftype)?></option>
                         <? endforeach;?>
                     </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <div class="checkbox">
+                        <label><input name="field[multiple]" type="checkbox"<?=($field['multiple'] ? ' checked="checked"' : '')?>> <?=t('multiple')?></label>
+                    </div>
                 </div>
             </div>
             <div class="form-group extra" id="extra_enum" style="<?=($field['type']!='enum' ? 'display:none;' : '')?>">
@@ -134,6 +140,17 @@ else $field=array();
                     <label class="col-lg-2 control-label" for="input_default"><?=t('Placeholder')?></label>
                     <div class="col-lg-10">
                         <input name="field[placeholder]" type="text" class="form-control" id="input_default" value="<?=$field['placeholder']?>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label" for="input_default"><?=t('After')?></label>
+                    <div class="col-lg-10">
+                        <select name="field[after]" id="input_type" class="form-control">
+                            <option value=""><?=t('at the end')?></option>
+                            <? foreach($type['fields'] as $i=>$v):?>
+                                <option value="<?=$v['name']?>"<?=($field['after']==$v ? ' selected="selected"' : '')?>><?=$v['name']?></option>
+                            <? endforeach;?>
+                        </select>
                     </div>
                 </div>
             </div>

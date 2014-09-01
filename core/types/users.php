@@ -4,7 +4,7 @@ class U extends E{
 
     static function init(){
         if(session_id()=='') session_start();
-        if(!self::$user=self::autorization()) self::$user['hash']=session_id();
+        self::$user=self::autorization();
     }
 
     static function set($params){
@@ -27,6 +27,24 @@ class U extends E{
 
         if(!empty($params['new_password'])) $params['password']=self::hashPassword($params['new_password'],$users[0]['email']);
         return parent::set($params);
+    }
+
+    static function getSelectList($params){
+        if(!$elements=self::get($params)) return false;
+        foreach($elements as $i=>$element){
+            $elements[$i]['option_name']=$element['name'].' '.$element['surname'];
+        }
+        return $elements;
+    }
+
+    static function signup($params){
+        if(empty($params['email'])) return self::error(31,'Empty email');
+        if(empty($params['password'])) return self::error(31,'Empty password');
+        if($params['password']!=$params['password2']) return self::error(31,'Passwords do not match');
+        $params['password']=self::hashPassword($params['password'],$params['email']);
+        $params['regdate']=date('Y-m-d H:i');
+        if(self::set($params)) return self::login($params['email'], $params['password2'], true);
+        else return false;
     }
 
     static function hashPassword($password,$salt){

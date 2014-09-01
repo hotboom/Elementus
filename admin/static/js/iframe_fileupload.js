@@ -31,12 +31,10 @@ $(function(){
         iframe.bind('load',function(event){
             file_name=$(this).contents().find("body").html();
             target.val(file_name);
-
                 button.parent().find('img').remove();
                 button.parent().append('<img src="/upload/files/'+file_name+'" style="width:100px; height: auto;">');
-            <? endif;?>
             });
             fileinput.click();
             event.preventDefault();
-            });
-            });
+        });
+    });

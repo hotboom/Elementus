@@ -14,6 +14,9 @@
             </span>
         </div><!-- /input-group -->
     </div>
+    <? if(!empty($data['field']['help'])):?>
+        <span class="help-block"><?=$data['field']['help']?></span>
+    <? endif;?>
 </div>
 <script>
     function getRandomNum(lbound, ubound) {

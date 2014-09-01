@@ -13,7 +13,7 @@
  *
  * @author  Andrey Nedorostkov <huntedbox@gmail.com>
  *
- * @since 1.0
+ * @since 1.1
  */
 class E{
     /** @type object Database object */
@@ -24,21 +24,27 @@ class E{
     public static $debug;
     /** @type array Current app params array */
     public static $app;
-    /** @type string Current app params array */
-    public static $foreign_select='select';
     /** @type string Path to Elementus root directory */
     public static $root_path;
     /** @type string Interface language */
-    public static $lang='ru';
+    public static $lang;
     /** @type string Template name */
     public static $template;
-
     /** @type mixed Temp variable for recursion functions results */
     private static $recursion_temp=false;
 
     private static $buffer=array();
     private static $buffer_functions=array();
 
+    /**
+     * Initiate core
+     *
+     * @param object $db Database object
+     * @param string $root_path Database object
+     * @param bool $debug Show debug
+     *
+     * @return void
+     */
     public static function init($db, $root_path, $debug=false){
         self::$db        = $db;
         self::$debug     = $debug;
@@ -54,19 +60,51 @@ class E{
             self::$template=$templates[0];
         }
 
+        self::$lang='ru';
+        if(!empty($_COOKIE['lang'])){
+            $sql="SHOW COLUMNS FROM `lang`";
+            $cols=self::$db->q($sql);
+            foreach($cols as $i=>$col){
+                if($i<2) continue;
+                if($col['Field']===$_COOKIE['lang']) self::$lang=$col['Field'];
+            }
+        }
+
         //Memoizated functions
         ob_start(array('E',"end_buffer"));
     }
 
+    /**
+     * Show debug info
+     *
+     * @param bool|string $debug Debug level: true - show database queries, 'explain' - show database database queries and explain info
+     *
+     * @return void
+     */
     static function debug($debug=true){
         self::$debug=$debug;
     }
 
+    /**
+     * Add core error and return false
+     *
+     * @param int $code Error number
+     * @param string $desr Error description
+     *
+     * @return bool
+     */
     static function error($code,$desr){
         self::$errors[]=array('code'=>$code,'desc'=>$desr);
         return false;
     }
 
+    /**
+     * Return applications array
+     *
+     * @param array $params Params to filter, sort and limit applications list
+     *
+     * @return array
+     */
     public static function getApps($params=array()){
         if(empty($params)) return self::$app;
         $sql="SELECT id,name,domain,alias,template_id FROM apps";
@@ -104,10 +142,17 @@ class E{
         if(!$type=self::getType($params['type'])) return false;
         if(!$types=self::getFullType($type['id'])) return false;
 
+        $fields=array();
         foreach($types as $i=>$t){
             $types[$i]['table']=self::getTypeTableName($t);
-            if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) unset($types[$i]);
+            if(!self::$db->q("SHOW TABLES LIKE '".$types[$i]['table']."'",self::$debug)) {
+                unset($types[$i]);
+                continue;
+            }
+            $types[$i]['fields']=self::getTypeFields($t);
+            $fields=array_merge($fields, $types[$i]['fields']);
         }
+        if(empty($types)) return array();
 
         if(!empty($params['count']))
         {
@@ -157,9 +202,23 @@ class E{
         if(isset($params['limit'])){
             if($params['limit']) $sql.="LIMIT ".($params['page']*$params['limit']).",".($params['page']*$params['limit']+$params['limit'])." ";
         }
-        //else $sql.="LIMIT ".($params['page']*30).",".($params['page']*30+30)." ";
         $elements=self::$db->q($sql,self::$debug,false);
         if(!empty($params['count'])) return $elements[0]['count(*)'];
+
+        //Fill multiple fields
+        foreach($types as $i=>$type){
+            foreach($type['fields'] as $field){
+                if($field['multiple']){
+                    foreach($elements as $j=>$element){
+                        $sql="SELECT ".$field['name']." FROM `multi_".$type['name']."__".$field['name']."` WHERE element_id='".$element['id']."'";
+                        $rows=self::$db->q($sql,self::$debug,false);
+                        $elements[$j][$field['name']]=array();
+                        foreach($rows as $row) $elements[$j][$field['name']][]=$row[$field['name']];
+                    }
+                }
+            }
+        }
+
         return $elements;
     }
 
@@ -168,7 +227,35 @@ class E{
         return $elements[0];
     }
 
+    static function getSelectList($params){
+        if(!$elements=self::get($params)) return false;
+        foreach($elements as $i=>$element){
+            unset($element['id']);
+            unset($element['type_id']);
+            unset($element['app_id']);
+            unset($element['element_id']);
+            $elements[$i]['option_name']=implode(' ',$element);
+        }
+        return $elements;
+    }
+
     public static function set($params=array()){
+        //Batch set
+        if(is_array($params['id'])){
+            if(count($params['id'])>1){
+                foreach($params['id'] as $id){
+                    $params['id']=$id;
+                    //Ignore empty fields
+                    foreach($params['fields'] as $i=>$field) {
+                        if(empty($field)) unset($params['fields'][$i]);
+                    }
+                    $ret[]=self::set($params);
+                    return $ret;
+                }
+            }
+            else $params['id']=$params['id'][0];
+        }
+
         if(!empty($params['type'])){
             $type=self::getType($params['type']);
             $types=self::getFullType($type);
@@ -205,9 +292,27 @@ class E{
             $sql=$prx.$type['table']." SET ";
             $sql.="element_id='".$params['element_id']."'";
             foreach($type['fields'] as $field){
-                $sql.=", `".$field['name']."`=";
-                if(empty($field['val'])&&$field['nullable']) $sql.="NULL";
-                else $sql.="'".$field['val']."'";
+                if($field['multiple']){
+                    if(!is_array($field['val'])) return self::error('21','Value of multiple field "'.$field['name'].'" must be an array, '.gettype($field['val']).' given');
+                    $tbl='multi_'.$type['name'].'__'.$field['name'];
+                    if(!self::$db->q("TRUNCATE TABLE  `$tbl`",self::$debug)) return false;
+                    foreach($field['val'] as $v){
+                        if(is_array($v)&&$field['type']=='elements'){
+                            $v=self::set(array_merge(array('type'=>$field['elements_type']),$v));
+                        }
+                        if(empty($v)&&$field['nullable']) $v="NULL";
+                        else $v="'".$v."'";
+                        if(!self::$db->q("INSERT INTO `$tbl` SET element_id='".$params['element_id']."', ".$field['name']."=".$v,self::$debug)) return false;
+                    }
+                }
+                else{
+                    if(is_array($field['val'])&&$field['type']=='elements'){
+                        $field['val']=self::set(array_merge(array('type'=>$field['elements_type']),$field['val']));
+                    }
+                    $sql.=", `".$field['name']."`=";
+                    if(empty($field['val'])&&$field['nullable']) $sql.="NULL";
+                    else $sql.="'".$field['val']."'";
+                }
             }
             if($prx=="UPDATE ") $sql.=" WHERE `element_id`='".$params['element_id']."'";
             if(!self::$db->q($sql,self::$debug)) return false;
@@ -264,6 +369,13 @@ class E{
         if(!empty($params['view'])&&!is_array($params['view'])) self::error(8,'Incorrect view format');
         if(!empty(self::$errors)) return false;
         $params['name']=mb_strtolower($params['name']);
+        if(!empty($params['id'])) {
+            $type=self::getType($params['id']);
+            if($params['name']!=$type['name']) {
+                if(!self::$db->q("RENAME TABLE  `".self::getTypeTableName($type)."` TO  `".self::getTypeTableName(array_merge($type,array('name'=>$params['name'])))."`",self::$debug)) return self::error('9','Type table rename error');
+            }
+        }
+
 
         $sql=(empty($params['id']) ? 'INSERT '.'INTO' : 'UPDATE')." types SET `parent`=".(empty($params['parent']) ? "NULL" : "'".$params['parent']."'").", `group`=".(empty($params['group']) ? "NULL" : "'".$params['group']."'").", `name`='".$params['name']."'";
         if(!empty($params['id'])) $sql.=" WHERE id='".$params['id']."'";
@@ -277,12 +389,13 @@ class E{
         else return true;
     }
 
-    static function deleteType($type_id){
+    static function deleteType($type){
         //Deleting type elements
-        self::clearType($type_id);
-
+        $type=self::getType($type);
+        self::clearType($type['id']);
+        self::$db->q("DROP TABLE `".$type['table']."`",self::$debug);
         //Deleting type
-        return self::$db->q("DELETE FROM `types` WHERE `id`='".$type_id."'",self::$debug);
+        return self::$db->q("DELETE FROM `types` WHERE `id`='".$type['id']."'",self::$debug);
     }
 
     static function clearType($type_id){
@@ -292,6 +405,7 @@ class E{
     }
 
     static function setField($type,$params){
+        self::debug();
         if(preg_match("/[^(\w)|(\-)]/",$params['name']))  return self::error(7,'Field name may contain only latin letters and _ or - symbols');
 
         $type=self::getType($type);
@@ -303,27 +417,83 @@ class E{
             ) ENGINE = INNODB DEFAULT CHARSET = utf8";
             self::$db->q($sql,self::$debug);
         }
-        if(!empty($params['old_name'])) {
-            $field=self::getField($type,$params['old_name']);
-            if($field['type']==='elements'){
-                //DROP OLD KEY
-                $sql="
-                    SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
-                    FROM information_schema.TABLE_CONSTRAINTS i
-                    LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
-                    WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
-                    AND k.COLUMN_NAME = '".$field['name']."'
-                    AND i.TABLE_SCHEMA = DATABASE()
-                    AND i.TABLE_NAME = '".$table."'";
-                $foreign_keys=self::$db->q($sql,self::$debug,false);
-                foreach($foreign_keys as $key){
-                    self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+
+        if(!empty($params['old_name'])&&$params['old_name']!=$params['name']) {
+            //DROP OLD KEY
+            $sql="
+                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                FROM information_schema.TABLE_CONSTRAINTS i
+                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                AND k.COLUMN_NAME = '".$params['old_name']."'
+                AND i.TABLE_SCHEMA = DATABASE()
+                AND i.TABLE_NAME = '".$table."'";
+            $foreign_keys=self::$db->q($sql,self::$debug,false);
+            foreach($foreign_keys as $key){
+                self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+            }
+
+            //Drop all indexes for this field if exist
+            if($indexes=self::$db->q("SHOW INDEX FROM `".$table."` WHERE Column_name='".$params['old_name']."'",self::$debug,false)){
+                foreach($indexes as $index){
+                    self::$db->q("ALTER TABLE `".$table."` DROP INDEX  `".$index['Key_name']."`",self::$debug);
                 }
             }
         }
 
         if(isset($params['hide'])&&$params['hide']!='') $extra['hide']=$params['hide'];
         if(!empty($params['placeholder'])) $extra['placeholder']=$params['placeholder'];
+
+        if(!empty($params['multiple'])) {
+            $extra['multiple']=$params['multiple'];
+            $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
+            $sql.='INT(11) NOT NULL';
+            $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
+            if(!empty($extra)) $sql.=" COMMENT '".my_json_encode($extra)."'";
+            if(!self::$db->q($sql,self::$debug)) return false;
+
+            unset($extra['multiple']);
+            $table='multi_'.$type['name'].'__'.$params['name'];
+            if(!self::$db->q("SHOW TABLES LIKE '".$table."'",self::$debug)){
+                $params['act']='add';
+                $sql="CREATE TABLE  ".$table." (
+                id INT( 11 ) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                element_id INT( 11 ) NOT NULL
+                ) ENGINE = INNODB DEFAULT CHARSET = utf8";
+                if(!self::$db->q($sql,self::$debug)) return false;
+            }
+        }
+        elseif($params['act']!='add'){
+            $mtable='multi_'.$type['name'].'__'.$params['name'];
+            if(self::$db->q("SHOW TABLES LIKE '".$mtable."'",self::$debug)){
+                if(!self::$db->q("DROP TABLE  `".$mtable."`",self::$debug)) return false;
+            }
+        }
+
+        //Drop index and FOREIGN KEY
+        if($params['act']!='add'){
+            //Drop FOREIGN KEY if exist
+            $sql="
+                    SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                    FROM information_schema.TABLE_CONSTRAINTS i
+                    LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                    WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                    AND k.COLUMN_NAME = '".$params['name']."'
+                    AND i.TABLE_SCHEMA = DATABASE()
+                    AND i.TABLE_NAME = '".$table."'";
+            $foreign_keys=self::$db->q($sql,self::$debug,false);
+            foreach($foreign_keys as $key){
+                self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+            }
+            if($params['type']!='elements'){
+                //Drop all indexes for this field if exist
+                if($indexes=self::$db->q("SHOW INDEX FROM `".$table."` WHERE Column_name='".$params['name']."'",self::$debug,false)){
+                    foreach($indexes as $index){
+                        self::$db->q("ALTER TABLE `".$table."` DROP INDEX  `".$index['Key_name']."`",self::$debug);
+                    }
+                }
+            }
+        }
 
         $sql="ALTER TABLE  ".$table." ".($params['act']=='add' ? 'ADD' :'CHANGE `'.$params['old_name'].'`')." `".$params['name']."` ";
         if($params['type']=='varchar')
@@ -344,17 +514,20 @@ class E{
             foreach($params['enum']['list'] as $i=>$item) $params['enum']['list'][$i]="'$item'";
             $sql.="ENUM(".implode(',',$params['enum']['list']).") NOT NULL";
         }
+        elseif($params['type']=='date')
+            $sql.='DATE NOT NULL';
         elseif($params['type']=='datetime')
             $sql.='DATETIME NOT NULL';
         elseif($params['type']=='elements'){
             $sql.='INT(11) NULL';
             $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
-            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!empty($extra)) $sql.=" COMMENT '".my_json_encode($extra)."'";
+            if(!empty($params['after'])) $sql.=" AFTER  `".$params['after']."`";
             if(!self::$db->q($sql,self::$debug)) return false;
-            if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
+            if(!self::$db->q("SHOW INDEX FROM `".$table."` WHERE Column_name='".$params['name']."'",self::$debug)){
+                if(!self::$db->q('ALTER TABLE  '.$table.' ADD INDEX (`'.$params['name'].'`)',self::$debug)) return false;
+            }
             $params['elements_type']=self::getTypeTableName($params['elements_type']);
-            //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_phones (`element_id`) ON DELETE SET NULL ON UPDATE CASCADE;
-            //ALTER TABLE et_content_products ADD FOREIGN KEY (brand) REFERENCES et_content_products_phones (element_id) ON DELETE SET NULL ON UPDATE CASCADE
             if(!self::$db->q('ALTER TABLE  '.$table.' ADD FOREIGN KEY (`'.$params['name'].'`) REFERENCES  '.$params['elements_type'].' (element_id) ON DELETE SET NULL ON UPDATE CASCADE',self::$debug)) return false;
             $sql=false;
         }
@@ -364,21 +537,22 @@ class E{
         }
 
         if($sql){
-            //print_r($extra);
             $sql.=(!empty($params['default']) ? " DEFAULT '".$params['default']."'" : "");
-            if(!empty($extra)) $sql.=" COMMENT '".json_encode($extra)."'";
+            if(!empty($extra)) $sql.=" COMMENT '".my_json_encode($extra)."'";
+            if(!empty($params['after'])) $sql.=" AFTER  `".$params['after']."`";
             if(!self::$db->q($sql,self::$debug)) return false;
         }
 
         if($params['lang']!=$params['name']&&!empty($params['lang'])){
             return self::setTranslate($params['name'],$params['lang']);
         }
+        self::debug(false);
         return true;
     }
 
     static function setTypeOpt($name,$value,$type_id){
         $opt=self::getTypeOpt($type_id,$name);
-        if(is_array($value)) $value=json_encode($value);
+        if(is_array($value)) $value=my_json_encode($value);
         $sql=(empty($opt) ? "INSERT INTO" : "UPDATE")." `types_settings` SET `name`='$name', `value`='".$value."' ";
         if(empty($opt)) $sql.=", `type_id`='$type_id'";
         else $sql.="WHERE `name`='$name' AND `type_id`='$type_id'";
@@ -387,6 +561,7 @@ class E{
     }
 
     public static function deleteTypeField($type,$field_name){
+        E::debug();
         $type=self::getType($type);
         if(is_array($field_name)){
             $return=array();
@@ -396,6 +571,19 @@ class E{
             return $return;
         }
         $table=self::getTypeTableName($type);
+        //DROP OLD KEY
+        $sql="
+                SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME, i.CONSTRAINT_NAME
+                FROM information_schema.TABLE_CONSTRAINTS i
+                LEFT JOIN information_schema.KEY_COLUMN_USAGE k ON i.CONSTRAINT_NAME = k.CONSTRAINT_NAME
+                WHERE i.CONSTRAINT_TYPE = 'FOREIGN KEY'
+                AND k.COLUMN_NAME = '".$field_name."'
+                AND i.TABLE_SCHEMA = DATABASE()
+                AND i.TABLE_NAME = '".$table."'";
+        $foreign_keys=self::$db->q($sql,self::$debug,false);
+        foreach($foreign_keys as $key){
+            self::$db->q('ALTER TABLE  '.$table.' DROP FOREIGN KEY  '.$key['CONSTRAINT_NAME'],self::$debug);
+        }
         return self::$db->q("ALTER TABLE ".$table." DROP `".$field_name."`",self::$debug);
     }
 
@@ -422,7 +610,9 @@ class E{
         if(!empty($filter)){
             $sql.="WHERE ".$filter;
         }
-        return self::$db->q($sql,self::$debug,false);
+        if(!$types=self::$db->q($sql,self::$debug,false)) return self::error('2','Type not found');
+        foreach($types as $i=>$type) $types[$i]['table']=self::getTypeTableName($type);
+        return $types;
     }
 
     static function getTypeOpt($type_id,$option_name=false){
@@ -503,6 +693,13 @@ class E{
         $type=self::getType($type);
         if(empty($type['table'])) $type['table']=self::getTypeTableName($type);
         $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
+        $field=array();
+        if(!empty($column['COLUMN_COMMENT'])) $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
+        if($field['comment']['multiple']) {
+            $type['table']='multi_'.$type['name'].'__'.$column['COLUMN_NAME'];
+            $column=self::$db->q("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='".$type['table']."' AND COLUMN_NAME='$field_name'", self::$debug);
+            $field['comment']=array_merge($field['comment'],json_decode($column['COLUMN_COMMENT'],true));
+        }
         $field['nullable']=($column['IS_NULLABLE']==='YES' ? true : false);
         $field['name']=$column['COLUMN_NAME'];
         $field['type']=$column['DATA_TYPE'];
@@ -514,10 +711,7 @@ class E{
         $field['default']=$column['COLUMN_DEFAULT'];
         $field['position']=$column['ORDINAL_POSITION'];
         $field['key']=$column['COLUMN_KEY'];
-        if(!empty($column['COLUMN_COMMENT'])) {
-            $field['comment']=json_decode($column['COLUMN_COMMENT'],true);
-            $field=array_merge($field, $field['comment']);
-        }
+        if(!empty($field['comment'])) $field=array_merge($field, $field['comment']);
         if($field['key']=='MUL') {
             $sql="
                 SELECT k.REFERENCED_TABLE_NAME, k.REFERENCED_COLUMN_NAME
@@ -530,9 +724,15 @@ class E{
             $inf=self::$db->q($sql,self::$debug);
             if(!empty($inf)) {
                 $field['type']='elements';
-                $field['elements_type']=substr($inf['REFERENCED_TABLE_NAME'],strripos($inf['REFERENCED_TABLE_NAME'],'_')+1);
+                $type_name=substr($inf['REFERENCED_TABLE_NAME'],strpos($inf['REFERENCED_TABLE_NAME'],'_')+1);
+                $field['elements_type']=self::getType($type_name);
+                while(!$field['elements_type']=self::getType($type_name)|(strpos('_',$inf['REFERENCED_TABLE_NAME'])===false)){
+                    $type_name=substr($type_name,strpos($type_name,'_')+1);
+                }
+                $field['elements_type']=$type_name;
             }
         }
+        if($p=strpos('_',$field['name'])!==false) $field['group']=substr($field['name'],0,$p+1);
         return $field;
     }
 
@@ -543,7 +743,7 @@ class E{
         $fields=self::$db->q('SHOW COLUMNS FROM `'.$type['table'].'`',self::$debug);
         foreach($fields as $i=>$field){
             if($field['Field']=='element_id') unset($fields[$i]);
-            else $fields[$i]=self::getField($type,$field['Field'],$table);
+            else $fields[$i]=self::getField($type,$field['Field']);
         }
         return $fields;
     }
@@ -584,13 +784,14 @@ class E{
         if(!empty($tables)){
             $sql.=" AND (";
             foreach($tables as $i=>$table) $sql.=($i ? " OR" : "")." k.REFERENCED_TABLE_NAME = '".$table."'";
+            foreach($types as $type) $sql.=" OR k.REFERENCED_TABLE_NAME LIKE 'multi_".$type['name']."__%'";
             $sql.=")";
         }
         $keys=self::$db->q($sql,self::$debug,false);
-
         $connected_types=array();
         foreach($keys as $key){
-            $connected['type']=self::getType(substr($key['TABLE_NAME'],strripos($key['TABLE_NAME'],'_')+1));
+            //if(strpos('multy_',$key['TABLE_NAME'],))
+            $connected['type']=self::getType(str_replace('et_','',$key['TABLE_NAME']));
             $connected['field']=$key['COLUMN_NAME'];
             $connected_types[]=$connected;
         }
@@ -613,6 +814,7 @@ class E{
     public static function translate($text,$ucfirst='auto',$lang='en'){
         mb_internal_encoding('utf-8');
         $text=trim((string)$text);
+        $text=str_replace('_',' ',$text);
         if($ucfirst==='auto') $ucfirst=ctype_upper(substr($text,0,1));
         if($lang==self::$lang) { //Do not translate
             if($ucfirst) return mb_ucfirst($text);
@@ -627,7 +829,7 @@ class E{
             if(!empty($translate)) {
                 //if($translate==$text) return $translate;
                 self::$db->q("INSERT INTO `lang` SET `".$lang."`='".$text."', `".self::$lang."`='".$translate."'",self::$debug);
-                return $translate;
+                $text=$translate;
             }
             /*//Try translate by word
                 $words=explode(' ',$text);
@@ -637,10 +839,12 @@ class E{
                 foreach($words as $word) $text.=self::translate($word).' ';
             }*/
         }
+        if(!empty($_COOKIE['langMenu'])) $text='<span class="lang">'.$text.'</span>';
         return trim($text);
     }
 
     static function setTranslate($en,$translate,$lang=''){
+        $en=trim(str_replace('_',' ',$en));
         if(empty($lang)) $lang=self::$lang;
         if(!empty($translate)){
             $sql="SELECT count(*) FROM `lang` WHERE `en`='$en'";

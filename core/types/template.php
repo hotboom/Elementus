@@ -1,5 +1,5 @@
 <?
-class Template extends E{
+class T extends E{
     static $id;
     static $path;
     static $name;
@@ -8,7 +8,7 @@ class Template extends E{
     static function init(){
         self::$id=parent::$template['id'];
         self::$name=parent::$template['name'];
-        self::$path=parent::$template['path'];
+        self::$path=self::$templates_dir.'/'.parent::$template['path'];
     }
 
     static function page($params){
@@ -21,4 +21,5 @@ class Template extends E{
         include($template);
     }
 }
+class_alias('T', 'Template');
 ?>

@@ -5,6 +5,7 @@ $type=E::getType($field['elements_type']);
 $type['class']=E::getTypeClass($type['name']);
 $fields=E::getTypeFields($type['id']);
 $type['tree']=false;
+
 /*oreach($fields as $field){
     if($field['elements_type']==$type['name']) {
         $type['tree']=$field;
@@ -16,30 +17,30 @@ $type['class']=E::getTypeClass($type);
 $params=array('type'=>$type['id'],'subtypes'=>true,'limit'=>999);
 $count=E::count($params);
 
-if($count<=100) $elements=$type['class']['name']::get($params);
+if($count<=100) $elements=$type['class']['name']::getSelectList($params);
 else {
-    if(!empty($data['value'])) $elements=$type['class']['name']::get($data['value']);
+    if(!empty($data['value'])) $elements=$type['class']['name']::getSelectList($data['value']);
     else $elements=array();
 }
 
 ?>
 <? if(!$type['tree']):?>
-<select name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$data['field']['name'] : $data['id'])?>" class="form-control selectpicker" data-field="<?=$data['field']['name']?>" <?=($count>100 ? 'data-ajax-search="/admin/index.php?page=api&method=get&params[type]='.$type['name'].'"' : '')?> data-live-search="true">
-    <? if($field['nullable']):?><option value=""><?=t('not set')?></option><? endif;?>
-    <? foreach($elements as $element):?>
-        <? if(empty($element['name'])){
-            $element['name']=$element['header'];
-            if(empty($element['name'])){
-                $element['name']=$element['id'];
-                foreach($fields as $field){
-                    if($field['type']=='varchar') $element['name'].=' '.$element[$field['name']];
-                }
-            }
-        }
-        ?>
-        <option value="<?=$element['id']?>" <?=($element['id']==$data['value'] ? 'selected':'')?>><?=(empty($element['name']) ? $element['header'] : $element['name'])?></option>
-    <? endforeach;?>
-</select>
+    <? if(!$data['field']['multiple']&&!$data['filter']):?>
+    <div class="input-group">
+    <? endif;?>
+        <select name="<?=$data['name']?>" id="<?=(empty($data['id']) ? 'input_'.$data['field']['name'] : $data['id'])?>" class="form-control selectpicker elements" data-field="<?=$data['field']['name']?>" data-type="<?=$type['id']?>" data-form="/admin/element/act/add/type/" <?=($count>100 ? 'data-ajax-search="/admin/index.php?page=api&method=get&params[type]='.$type['name'].'"' : '')?> data-live-search="true" <?=(!empty($data['field']['placeholder']) ? 'title="'.$data['field']['placeholder'].'"' : '')?>>
+            <? if($field['nullable']):?><option value=""><?=(!empty($data['field']['placeholder']) ? $data['field']['placeholder'] : t('not set'))?></option><? endif;?>
+            <option value="add"><?=t('Add')?>...</option>
+            <? foreach($elements as $element):?>
+                <option value="<?=$element['id']?>" <?=($element['id']==$data['value'] ? 'selected':'')?>><?=$element['option_name']?></option>
+            <? endforeach;?>
+        </select>
+    <? if(!$data['field']['multiple']&&!$data['filter']):?>
+        <span class="input-group-btn">
+            <a href="/admin/index.php?page=element&type=<?=$type['id']?>&act=edit" data-target=".modal-body" class="btn btn-default"><i class="fa fa-edit"></i></a>
+        </span>
+    </div>
+    <? endif;?>
 <? else:
     if(!function_exists('tree')){
         function tree($type, $data, $parent_id=false, $class=false){

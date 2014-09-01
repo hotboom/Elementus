@@ -1,28 +1,29 @@
 <?
 $field=$data['field'];
 $element=$data['element'];
+$path='pages/field_types/';
 ?>
 <? if($field['name']!='password'): ?>
 <div class="form-group">
     <label class="col-lg-2 control-label" for="input<?=$field['name']?>"><?=t($field['name'],true)?></label>
     <div class="col-lg-10">
         <?if($field['type']==='elements'):?>
-            <? Template::render('pages/field_types/elements.php',$data); ?>
+            <? Template::render($path.'elements.php',$data); ?>
         <?elseif($field['type']==='enum'): ?>
-            <? Template::render('pages/field_types/enum.php',$data); ?>
+            <? Template::render($path.'enum.php',$data); ?>
         <?elseif($field['type']==='text'): ?>
-            <? Template::render('pages/field_types/text.php',$data); ?>
+            <? Template::render($path.'text.php',$data); ?>
         <?elseif($field['type']==='html'): ?>
-            <? Template::render('pages/field_types/html.php',$data); ?>
+            <? Template::render($path.'html.php',$data); ?>
         <?elseif($field['type']==='file'|$field['type']==='image'): ?>
-            <? Template::render('pages/field_types/file.php',$data); ?>
-        <?elseif($field['type']==='datetime'): ?>
-            <? Template::render('pages/field_types/datetime.php',$data); ?>
+            <? Template::render($path.'file.php',$data); ?>
+        <?elseif($field['type']==='datetime'|$field['type']==='date'): ?>
+            <? Template::render($path.'datetime.php',$data); ?>
         <?else: ?>
-            <? Template::render('pages/field_types/default.php',$data); ?>
+            <? Template::render($path.'default.php',$data); ?>
         <?endif; ?>
     </div>
 </div>
 <? else: ?>
-    <? Template::render('pages/field_types/password.php',$data); ?>
+    <? Template::render($path.'password.php',$data); ?>
 <? endif;?>

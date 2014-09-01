@@ -102,7 +102,7 @@ else {
                 </div>
                 <div class="form-group" id="group_view_fields">
                     <label for="input_view_fields"><?=t('Delete type')?></label>
-                    <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target="#window" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
+                    <a href="/admin/index.php?page=type_form&act=delete&types[]=<?=$type['id']?>" data-target=".modal-body" class="btn btn-danger pull-right"><?=t('Delete type')?></a>
                 </div>
             </div>
             <button type="submit" class="btn btn-success"><?=t($act)?></button>

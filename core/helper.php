@@ -11,6 +11,38 @@ if(!function_exists('mb_ucfirst')) {
     }
 }
 
+function my_json_encode($arr)
+{
+    //convmap since 0x80 char codes so it takes all multibyte codes (above ASCII 127). So such characters are being "hidden" from normal json_encoding
+    array_walk_recursive($arr, function (&$item, $key) { if (is_string($item)) $item = mb_encode_numericentity($item, array (0x80, 0xffff, 0, 0xffff), 'UTF-8'); });
+    return mb_decode_numericentity(json_encode($arr), array (0x80, 0xffff, 0, 0xffff), 'UTF-8');
+
+}
+
+function date_rus($date=false){
+    if(!$date) $date=date("d.m.Y");
+    else{
+        if(is_numeric($date)) $date=date("d.m.Y",$date);
+        else $date=date("d.m.Y",strtotime($date));
+    }
+    $date=explode(".", $date);
+    switch ($date[1]){
+        case 1: $m='января'; break;
+        case 2: $m='февраля'; break;
+        case 3: $m='марта'; break;
+        case 4: $m='апреля'; break;
+        case 5: $m='мая'; break;
+        case 6: $m='июня'; break;
+        case 7: $m='июля'; break;
+        case 8: $m='августа'; break;
+        case 9: $m='сентября'; break;
+        case 10: $m='октября'; break;
+        case 11: $m='ноября'; break;
+        case 12: $m='декабря'; break;
+    }
+    return '«'.$date[0].'» '.$m.' '.$date[2].'г.';
+}
+
 function translit($text, $mode='file'){
     $translitRus['а']="a";
     $translitRus['б']="b";

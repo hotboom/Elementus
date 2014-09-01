@@ -11,3 +11,6 @@ $field['id']=(empty($data['id']) ? 'input_'.$field['name'] : $data['id'])
         });
     });
 </script>
+<? if(!empty($data['field']['help'])):?>
+    <span class="help-block"><?=$data['field']['help']?></span>
+<? endif;?>

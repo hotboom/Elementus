@@ -1,4 +1,8 @@
-<? $data['field']['default']=''; ?>
+<?
+$data['field']['default']='';
+$data['filter']=true;
+
+?>
 <?if($data['field']['type']==='elements'):?>
     <? Template::render('pages/field_types/elements.php',$data); ?>
 <?elseif($data['field']['type']==='enum'): ?>

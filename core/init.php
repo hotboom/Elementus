@@ -16,13 +16,13 @@ E::init($db,$root_path);
 require_once($root_path."/core/types/template.php");
 Template::init();
 
-//Sections
-require_once($root_path."/core/types/sections.php");
-S::init();
-
 //Users
 require_once($root_path."/core/types/users.php");
 U::init();
+
+//Sections
+require_once($root_path."/core/types/sections.php");
+S::init();
 
 require_once($root_path."/core/types/products.php");
 

@@ -9,7 +9,8 @@ $query='';
 for($i=0; $i<count($url['path']); $i=$i+2){
     $query.=$url['path'][$i].'='.$url['path'][$i+1].'&';
 }
+parse_str($url['query'],$q);
 parse_str($query,$arr);
-$_GET=array_merge($_GET,$arr);
+$_GET=array_merge($_GET,$arr,$q);
 if(!empty($_GET['page'])) require_once("index.php");
 ?>

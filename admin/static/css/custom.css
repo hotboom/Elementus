@@ -66,3 +66,9 @@ table.selectable #selectAll{margin-right:8px;}
 .loading{background: url(../images/ajax-loader.gif) no-repeat center center;}
 
 .modal-body.loading, #page.loading{min-height: 150px;}
+
+.popover{z-index: 1050;}
+
+.input-group .bootstrap-select .btn{
+    border-top-right-radius: 0px; border-bottom-right-radius: 0px; border-right:0px;
+}

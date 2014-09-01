@@ -18,4 +18,4 @@ function treeTypes($parent_id='NULL',$class='types'){
 }
 treeTypes();
 ?>
-<a href="/admin/index.php?page=type_form" class="btn btn-success" data-target="#window"><i class="fa fa-plus"></i> <?=t('Add new')?></a>
+<a href="/admin/index.php?page=type_form" class="btn btn-success" data-target=".modal-body"><i class="fa fa-plus"></i> <?=t('Add new')?></a>

@@ -23,108 +23,18 @@
         </div><!-- /.modal-body -->
     </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
-<script>
-    $(document).bind("ajaxComplete", function(){
-        //Ajax form submit
-        $('form[data-async]').unbind().submit(function(event) {
-            var form = $(this);
-            var target = $(form.attr('data-target'));
-
-            $.ajax({
-                type: form.attr('method'),
-                url: form.attr('action'),
-                data: form.serialize(),
-                beforeSend: function(xhr) {
-                    target.find('*').hide();
-                    target.addClass('loading');
-                },
-                success: function(data, status) {
-                    target.removeClass('loading');
-                    target.html(data);
-                }
-            });
-            event.preventDefault();
-        });
-
-        //Ajax links
-        $('a[data-target]').unbind().click(function(event){
-            target=$(this).attr('data-target');
-            url=$(this).attr('href');
-            $('table.selectable input:checked').each(function(){
-                url=url+'&'+$(this).attr('name')+'='+$(this).val();
-            });
-            $(target+' .modal-body > *').remove();
-            $(target+' .modal-body').addClass('loading');
-            $(target).modal('show');
-            $.ajax({
-                url: url,
-                cache:false,
-                success: function(data){
-                    $(target+' .modal-body').removeClass('loading');
-                    $(target+' .modal-body').html(data);
-                }
-            });
-            event.preventDefault();
-        });
-
-        var table=$('table.selectable tbody');
-
-        table.unbind().on('click','tr', function(event){
-            var checkbox=$(this).find('input[type=checkbox]');
-            checkbox.click();
-            event.preventDefault();
-        });
-
-        table.on('click','tr input[type=checkbox]',function(event){
-            //console.log($(this));
-            var tr=$(this).parents('tr');
-            tr.toggleClass('active');
-            if($('table.selectable tr.active').size()){
-                $('#btn-edit').removeClass('disabled');
-                $('#btn-copy').removeClass('disabled');
-                $('#btn-delete').removeClass('disabled');
-            }
-            else{
-                $('#btn-edit').addClass('disabled');
-                $('#btn-copy').addClass('disabled');
-                $('#btn-delete').addClass('disabled');
-            }
-            event.stopPropagation();
-        });
-
-        table.on('dblclick', 'tr', function(event){
-            $('table.selectable input[type=checkbox]').attr('checked',false).parents('tr.active').toggleClass('active');
-            var checkbox=$(this).find('input[type=checkbox]');
-            checkbox.click();
-            $('#btn-edit').click();
-            event.preventDefault();
-            event.stopPropagation();
-        });
-
-        $("table tr.filter th input[type='text']").keypress(function(e){
-            if(e.which==13) {
-                console.log(location.hash);
-                location.hash='#/type/id/7';
-                e.preventDefault();
-            }
-
-        });
-
-        $('#selectAll').click(function(e){
-            table.find('input[type=checkbox]').click();
-        });
-
-        $('.selectpicker').selectpicker({
-            'selectedText': 'cat'
-        });
-
-        $.fn.preload = function() {
-            this.each(function(){
-                $('<img/>')[0].src = this;
-            });
-        }
-        $(['/admin/static/images/ajax-loader.gif','/admin/static/images/ajax-loader_small.gif']).preload();
-    });
-</script>
+<div id="lang_form" style="display: none;">
+    <form class="form-inline" role="form">
+        <div class="form-group">
+            <label class="sr-only" for="input_en">En:</label>
+            <input type="email" class="form-control" name="en" id="input_en" placeholder="en">
+        </div>
+        <div class="form-group">
+            <label class="sr-only" for="input_ru">Ru:</label>
+            <input type="email" class="form-control" name="ru" id="input_ru" placeholder="ru">
+        </div>
+        <button type="submit" class="btn btn-default"><?=t('Save')?></button>
+    </form>
+</div>
 </body>
 </html>

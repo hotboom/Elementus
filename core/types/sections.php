@@ -22,6 +22,15 @@ class S extends E{
             }
         }
         else self::$section=self::getByPath('main');
+
+        //Access check
+        if(!empty(self::$section['access'])){
+            if(U::$user['group']['id']!=self::$section['access']&&U::$user['group']['parent']!=self::$section['access']){
+                header('HTTP/1.0 401 - Access denied');
+                S::$section['template']='login';
+            }
+        }
+
         self::$section['parents']=self::getParents(S::$section['id']);
         foreach(self::$section['parents'] as $i=>$parent) self::$section['parents'][$i]=S::getById($parent);
         self::$section['parents']=array_reverse(self::$section['parents']);
@@ -29,12 +38,50 @@ class S extends E{
 
     static function get($params=array()){
         $params['type']='sections';
-        return parent::get($params);
+        $params['order']='order';
+        $sections=parent::get($params);
+        if(!empty($params['parent_id'])){
+            $parent=self::getById($params['parent_id']);
+        }
+        foreach($sections as $i=>$section){
+            if(empty($section['link'])) $sections[$i]['link']='/'.$section['path'].'/';
+            if(empty($section['template'])&&!empty($parent)) $sections[$i]['template']='/'.$parent['template'].'/';
+            if(S::$section['id']==$section['id']) $sections[$i]['selected']=true;
+        }
+        return $sections;
+    }
+
+    static function getSelectList($params){
+        if(!$elements=self::get($params)) return false;
+        foreach($elements as $i=>$element){
+            $elements[$i]['option_name']=$element['name'];
+        }
+        return $elements;
     }
 
     static function set($params){
+        if(is_array($params['id'])){
+            if(count($params['id'])>1){
+                foreach($params['id'] as $id){
+                    $params['id']=$id;
+                    //Ignore empty fields
+                    foreach($params['fields'] as $i=>$field) {
+                        if(empty($field)) unset($params['fields'][$i]);
+                    }
+                    $ret[]=self::set($params);
+                    return $ret;
+                }
+            }
+            else $params['id']=$params['id'][0];
+        }
+
         $params['type']=1;
         if(empty($params['path'])) $params['path']=mb_strtolower(translit($params['name']));
+        $c=parent::count(array(
+            'type'=>1,
+            'filter'=>"path='".$params['path']."'".(!empty($params['id']) ? " AND element_id!='".$params['id']."'" : "")
+        ));
+        if($c) return self::error('4','Path '.$params['path'].' used by another section');
         return parent::set($params);
     }
 
@@ -55,6 +102,7 @@ class S extends E{
         //E::debug();
         if(empty($parent_id)) $params['filter']="parent_id is NULL";
         else $params['filter']="parent_id='".$parent_id."'";
+        $params['filter'].=" AND `show`=1";
         $params['order']='order';
         return self::get($params);
     }

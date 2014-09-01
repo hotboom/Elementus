@@ -8,3 +8,6 @@ $element=$data['element'];
         <option value="<?=$val?>" <?=($val==$data['value']|$val==$field['default'] ? 'selected':'')?>><?=$val?></option>
     <? endforeach;?>
 </select>
+<? if(!empty($data['field']['help'])):?>
+    <span class="help-block"><?=$data['field']['help']?></span>
+<? endif;?>

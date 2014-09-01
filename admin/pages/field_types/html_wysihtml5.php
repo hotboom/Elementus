@@ -15,3 +15,6 @@ $element=$data['element'];
         parserRules:  wysihtml5ParserRules
     });
 </script>
+<? if(!empty($data['field']['help'])):?>
+    <span class="help-block"><?=$data['field']['help']?></span>
+<? endif;?>
